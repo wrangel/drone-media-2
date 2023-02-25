@@ -1,0 +1,38 @@
+/* CSS Document */
+
+.sidebar {
+	background-color: transparent;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	top: 50px; /* 55px */
+	width: 72px;
+	z-index: 200;
+	padding-top: 5px;
+}
+
+.sidebar-link {
+	height: 74px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	text-decoration: none;
+	cursor: pointer;
+	z-index: 1;
+}
+
+.sidebar-link:hover {
+	background-color: var(--sidebarcolor);
+}
+
+.sidebar-link img {
+	height: 24px;
+	margin-bottom: 4px;
+	filter: invert(100%);
+}
+
+.sidebar-link div {
+	font-size: 10px;
+	color: white;
+}

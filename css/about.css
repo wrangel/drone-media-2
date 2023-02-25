@@ -1,0 +1,40 @@
+/* CSS Document */
+:root {
+	--sidebarcolor: cornflowerblue;
+	--color: blue; /* #551A8B */
+	--fontcolor: whitesmoke;
+}
+
+body {
+	background: url("../media/about/100_0186.webp") no-repeat center center fixed; 
+  	-webkit-background-size: cover;
+  	-moz-background-size: cover;
+  	-o-background-size: cover;
+  	background-size: cover;
+}
+
+.container {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: var(--fontcolor);
+	text-align: center;
+	/*mix-blend-mode: difference;*/ /* brilliant: change font according to ANY background */
+}
+
+h1,
+h2,
+p {
+	font-weight: 300;
+}
+
+a:link,
+a:visited {
+	color: var(--fontcolor);
+	text-decoration: none;
+}
+
+a:hover {
+	color: var(--color);
+}

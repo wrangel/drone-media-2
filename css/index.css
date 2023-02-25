@@ -1,0 +1,23 @@
+/* CSS Document */
+:root {
+	--sidebarcolor: cornflowerblue;
+	--color: cornflowerblue;
+}
+
+body {
+	background: url("../media/home/100_0148.webp") no-repeat center center fixed; 
+  	-webkit-background-size: cover;
+  	-moz-background-size: cover;
+  	-o-background-size: cover;
+  	background-size: cover;
+}
+
+h1 {
+	position: fixed;
+	top: 27%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 3.6rem;
+	color: var(--color);
+	font-weight: 300;
+}

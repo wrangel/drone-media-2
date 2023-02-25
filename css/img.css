@@ -1,0 +1,19 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  background-color: black;
+}
+
+.bg-image {
+  /* The image used is passed on from the html */
+  background-image: var(--image);
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain; /*cover crops image if necessary, contain maintains original aspect ratio (always shows entire image) */
+  background-position: center center;
+}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%- include('../partials/_head') %>
+		<link rel="stylesheet" href="css/img.css">
+	</head>
+
+	<body>
+		<script>
+			/* Get the passed-on parameters */
+			const image_type = '<%-type%>'
+			const image_name = '<%-img%>'
+			const style = "--image: url('../media/" + image_type + '/' + image_name + ".webp')"
+			
+			/* Add a div to the body which acts as the container for the background image */
+			const el = document.createElement('div');
+			el.className = "bg-image"
+			el.style = style
+			document.body.appendChild(el)
+		</script>	
+	</body>
+</html>

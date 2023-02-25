@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+	<head>
+		<%- include('../partials/_head') %>
+		<%- include('../partials/_head-pano-viewer') %>
+		<link rel="stylesheet" href="css/pano-viewer.css">
+	</head>
+	
+	<body>
+		<%- include('../partials/_pano-icons') %>
+		
+		<!-- create a viewer container with a defined size -->
+		<div class="outer-box">
+			<div id="viewer"></div>
+		</div>
+
+		<!-- Pass EJS variable from server to client, run the client-side PSV -->
+		<script>const img = '<%-img%>'</script>
+		<script src="js/pano-viewer.js"></script>
+	</body>
+</html>

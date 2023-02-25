@@ -1,0 +1,27 @@
+/* CSS Document */
+html, body {
+  	margin: 0px;
+	height: 100%;
+}
+
+.outer-box {
+  	width: 100%;
+ 	height: 100%;
+ 	display: table;
+}
+
+#viewer {
+	width: 100vw; 
+	height: 100vh;
+	text-align: center;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.psv-navbar {
+	background-color: transparent;
+}
+
+.psv-panel-menu {
+  height: 50%;
+}
