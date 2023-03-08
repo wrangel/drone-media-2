@@ -13,8 +13,12 @@ const port = 8080
 // Set and export directories
 const mediaDir = path.join(__dirname, 'media')
 const mediaFolders = ['hdr', 'pano', 'wide_angle']
-const rawMediaRepo = '~/SynologyDrive/Matthias/DJI/'
+const rawMediaRepo = '/Users/matthiaswettstein/SynologyDrive/Matthias/DJI/'
+const rawMediaPrefix = 'Einzelfotos'
+const rawMediaSuffix = '.tif'
 module.exports = { mediaDir, mediaFolders }
+
+filterDots = file => !file.startsWith('.')
 
 // PREPARATIONS
 // Get existing media
@@ -23,11 +27,13 @@ mediaFolders.forEach(
   mediaFolder => {
     let fullPath = path.join(mediaDir, mediaFolder)
     let fileObjs = fs.readdirSync(fullPath, { withFileTypes: false })
-      .filter(file => !file.startsWith('.'))
+      .filter(filterDots)
       .map(file => ({key: file.substring(0, file.lastIndexOf('.')), folder: mediaFolder}))
     existingMedia = existingMedia.concat(fileObjs)
   }
 )
+
+
 
 async function main() {
   // Get all existing metadata on db
@@ -36,10 +42,28 @@ async function main() {
     .map(element => element.name)
 
     // Get all images which are newly added to the web app
-    const res = existingMedia.filter(({key}) => !existingMetadata.includes(key))
+    const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
 
-    console.log(res)
+    newMedia.forEach (
+      medium => {
+        let folder = medium.folder
+        let id = medium.key
+        if (folder == "hdr") {
+          let originalFile = path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
+          //console.log(originalFile)
+        }
+        else {
+          let filePath = path.join(rawMediaRepo, folder, rawMediaPrefix, id)
+          let firstFile = fs.readdirSync(filePath, { withFileTypes: false })
+            .filter(filterDots = file => !file.startsWith('.'))[0]
+          console.log(folder, firstFile)
+        }
+      }   
+    )
 }
+
+// dji_fly_20221226_104714-HDR
+// dji_fly_20230122_150408-HDR
 
 main()
 
