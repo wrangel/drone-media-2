@@ -16,30 +16,25 @@ const mediaFolders = ['hdr', 'pano', 'wide_angle']
 module.exports = { mediaDir, mediaFolders }
 
 // PREPARATIONS
-// Store new file's metadata in DB
-
-let r = []
-
-let a = mediaFolders.map(
-  mediaFolder => {
-    fs.readdir(path.join(mediaDir, mediaFolder), (err, files) => {
-      let a = files.filter(file => !file.startsWith('.'))
-    })
-  }
-)
-
-allExistingMedia = []
+// Get existing media
+let allExistingMedia = []
 mediaFolders.forEach(
   mediaFolder => {
-    const fileObjs = fs.readdirSync(path.join(mediaDir, 'hdr'), { withFileTypes: false })
+    const fileObjs = fs.readdirSync(path.join(mediaDir, mediaFolder), { withFileTypes: false })
       .filter(file => !file.startsWith('.'))
+      .map(file => file.substring(0, file.lastIndexOf('.')))
     allExistingMedia = allExistingMedia.concat(fileObjs)
-
   }
 )
 
-
 console.log(allExistingMedia)
+
+
+// Store new file's metadata in DB
+
+
+
+
 
 /*
 
