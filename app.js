@@ -13,6 +13,7 @@ const port = 8080
 // Set and export directories
 const mediaDir = path.join(__dirname, 'media')
 const mediaFolders = ['hdr', 'pano', 'wide_angle']
+const rawMediaRepo = '~/SynologyDrive/Matthias/DJI/'
 module.exports = { mediaDir, mediaFolders }
 
 // PREPARATIONS
@@ -23,15 +24,10 @@ mediaFolders.forEach(
     let fullPath = path.join(mediaDir, mediaFolder)
     let fileObjs = fs.readdirSync(fullPath, { withFileTypes: false })
       .filter(file => !file.startsWith('.'))
-      .map(file => [file.substring(0, file.lastIndexOf('.')), path.join(fullPath, file)])
-    
+      .map(file => ({key: file.substring(0, file.lastIndexOf('.')), folder: mediaFolder}))
     existingMedia = existingMedia.concat(fileObjs)
   }
 )
-existingMedia = new Map(existingMedia)
-
-console.log(existingMedia)
-/* 
 
 async function main() {
   // Get all existing metadata on db
@@ -39,8 +35,17 @@ async function main() {
     .select('name -_id'))
     .map(element => element.name)
 
-  // Get all images which are newly added to the web app
-  const newMedia = existingMedia.filter(x => !existingMetadata.includes(x))
+    // Get all images which are newly added to the web app
+    const res = existingMedia.filter(({key}) => !existingMetadata.includes(key))
+
+    console.log(res)
+}
+
+main()
+
+
+/*
+
   // Store new file's metadata in DB
   newMedia.forEach(
     file => {
