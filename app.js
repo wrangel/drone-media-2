@@ -33,8 +33,6 @@ mediaFolders.forEach(
   }
 )
 
-
-
 async function main() {
   // Get all existing metadata on db
   const existingMetadata = (await Island.find({})
@@ -44,22 +42,26 @@ async function main() {
     // Get all images which are newly added to the web app
     const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
 
+    originalFiles = []
     newMedia.forEach (
       medium => {
-        let folder = medium.folder
-        let id = medium.key
-        if (folder == "hdr") {
-          let originalFile = path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
-          //console.log(originalFile)
+        const folder = medium.folder
+        const id = medium.key
+        if (folder == mediaFolders[0]) {
+          const originalFile = path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
+          originalFiles.push(originalFile)
         }
         else {
-          let filePath = path.join(rawMediaRepo, folder, rawMediaPrefix, id)
-          let firstFile = fs.readdirSync(filePath, { withFileTypes: false })
-            .filter(filterDots = file => !file.startsWith('.'))[0]
-          console.log(folder, firstFile)
+          const filePath = path.join(rawMediaRepo, folder, rawMediaPrefix, id)
+          // Get the first file in each directory
+          const originalFile = fs.readdirSync(filePath, { withFileTypes: false })
+            .filter(filterDots = file => !file.startsWith('.'))
+            .map(file => path.join(filePath, file))[0]
+          originalFiles.push(originalFile)
         }
       }   
     )
+    console.log(originalFiles)
 }
 
 // dji_fly_20221226_104714-HDR
