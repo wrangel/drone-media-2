@@ -17,46 +17,51 @@ module.exports = { mediaDir, mediaFolders }
 
 // PREPARATIONS
 // Get existing media
-let allExistingMedia = []
+let existingMedia = []
 mediaFolders.forEach(
   mediaFolder => {
-    const fileObjs = fs.readdirSync(path.join(mediaDir, mediaFolder), { withFileTypes: false })
+    let fullPath = path.join(mediaDir, mediaFolder)
+    let fileObjs = fs.readdirSync(fullPath, { withFileTypes: false })
       .filter(file => !file.startsWith('.'))
-      .map(file => file.substring(0, file.lastIndexOf('.')))
-    allExistingMedia = allExistingMedia.concat(fileObjs)
+      .map(file => [file.substring(0, file.lastIndexOf('.')), path.join(fullPath, file)])
+    
+    existingMedia = existingMedia.concat(fileObjs)
   }
 )
+existingMedia = new Map(existingMedia)
 
-console.log(allExistingMedia)
-
-
-// Store new file's metadata in DB
-
-
-
-
-
-/*
-
-const images = ['20230227_203149.jpg'] // TODO: list added media
+console.log(existingMedia)
+/* 
 
 async function main() {
-  // Get all images which are newly added to the web app 
-  // Get all the fields present on the db
-  const docs = await Island.find({}).select('name -_id')
-  console.log(docs)
+  // Get all existing metadata on db
+  const existingMetadata = (await Island.find({})
+    .select('name -_id'))
+    .map(element => element.name)
 
-  // Write all newly added images into the db
-  
-  for (i in images) {
+  // Get all images which are newly added to the web app
+  const newMedia = existingMedia.filter(x => !existingMetadata.includes(x))
+  // Store new file's metadata in DB
+  newMedia.forEach(
+    file => {
+      module.exports = file
+      require('./saveMetadata')
+    }
+  )
+}
+
+main()
+
+
+
+
+for (i in newMedia) {
     module.exports = images[i]
     require('./saveMetadata')
   }
 
 
-}
 
-main()
 
 
 // ROUTES
