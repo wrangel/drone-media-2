@@ -20,6 +20,13 @@ module.exports = { mediaDir, mediaFolders }
 
 filterDots = file => !file.startsWith('.')
 
+const saveMetadata = (file) => {
+  // Store new file's metadata in DB
+  module.exports = file
+  require('./saveMetadata')
+}
+          
+
 // PREPARATIONS
 // Get existing media
 let existingMedia = []
@@ -42,14 +49,13 @@ async function main() {
     // Get all images which are newly added to the web app
     const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
 
-    originalFiles = []
     newMedia.forEach (
       medium => {
         const folder = medium.folder
         const id = medium.key
         if (folder == mediaFolders[0]) {
           const originalFile = path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
-          originalFiles.push(originalFile)
+          //saveMetadata(originalFile)
         }
         else {
           const filePath = path.join(rawMediaRepo, folder, rawMediaPrefix, id)
@@ -57,11 +63,10 @@ async function main() {
           const originalFile = fs.readdirSync(filePath, { withFileTypes: false })
             .filter(filterDots = file => !file.startsWith('.'))
             .map(file => path.join(filePath, file))[0]
-          originalFiles.push(originalFile)
+            saveMetadata(originalFile)
         }
       }   
     )
-    console.log(originalFiles)
 }
 
 // dji_fly_20221226_104714-HDR
@@ -72,7 +77,7 @@ main()
 
 /*
 
-  // Store new file's metadata in DB
+  
   newMedia.forEach(
     file => {
       module.exports = file

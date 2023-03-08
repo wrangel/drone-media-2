@@ -17,6 +17,7 @@ async function getReverseGeoData(latitude, longitude) {
         lat: latitude,
         lon: longitude
     }))
+    console.log(response)
     return response.json() // parses JSON response into native JavaScript objects
   }
 
