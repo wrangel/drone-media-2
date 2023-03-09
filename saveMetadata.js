@@ -39,7 +39,10 @@ newRawMedia.forEach (
         let metadata = {
             name: prepareName(media),
             dateTime: new Date(),
-            location: { type: "", coordinates: {} },
+            location: {
+                type: "", 
+                coordinates: {} 
+            },
             altitude: "",
             country: "", // JSON data parsed by `data.json()` call
             city: "",

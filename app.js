@@ -10,6 +10,13 @@ const Island = require('././manageDBConnection')
 const app = express()
 const port = 8080
 
+
+
+
+
+
+
+
 // Set and export directories
 const mediaDir = path.join(__dirname, 'media')
 const mediaFolders = ['hdr', 'pano', 'wide_angle']
@@ -18,14 +25,17 @@ const rawMediaPrefix = 'Einzelfotos'
 const rawMediaSuffix = '.tif'
 module.exports = { mediaDir, mediaFolders }
 
+// Filter hidden files
 filterDots = file => !file.startsWith('.')
 
+// Save document to Mongo DB
 const saveMetadata = (files) => {
   // Store new file's metadata in DB
   module.exports = files
   require('./saveMetadata')
 }
           
+
 // PREPARATIONS
 // Get existing media
 let existingMedia = []
@@ -48,6 +58,7 @@ async function main() {
     // Get all images which are newly added to the web app
     const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
 
+    // Loop through media and check if they have been added since the last dump of metadata to the DB
     newRawMedia = []
     newMedia.forEach (
       medium => {
@@ -71,6 +82,7 @@ async function main() {
 }
 
 main()
+
 
 /*
 
