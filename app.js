@@ -26,7 +26,6 @@ const saveMetadata = (files) => {
   require('./saveMetadata')
 }
           
-
 // PREPARATIONS
 // Get existing media
 let existingMedia = []

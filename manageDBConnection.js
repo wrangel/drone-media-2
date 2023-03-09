@@ -15,12 +15,13 @@ const islandSchema = new mongoose.Schema({
   type: String,
   author: String,
   dateTime: Date,
-  coordinates: {},
+  location: {},
+  altitude: String,
   country: String,
   city: String,
   postalCode: String,
+  suburb: String,
   road: String,
-  houseNumber: String,
   noViews: Number
 })
 
