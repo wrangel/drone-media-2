@@ -3,7 +3,7 @@ const express = require('express')
 const path = require('path')
 
 // Load Mongoose model
-const Island = require('././manageDBConnection')
+const Island = require('./src/middleware/manageDBConnection')
 
 // Initialise Express and set port
 const app = express()
@@ -15,7 +15,7 @@ const mediaFolders = ['hdr', 'pano', 'wide_angle']
 module.exports = { mediaDir, mediaFolders }
 
 // Load metadata bookkeeping
-require('././keepMetadataBooks')
+require('./src/middleware/keepMetadataBooks')
 
 
 /*
