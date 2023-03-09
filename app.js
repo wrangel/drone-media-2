@@ -20,9 +20,9 @@ module.exports = { mediaDir, mediaFolders }
 
 filterDots = file => !file.startsWith('.')
 
-const saveMetadata = (file) => {
+const saveMetadata = (files) => {
   // Store new file's metadata in DB
-  module.exports = file
+  module.exports = files
   require('./saveMetadata')
 }
           
@@ -49,56 +49,31 @@ async function main() {
     // Get all images which are newly added to the web app
     const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
 
+    newRawMedia = []
     newMedia.forEach (
       medium => {
         const folder = medium.folder
         const id = medium.key
+        let originalFile 
         if (folder == mediaFolders[0]) {
-          const originalFile = path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
-          //saveMetadata(originalFile)
+          originalFile = path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
         }
         else {
           const filePath = path.join(rawMediaRepo, folder, rawMediaPrefix, id)
           // Get the first file in each directory
-          const originalFile = fs.readdirSync(filePath, { withFileTypes: false })
+          originalFile = fs.readdirSync(filePath, { withFileTypes: false })
             .filter(filterDots = file => !file.startsWith('.'))
             .map(file => path.join(filePath, file))[0]
-            saveMetadata(originalFile)
         }
+      newRawMedia.push(originalFile)
       }   
     )
+    saveMetadata(newRawMedia)
 }
 
-// dji_fly_20221226_104714-HDR
-// dji_fly_20230122_150408-HDR
-
 main()
-
 
 /*
-
-  
-  newMedia.forEach(
-    file => {
-      module.exports = file
-      require('./saveMetadata')
-    }
-  )
-}
-
-main()
-
-
-
-
-for (i in newMedia) {
-    module.exports = images[i]
-    require('./saveMetadata')
-  }
-
-
-
-
 
 // ROUTES
 // Render static files
