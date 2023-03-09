@@ -1,87 +1,21 @@
 // Load Node modules
 const express = require('express')
-const fs = require('fs')
-const path = require('path');
+const path = require('path')
 
-// Load modules
+// Load Mongoose model
 const Island = require('././manageDBConnection')
 
 // Initialise Express and set port
 const app = express()
 const port = 8080
 
-
-
-
-
-
-
-
-// Set and export directories
+// Set and export web app directories
 const mediaDir = path.join(__dirname, 'media')
 const mediaFolders = ['hdr', 'pano', 'wide_angle']
-const rawMediaRepo = '/Users/matthiaswettstein/SynologyDrive/Matthias/DJI/'
-const rawMediaPrefix = 'Einzelfotos'
-const rawMediaSuffix = '.tif'
 module.exports = { mediaDir, mediaFolders }
 
-// Filter hidden files
-filterDots = file => !file.startsWith('.')
-
-// Save document to Mongo DB
-const saveMetadata = (files) => {
-  // Store new file's metadata in DB
-  module.exports = files
-  require('./saveMetadata')
-}
-          
-
-// PREPARATIONS
-// Get existing media
-let existingMedia = []
-mediaFolders.forEach(
-  mediaFolder => {
-    let fullPath = path.join(mediaDir, mediaFolder)
-    let fileObjs = fs.readdirSync(fullPath, { withFileTypes: false })
-      .filter(filterDots)
-      .map(file => ({key: file.substring(0, file.lastIndexOf('.')), folder: mediaFolder}))
-    existingMedia = existingMedia.concat(fileObjs)
-  }
-)
-
-async function main() {
-  // Get all existing metadata on db
-  const existingMetadata = (await Island.find({})
-    .select('name -_id'))
-    .map(element => element.name)
-
-    // Get all images which are newly added to the web app
-    const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
-
-    // Loop through media and check if they have been added since the last dump of metadata to the DB
-    newRawMedia = []
-    newMedia.forEach (
-      medium => {
-        const folder = medium.folder
-        const id = medium.key
-        let originalFile 
-        if (folder == mediaFolders[0]) {
-          originalFile = path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
-        }
-        else {
-          const filePath = path.join(rawMediaRepo, folder, rawMediaPrefix, id)
-          // Get the first file in each directory
-          originalFile = fs.readdirSync(filePath, { withFileTypes: false })
-            .filter(filterDots = file => !file.startsWith('.'))
-            .map(file => path.join(filePath, file))[0]
-        }
-      newRawMedia.push(originalFile)
-      }   
-    )
-    saveMetadata(newRawMedia)
-}
-
-main()
+// Load metadata bookkeeping
+require('././keepMetadataBooks')
 
 
 /*

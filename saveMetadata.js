@@ -1,11 +1,15 @@
 const ExifReader = require('exifreader')
 const path = require('path')
+
+// Get Mongoose model
 const Island = require('./manageDBConnection')
+
+// Define constants
 const reverseGeoCodeURL = 'https://geocode.maps.co/reverse'
 const panoFirstImageName = 'DJI_0001'
 
 // Get media from main
-const newRawMedia = require('./app')
+const newRawMedia = require('./keepMetadataBooks')
 
 // Get reverse geo data
 async function getReverseGeoData(latitude, longitude) {
@@ -50,7 +54,6 @@ newRawMedia.forEach (
             suburb: "",
             road: "",
         }
-        
         // Get the exif data
         ExifReader.load(media)
             .then(data => {
