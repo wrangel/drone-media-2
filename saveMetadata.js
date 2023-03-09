@@ -32,7 +32,6 @@ const prepareName = (filePath) => {
     return correctedName
 }
 
-
 // Loop through media
 newRawMedia.forEach (
     media => {
@@ -40,7 +39,7 @@ newRawMedia.forEach (
         let metadata = {
             name: prepareName(media),
             dateTime: new Date(),
-            location: { type: "", coordinates: [] },
+            location: { type: "", coordinates: {} },
             altitude: "",
             country: "", // JSON data parsed by `data.json()` call
             city: "",
@@ -62,8 +61,8 @@ newRawMedia.forEach (
                     let latitude = data.GPSLatitude.description
                     let longitude = data.GPSLongitude.description
                     metadata.location.type = "Point"
-                    metadata.location.coordinates[0] = latitude
-                    metadata.location.coordinates[1] = longitude
+                    metadata.location.coordinates.latitude = latitude
+                    metadata.location.coordinates.longitude = longitude
                     getReverseGeoData(latitude, longitude).then(
                         data => {
                             // Get the reverse geo data
