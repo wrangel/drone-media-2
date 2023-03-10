@@ -1,7 +1,7 @@
 const glob = require('glob')
 const globParent = require('glob-parent')
 
-
+// Prepare all metadata
 async function grab() {
   // Get all the metadata on the db
   const docs = await __Island.find({})

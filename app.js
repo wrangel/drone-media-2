@@ -1,4 +1,4 @@
-/// PREPARATIONS
+/// PREPARE
 // Load Node modules
 const express = require('express')
 global.__path = require('path')
@@ -12,28 +12,15 @@ global.__mediaPath = __path.join(__dirname, 'media')
 global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
 
 
-/// METADATA MANAGEMENT
+/// MANAGE METADATA
 // Load Mongoose model
 global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 
-// Conduct metadata bookkeeping
+// Prepare the metadata
 require(__path.join(__middlewarePath, 'manageBooks'))
 
-// Get the media and their metadata
-require(__path.join(__middlewarePath, 'getMetadata'))
-  .then(
 
-      a => console.log(a)
-
-  )
-  .catch((error) => { console.log(error) })
-
-
-
-
-
-/*
-/// RENDERING
+/// RENDER
 // Initialise Express and set port
 const app = express()
 const port = 8080
@@ -49,11 +36,11 @@ app.listen(port, (req, res) => {
   console.log(`App is running on port ${port}`)
 })
 
--------------------------------------------------------------------------------- *** GET Routes - display pages ***
+/* *** GET Routes - display pages ***
     Root Route
     --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data from the front-end to the server (usually via a form) typically before a page is rendered and the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
----
+*/
 app.get('/', (req, res, next) => res.render(__path.join(pagesPath, 'index')))
 app.get('/about', (req, res, next) => res.render(__path.join(pagesPath, 'about')))
 
@@ -65,13 +52,20 @@ app.get('/pano-viewer', (req, res, next) => {
   res.render(__path.join(pagesPath, 'pano-viewer'), { img: req.query.img } )
 })
 
-// Route media folders, provide them with 'media' data
-__mediaFolders.forEach(element => {
-  app.get('/' + element, (req, res, next) => {
-    res.render(__path.join(pagesPath, 'media'), {
-        data: media.filter(f => f.type == element)
-    })  
-  })
-})
+// Get the media and their metadata (a Promise)
+require(__path.join(__middlewarePath, 'getMetadata'))
+  .then(
+      media => {
+        // Route media folders, provide them with 'media' data
+        __mediaFolders.forEach(element => {
+          app.get('/' + element, (req, res, next) => {
+            res.render(__path.join(pagesPath, 'media'), {
+                data: media.filter(f => f.type == element)
+            })
+            console.log(media.filter(f => f.type == element))  
+          })
+        })
+      }
+  )
+  .catch((error) => { console.log(error) })
 
-*/
