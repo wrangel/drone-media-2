@@ -20,7 +20,7 @@ async function grab() {
             type: type,
             viewer: viewer,
             author: "", // TODO
-            datetime: dbMetadata.dateTime,
+            dateTime: dbMetadata.dateTime,
             latitude: dbMetadata.location.coordinates.latitude,
             longitude: dbMetadata.location.coordinates.longitude,
             altitude: dbMetadata.altitude,

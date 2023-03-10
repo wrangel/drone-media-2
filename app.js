@@ -62,10 +62,8 @@ require(__path.join(__middlewarePath, 'getMetadata'))
             res.render(__path.join(pagesPath, 'media'), {
                 data: media.filter(f => f.type == element)
             })
-            console.log(media.filter(f => f.type == element))  
           })
         })
       }
   )
   .catch((error) => { console.log(error) })
-

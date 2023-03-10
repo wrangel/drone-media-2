@@ -18,7 +18,7 @@
             <% data.forEach(element => { %>
                 <div>
                     <div class="thumbnail-row">
-                        <a target="_blank" rel="noopener noreferrer" href= <%= element.viewer + "-viewer?type=" + element.type + "&img=" + element.file %> >
+                        <a target="_blank" rel="noopener noreferrer" href= <%= element.viewer + "-viewer?type=" + element.type + "&img=" + element.name %> >
                             <img class="thumbnail" src= <%= "media/thumbnails/" + element.name + ".webp" %> alt="Drone Media Here">
                         </a>
                     </div>
@@ -30,13 +30,21 @@
 							<img class="profile-picture" src="media/author_pictures/elias.webp" alt="Channel Picture Here">
 						</div>
 						<div>
-							<p class="media-title">Zürich &#183; Switzerland</p>
-							<p class="media-stats"><%= element.dateTime %></p>
+							<p class="media-title"><%= element.city %>  &#183; <%= element.country %></p>
+                            <p class="media-stats"><%= element.dateTime %>  &#183; <%= element.altitude %> </p>
+							<p class="media-stats"> 
+                                    <%= element.author %> 
+                                    <%= element.latitude %> 
+                                    <%= element.longitude %> 
+                                    <%= element.postalCode %> 
+                                    <%= element.suburb %> 
+                                    <%= element.road %> 
+                                    <%= element.noViews %> 
+                            </p>
 							<p id="media-counter"></p>
 						</div>
 					</div>
-
-                    
+                
 
                 </div>
             <% }) %>
