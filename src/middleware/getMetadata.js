@@ -2,16 +2,13 @@ const fs = require('fs')
 const Island = require('./manageDb')
 
 
-
-
-
 async function main() {
   // Get all the metadata on the db
   const docs = await Island.find({})
   console.log(docs)
   }
 
-main()
+//main()
 
 
 

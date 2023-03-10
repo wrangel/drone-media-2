@@ -1,8 +1,7 @@
 const ExifReader = require('exifreader')
-const path = require('path')
 
 // Get Mongoose model
-const Island = require('./manageDb')
+const Island = require(__path.join(__middlewarePath, 'manageDb'))
 
 // Define constants
 const reverseGeoCodeURL = 'https://geocode.maps.co/reverse'

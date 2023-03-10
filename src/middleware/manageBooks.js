@@ -1,11 +1,4 @@
 const fs = require('fs')
-const path = require('path')
-
-// Get web app directories
-const {mediaPath, mediaFolders} = require('../../app')
-
-// Load Mongoose model
-const Island = require('./manageDb')
 
 // Define path constants
 const rawMediaRepo = '/Users/matthiaswettstein/SynologyDrive/Matthias/DJI/'
@@ -19,14 +12,14 @@ filterDots = file => !file.startsWith('.')
 const saveMetadata = (files) => {
   // Store new file's metadata in DB
   module.exports = files
-  require('./saveMetadata')
+  require(path.join(__middlewarePath, 'saveMetadata'))
 }
           
 // Get existing media
 let existingMedia = []
-mediaFolders.forEach(
+__mediaFolders.forEach(
   mediaFolder => {
-    let fullPath = path.join(mediaPath, mediaFolder)
+    let fullPath = __path.join(__mediaPath, mediaFolder)
     let fileObjs = fs.readdirSync(fullPath, { withFileTypes: false })
       .filter(filterDots)
       .map(file => ({key: file.substring(0, file.lastIndexOf('.')), folder: mediaFolder}))
@@ -36,7 +29,7 @@ mediaFolders.forEach(
 
 async function main() {
   // Get all existing metadata on db
-  const existingMetadata = (await Island.find({})
+  const existingMetadata = (await __Island.find({})
     .select('name -_id'))
     .map(element => element.name)    
     // Get all images which are newly added to the web app
