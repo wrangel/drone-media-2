@@ -1,33 +1,27 @@
-const fs = require('fs')
-const Island = require('./manageDb')
+const glob = require('glob')
+const globParent = require('glob-parent')
 
+
+// Create dict with all media files and their respective metadata
+  const media = glob.sync(__mediaPath + '/*('+ __mediaFolders.toString().replaceAll(',', '|') + ')/*')
+    .map(path => {
+      const tmp = globParent(path)
+      const type = tmp.substring(tmp.lastIndexOf('/') + 1, tmp.length)
+      const viewer = type == 'pano' ? 'pano' : 'img'
+      const id = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
+      return {
+        type: type,
+        viewer: viewer,
+        file: id
+      }
+    })
+
+module.exports = media.reverse()
 
 async function main() {
   // Get all the metadata on the db
-  const docs = await Island.find({})
-  console.log(docs)
-  }
+  const docs = await __Island.find({})
+  //console.log(docs)
+}
 
-//main()
-
-
-
-/*
-
-				<div>
-					<div class="thumbnail-row">
-						<a target="_blank" rel="noopener noreferrer" href="pano-viewer.html?img=100_0478" onclick="countUp()"><img class="thumbnail" src="media/thumbnails/100_047	8.webp" alt="Drone Media Here"></a>
-					</div>
-					<div class="media-info-grid">
-						<div class="author-picture">
-							<img class="profile-picture" src="media/author_pictures/wrangel.svg" alt="Channel Picture Here">
-						</div>
-						<div>
-							<p class="media-title">Törbeltälli &#183; Switzerland</p>
-							<p class="media-stats">2023-02-15 &#183; 14:59</p>
-							<p id="media-counter"></p>
-						</div>
-					</div>
-				</div>
-
-*/
+main()

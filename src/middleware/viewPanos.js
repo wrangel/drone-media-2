@@ -1,5 +1,3 @@
-co
-
 const panoMaxFov = 110; // 90, zoom out
 const panoMinFov = 10; // 30, zoom in
 

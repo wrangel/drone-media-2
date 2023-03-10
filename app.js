@@ -19,11 +19,13 @@ global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 // Conduct metadata bookkeeping
 require(__path.join(__middlewarePath, 'manageBooks'))
 
-// Get metadata from db
-require(__path.join(__middlewarePath, 'getMetadata'))
+// Get the media and their metadata
+const media = require(__path.join(__middlewarePath, 'getMetadata'))
 
-// Get the media
-const media = require(__path.join(__middlewarePath, 'displayMedia'))
+console.log(media)
+
+
+/*
 
 /// RENDERING
 // Initialise Express and set port
@@ -41,11 +43,11 @@ app.listen(port, (req, res) => {
   console.log(`App is running on port ${port}`)
 })
 
-/*  *** GET Routes - display pages ***
+---  *** GET Routes - display pages ***
     Root Route
     --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data from the front-end to the server (usually via a form) typically before a page is rendered and the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
-*/
+---
 app.get('/', (req, res, next) => res.render(__path.join(pagesPath, 'index')))
 app.get('/about', (req, res, next) => res.render(__path.join(pagesPath, 'about')))
 
@@ -57,7 +59,7 @@ app.get('/pano-viewer', (req, res, next) => {
   res.render(__path.join(pagesPath, 'pano-viewer'), { img: req.query.img } )
 })
 
-// Route media folders
+// Route media folders, provide them with 'media' data
 __mediaFolders.forEach(element => {
   app.get('/' + element, (req, res, next) => {
     res.render(__path.join(pagesPath, 'media'), {
@@ -65,3 +67,5 @@ __mediaFolders.forEach(element => {
     })  
   })
 })
+
+*/
