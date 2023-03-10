@@ -5,7 +5,7 @@ const path = require('path')
 const {mediaDir, mediaFolders} = require('../../app')
 
 // Load Mongoose model
-const Island = require('./manageDBConnection')
+const Island = require('./manageDb')
 
 // Define path constants
 const rawMediaRepo = '/Users/matthiaswettstein/SynologyDrive/Matthias/DJI/'

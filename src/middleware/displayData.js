@@ -1,7 +1,7 @@
 const glob = require('glob')
 const globParent = require('glob-parent')
 
-const { mediaDir, mediaFolders } = require('./app')
+const { mediaDir, mediaFolders } = require('../../app')
 
 // Create dict with all media files and their respective parents
   const media = glob.sync(mediaDir + '/*('+ mediaFolders.toString().replaceAll(',', '|') + ')/*')
