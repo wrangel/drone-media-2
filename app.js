@@ -5,6 +5,8 @@ const path = require('path')
 // Load Mongoose model
 const Island = require('./src/middleware/manageDb')
 
+/*
+
 // Initialise Express and set port
 const app = express()
 const port = 8080
@@ -61,3 +63,5 @@ mediaFolders.forEach(element => {
     })  
   })
 })
+
+*/
