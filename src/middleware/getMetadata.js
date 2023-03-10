@@ -5,6 +5,7 @@ async function main() {
   // Get all the metadata on the db
   const docs = await __Island.find({})
 
+
   // Create dict with all media files and their respective metadata
     const media = glob.sync(__mediaPath + '/*('+ __mediaFolders.toString().replaceAll(',', '|') + ')/*')
       .map(path => {
@@ -12,15 +13,18 @@ async function main() {
         const type = tmp.substring(tmp.lastIndexOf('/') + 1, tmp.length)
         const viewer = type == 'pano' ? 'pano' : 'img'
         const id = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
-        console.log("----------------------------------")
-        const dbMetadata = docs.filter(i => i.name === id)
-        console.log(c)
+
+
+        const dbMetadata = docs.filter(i => i.name === id)[0]
+        // get if exists!! else empty (ternary)
+
         
         
         return {
+          file: id,
           type: type,
           viewer: viewer,
-          file: id
+          datetime: dbMetadata.dateTime
         }
       })
 

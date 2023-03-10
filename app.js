@@ -20,13 +20,18 @@ global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 require(__path.join(__middlewarePath, 'manageBooks'))
 
 // Get the media and their metadata
-const media = require(__path.join(__middlewarePath, 'getMetadata'))
 
+async function main() {
+
+const media = await require(__path.join(__middlewarePath, 'getMetadata'))
 console.log(media)
+console.log("sdfsdf")
+}
+
+main()
 
 
 /*
-
 /// RENDERING
 // Initialise Express and set port
 const app = express()
@@ -43,7 +48,7 @@ app.listen(port, (req, res) => {
   console.log(`App is running on port ${port}`)
 })
 
----  *** GET Routes - display pages ***
+-------------------------------------------------------------------------------- *** GET Routes - display pages ***
     Root Route
     --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data from the front-end to the server (usually via a form) typically before a page is rendered and the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
