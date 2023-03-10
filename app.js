@@ -1,3 +1,4 @@
+/// PREPARATIONS
 // Load Node modules
 const express = require('express')
 const path = require('path')
@@ -10,6 +11,8 @@ const mediaPath = path.join(__dirname, 'media')
 const mediaFolders = ['hdr', 'pano', 'wide_angle']
 module.exports = { mediaPath, mediaFolders }
 
+
+/// METADATA MANAGEMENT
 // Load Mongoose model
 const Island = require(path.join(middlewarePath, 'manageDb'))
 
@@ -22,6 +25,8 @@ require(path.join(middlewarePath, 'getMetadata'))
 // Get the media
 const media = require(path.join(middlewarePath, 'displayMedia'))
 
+
+/// RENDERING
 // Initialise Express and set port
 const app = express()
 const port = 8080
