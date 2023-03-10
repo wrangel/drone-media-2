@@ -2,15 +2,6 @@
 const express = require('express')
 const path = require('path')
 
-// Load Mongoose model
-////const Island = require('./src/middleware/manageDb')
-
-// Conduct metadata bookkeeping
-////require('./src/middleware/manageBooks')
-
-// Get metadata from db
-////require('./src/middleware/getMetadata')
-
 // Set and export web app directories
 const basePath = path.join(__dirname, 'src')
 const middlewarePath = path.join(basePath, 'middleware')
@@ -19,6 +10,18 @@ const mediaPath = path.join(__dirname, 'media')
 const mediaFolders = ['hdr', 'pano', 'wide_angle']
 module.exports = { mediaPath, mediaFolders }
 
+// Load Mongoose model
+const Island = require(path.join(middlewarePath, 'manageDb'))
+
+// Conduct metadata bookkeeping
+require(path.join(middlewarePath, 'manageBooks'))
+
+// Get metadata from db
+require(path.join(middlewarePath, 'getMetadata'))
+
+// Get the media
+const media = require(path.join(middlewarePath, 'displayMedia'))
+
 // Initialise Express and set port
 const app = express()
 const port = 8080
@@ -26,10 +29,10 @@ const port = 8080
 // Render static files (css, ..)
 app.use(express.static(__dirname))
 
-// Set the view engine to ejs / tell Express server to use ejs
+// Tell Express server to use ejs view engine
 app.set('view engine', 'ejs')
 
-// Port website will run on
+// Determine port website will run on
 app.listen(port, (req, res) => {
   console.log(`App is running on port ${port}`)
 })
@@ -49,8 +52,6 @@ app.get('/img-viewer', (req, res, next) => {
 app.get('/pano-viewer', (req, res, next) => {
   res.render(path.join(pagesPath, 'pano-viewer'), { img: req.query.img } )
 })
-
-const media = require(path.join(middlewarePath, 'displayMedia'))
 
 // Route media folders
 mediaFolders.forEach(element => {
