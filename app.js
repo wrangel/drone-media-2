@@ -20,15 +20,16 @@ global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 require(__path.join(__middlewarePath, 'manageBooks'))
 
 // Get the media and their metadata
+require(__path.join(__middlewarePath, 'getMetadata'))
+  .then(
 
-async function main() {
+      a => console.log(a)
 
-const media = await require(__path.join(__middlewarePath, 'getMetadata'))
-console.log(media)
-console.log("sdfsdf")
-}
+  )
+  .catch((error) => { console.log(error) })
 
-main()
+
+
 
 
 /*
