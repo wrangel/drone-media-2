@@ -1,6 +1,6 @@
-FROM node:16-slim
+FROM node:latest
 
-# Create app directory
+# Create app directory within Container
 WORKDIR /usr/src/app
 
 # Install app dependencies

@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  web:
+    image: wrangel/ellesmere:latest
+    build: .
+    command: "node app.js"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "mongo"
+  mongo:
+    image: "mongo"
+    ports:
+      - "27017:27017"
+  

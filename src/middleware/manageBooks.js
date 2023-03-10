@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 // Get web app directories
-const {mediaDir, mediaFolders} = require('../../app')
+const {mediaPath, mediaFolders} = require('../../app')
 
 // Load Mongoose model
 const Island = require('./manageDb')
@@ -26,7 +26,7 @@ const saveMetadata = (files) => {
 let existingMedia = []
 mediaFolders.forEach(
   mediaFolder => {
-    let fullPath = path.join(mediaDir, mediaFolder)
+    let fullPath = path.join(mediaPath, mediaFolder)
     let fileObjs = fs.readdirSync(fullPath, { withFileTypes: false })
       .filter(filterDots)
       .map(file => ({key: file.substring(0, file.lastIndexOf('.')), folder: mediaFolder}))
