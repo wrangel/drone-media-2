@@ -14,11 +14,13 @@ const mediaDir = path.join(__dirname, 'media')
 const mediaFolders = ['hdr', 'pano', 'wide_angle']
 module.exports = { mediaDir, mediaFolders }
 
-// Load metadata bookkeeping
+// Conduct metadata bookkeeping
 require('./src/middleware/manageBooks')
 
 
-/*
+// Get metadata from db
+require('./src/middleware/getMetadata')
+
 
 // ROUTES
 // Render static files
@@ -49,7 +51,7 @@ app.get('/pano-viewer', (req, res, next) => {
   res.render('pages/pano-viewer', { img: req.query.img } )
 })
 
-const media = require('./data')
+const media = require('./src/middleware/displayMedia')
 
 // Route media folders
 mediaFolders.forEach(element => {
@@ -59,5 +61,3 @@ mediaFolders.forEach(element => {
     })  
   })
 })
-
-*/
