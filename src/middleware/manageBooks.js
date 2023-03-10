@@ -12,7 +12,7 @@ filterDots = file => !file.startsWith('.')
 const saveMetadata = (files) => {
   // Store new file's metadata in DB
   module.exports = files
-  require(path.join(__middlewarePath, 'saveMetadata'))
+  require(__path.join(__middlewarePath, 'saveMetadata'))
 }
           
 // Get existing media
@@ -43,16 +43,16 @@ async function main() {
             const id = medium.key
             let originalFile 
             // Get HDR media
-            if (folder == mediaFolders[0]) {
-            originalFile = path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
+            if (folder == __mediaFolders[0]) {
+            originalFile = __path.join(rawMediaRepo, folder, id)  + rawMediaSuffix
             }
             // Get non-HDE media
             else {
-                const filePath = path.join(rawMediaRepo, folder, rawMediaPrefix, id)
+                const filePath = __path.join(rawMediaRepo, folder, rawMediaPrefix, id)
                 // Get the first file in each directory
                 originalFile = fs.readdirSync(filePath, { withFileTypes: false })
                     .filter(filterDots = file => !file.startsWith('.'))
-                    .map(file => path.join(filePath, file))[0]
+                    .map(file => __path.join(filePath, file))[0]
                 }
             newRawMedia.push(originalFile)
             }   

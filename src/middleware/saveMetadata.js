@@ -3,9 +3,11 @@ const ExifReader = require('exifreader')
 // Get Mongoose model
 const Island = require(__path.join(__middlewarePath, 'manageDb'))
 
-// Define constants
+// Define REST constants
 const reverseGeoCodeURL = 'https://geocode.maps.co/reverse'
 const panoFirstImageName = 'DJI_0001'
+const url = 'https://app.zipcodebase.com/api/v1/search'
+const apiKey = 'f9a4b680-bf90-11ed-b04f-f5f79e90e953'
 
 // Get media from main
 const newRawMedia = require('./manageBooks')
@@ -18,7 +20,17 @@ async function getReverseGeoData(latitude, longitude) {
     }))
     return response.json() // parses JSON response into native JavaScript objects
   }
-  
+
+// Get missing cities
+async function getCity(postalCode) {
+    const response = await fetch(url + '?' + new URLSearchParams({
+        apikey: apiKey,
+        codes: postalCode,
+        country: 'CH'
+    }))
+    return response.json() // parses JSON response into native JavaScript objects
+}
+
 // Prepare corrected date which is legible to MongoDB
 const prepareDate = (originalDate) => {
     const [year, mon, day, hour, min, sec] = originalDate
@@ -31,7 +43,7 @@ const prepareDate = (originalDate) => {
 // Construct a unique identifier on MongoDB based on DJIs internal media numbering
 const prepareName = (filePath) => {
     const identifyer = filePath.substring(filePath.lastIndexOf('/') + 1, filePath.lastIndexOf('.'))
-    const correctedName = identifyer == panoFirstImageName ? path.basename(path.dirname(filePath)) : identifyer
+    const correctedName = identifyer == panoFirstImageName ? __path.basename(__path.dirname(filePath)) : identifyer
     return correctedName
 }
 
@@ -72,7 +84,7 @@ newRawMedia.forEach (
                         data => {
                             // Get the reverse geo data
                             metadata.country =  data.address.country // JSON data parsed by `data.json()` call
-                            metadata.city = data.address.city
+                            metadata.city = data.address.city ? undefined : "lalallsslsllslsl"
                             metadata.postalCode = data.address.postcode
                             metadata.suburb = data.address.suburb
                             metadata.road = data.address.road
