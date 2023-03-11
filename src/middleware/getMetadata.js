@@ -27,7 +27,6 @@ async function grab() {
             country: dbMetadata.country,
             city: dbMetadata.city,
             postalCode: dbMetadata.postalCode,
-            suburb: dbMetadata.suburb,
             road: dbMetadata.road,
             noViews: 0 // TODO
           }

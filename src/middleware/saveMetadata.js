@@ -68,43 +68,27 @@ newRawMedia.forEach (
         // Get the exif data
         ExifReader.load(media)
             .then(data => {
-                if(data.DateTimeOriginal) {
-                    metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
-                }
-                if(data.GPSAltitude) {
-                    metadata.altitude = data.GPSAltitude.description
-                }
-                if(data.GPSLatitude && data.GPSLongitude) {
-                    let latitude = data.GPSLatitude.description
-                    let longitude = data.GPSLongitude.description
-                    metadata.location.type = "Point"
-                    metadata.location.coordinates.latitude = latitude
-                    metadata.location.coordinates.longitude = longitude
-                    
-                    getReverseGeoData(latitude, longitude).then(
-                        data => {
-
-
-                            
-                            let a = data.address.city ? undefined : "lalallsslsllslsl"
-
-
-                            // Get the reverse geo data
-                            metadata.country =  data.address.country // JSON data parsed by `data.json()` call
-                            metadata.city = a
-                            metadata.postalCode = data.address.postcode
-                            metadata.suburb = data.address.suburb
-                            metadata.road = data.address.road
-                            // Feed metadata into Mongoose model
-                            const document = new Island(metadata)
-                            // Save document to DB
-                            document.save()
-                        }
-                    )
-
-
-
-                }
-            })
+                metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
+                metadata.altitude = data.GPSAltitude.description
+                let latitude = data.GPSLatitude.description
+                let longitude = data.GPSLongitude.description
+                metadata.location.type = "Point"
+                metadata.location.coordinates.latitude = latitude
+                metadata.location.coordinates.longitude = longitude
+                getReverseGeoData(latitude, longitude).then(
+                    data => {
+                        // Get the reverse geo data
+                        metadata.country =  data.address.country // JSON data parsed by `data.json()` call
+                        metadata.city = data.address.city
+                        metadata.postalCode = data.address.postcode
+                        metadata.suburb = data.address.suburb
+                        metadata.road = data.address.road
+                        // Feed metadata into Mongoose model
+                        const document = new Island(metadata)
+                        // Save document to DB
+                        document.save()
+                    }
+                )}
+            )
         }
     )

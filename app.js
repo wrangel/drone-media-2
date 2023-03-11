@@ -18,9 +18,15 @@ global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 
 // Prepare the metadata
 require(__path.join(__middlewarePath, 'manageBooks'))
-
+require(__path.join(__middlewarePath, 'improveMetadata'))
 
 /*
+
+
+
+
+
+
 
 /// RENDER
 // Initialise Express and set port
@@ -68,4 +74,5 @@ require(__path.join(__middlewarePath, 'getMetadata'))
       }
   )
   .catch((error) => { console.log(error) })
-*/
+
+  */
