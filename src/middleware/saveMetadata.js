@@ -12,7 +12,7 @@ const apiKey = 'f9a4b680-bf90-11ed-b04f-f5f79e90e953'
 // Get media from main
 const newRawMedia = require('./manageBooks')
 
-// Get reverse geo data
+// Get reverse geo data (REST)
 async function getReverseGeoData(latitude, longitude) {
     const response = await fetch(reverseGeoCodeURL + '?' + new URLSearchParams({
         lat: latitude,
@@ -21,7 +21,7 @@ async function getReverseGeoData(latitude, longitude) {
     return response.json() // parses JSON response into native JavaScript objects
   }
 
-// Get missing cities
+// Get missing cities (REST)
 async function getCity(postalCode) {
     const response = await fetch(url + '?' + new URLSearchParams({
         apikey: apiKey,
@@ -80,11 +80,18 @@ newRawMedia.forEach (
                     metadata.location.type = "Point"
                     metadata.location.coordinates.latitude = latitude
                     metadata.location.coordinates.longitude = longitude
+                    
                     getReverseGeoData(latitude, longitude).then(
                         data => {
+
+
+                            
+                            let a = data.address.city ? undefined : "lalallsslsllslsl"
+
+
                             // Get the reverse geo data
                             metadata.country =  data.address.country // JSON data parsed by `data.json()` call
-                            metadata.city = data.address.city ? undefined : "lalallsslsllslsl"
+                            metadata.city = a
                             metadata.postalCode = data.address.postcode
                             metadata.suburb = data.address.suburb
                             metadata.road = data.address.road
@@ -94,7 +101,10 @@ newRawMedia.forEach (
                             document.save()
                         }
                     )
+
+
+
                 }
             })
         }
-)
+    )
