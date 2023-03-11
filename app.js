@@ -16,15 +16,8 @@ global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
 // Load Mongoose model
 global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 
-// Prepare the metadata
+// Collect new metadata
 require(__path.join(__middlewarePath, 'manageBooks'))
-
-/*
-
-
-
-
-
 
 
 /// RENDER
@@ -73,5 +66,3 @@ require(__path.join(__middlewarePath, 'getMetadata'))
       }
   )
   .catch((error) => { console.log(error) })
-
-  */

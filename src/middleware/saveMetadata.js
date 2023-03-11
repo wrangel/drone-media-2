@@ -8,10 +8,8 @@ const baseUrlElement1 = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
 const baseUrlElement2 = '.json?access_token='
 const ACCESS_TOKEN = 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ'
 const panoFirstImageName = 'DJI_0001'
-const addressComponents = ["address", "postcode", "region", "country"]
+const addressComponents = ["address", "postcode", "place", "region", "country"]
 
-// Get media from main
-const newRawMedia = require('./manageBooks')
 
 // Get reverse geo data (REST)
 async function getReverseGeoData(latitude, longitude) {
@@ -69,8 +67,9 @@ newRawMedia.forEach (
                         })
                         metadata.road = everything[0]
                         metadata.postalCode = everything[1]
-                        metadata.city = everything[2]
-                        metadata.country = everything[3]
+                        metadata.location = everything[2]
+                        metadata.region = everything[3]
+                        metadata.country = everything[4]
                         // Feed metadata into Mongoose model
                         const document = new Island(metadata)
                         // Save document to DB

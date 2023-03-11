@@ -17,7 +17,8 @@ const islandSchema = new mongoose.Schema({
   geometry: {},
   altitude: String,
   country: String,
-  city: String,
+  region: String,
+  location: String,
   postalCode: String,
   road: String,
   noViews: Number

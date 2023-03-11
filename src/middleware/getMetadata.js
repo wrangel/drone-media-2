@@ -21,11 +21,12 @@ async function grab() {
             viewer: viewer,
             author: "", // TODO
             dateTime: dbMetadata.dateTime,
-            latitude: dbMetadata.location.coordinates.latitude,
-            longitude: dbMetadata.location.coordinates.longitude,
+            latitude: dbMetadata.geometry.coordinates.latitude,
+            longitude: dbMetadata.geometry.coordinates.longitude,
             altitude: dbMetadata.altitude,
             country: dbMetadata.country,
-            city: dbMetadata.city,
+            region: dbMetadata.region,
+            location: dbMetadata.location,
             postalCode: dbMetadata.postalCode,
             road: dbMetadata.road,
             noViews: 0 // TODO
