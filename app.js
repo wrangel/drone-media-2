@@ -18,7 +18,6 @@ global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 
 // Prepare the metadata
 require(__path.join(__middlewarePath, 'manageBooks'))
-require(__path.join(__middlewarePath, 'improveMetadata'))
 
 /*
 

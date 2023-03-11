@@ -8,7 +8,7 @@ const baseUrlElement1 = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
 const baseUrlElement2 = '.json?access_token='
 const ACCESS_TOKEN = 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ'
 const panoFirstImageName = 'DJI_0001'
-
+const addressComponents = ["address", "postcode", "region", "country"]
 
 // Get media from main
 const newRawMedia = require('./manageBooks')
@@ -48,48 +48,34 @@ newRawMedia.forEach (
             geometry: {
                 type: "", 
                 coordinates: {} 
-            },
-            altitude: "",
-            country: "", // JSON data parsed by `data.json()` call
-            city: "",
-            postalCode: "",
-            suburb: "",
-            road: "",
+            }
         }
         // Get the exif data
         ExifReader.load(media)
             .then(data => {
                 metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
                 metadata.altitude = data.GPSAltitude.description
-                let latitude = data.GPSLatitude.description
-                let longitude = data.GPSLongitude.description
                 metadata.geometry.type = "Point"
-                metadata.geometry.coordinates.latitude = latitude
-                metadata.geometry.coordinates.longitude = longitude
-                getReverseGeoData(latitude, longitude).then(
-                    data => {
-
-/*
-                        // Get the reverse geo data
-                        metadata.country =  data.address.country // JSON data parsed by `data.json()` call
-                        metadata.city = data.address.city
-                        metadata.postalCode = data.address.postcode
-                        metadata.suburb = data.address.suburb
-                        metadata.road = data.address.road
-
-
-*/
-
+                metadata.geometry.coordinates.latitude = data.GPSLatitude.description
+                metadata.geometry.coordinates.longitude = data.GPSLongitude.description
+                // Attach reverse geo information based on geometry
+                getReverseGeoData(metadata.geometry.coordinates.latitude, metadata.geometry.coordinates.longitude).then(
+                    data => {       
+                        everything = []
+                        // Fuzzy match the Mapbox output
+                        addressComponents.forEach(addressComponent => {
+                            everything.push(data.features.filter(doc => doc.id.startsWith(addressComponent))
+                                .map(doc => doc.text)[0])
+                        })
+                        metadata.road = everything[0]
+                        metadata.postalCode = everything[1]
+                        metadata.city = everything[2]
+                        metadata.country = everything[3]
                         // Feed metadata into Mongoose model
                         const document = new Island(metadata)
                         // Save document to DB
                         document.save()
-
-
-
-
-                    }
-                )}
-            )
-        }
-    )
+                    })
+                })
+            }
+        )
