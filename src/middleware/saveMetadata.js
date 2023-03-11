@@ -4,32 +4,23 @@ const ExifReader = require('exifreader')
 const Island = require(__path.join(__middlewarePath, 'manageDb'))
 
 // Define REST constants
-const reverseGeoCodeURL = 'https://geocode.maps.co/reverse'
+const baseUrlElement1 = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
+const baseUrlElement2 = '.json?access_token='
+const ACCESS_TOKEN = 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ'
 const panoFirstImageName = 'DJI_0001'
-const url = 'https://app.zipcodebase.com/api/v1/search'
-const apiKey = 'f9a4b680-bf90-11ed-b04f-f5f79e90e953'
+
 
 // Get media from main
 const newRawMedia = require('./manageBooks')
 
 // Get reverse geo data (REST)
 async function getReverseGeoData(latitude, longitude) {
-    const response = await fetch(reverseGeoCodeURL + '?' + new URLSearchParams({
-        lat: latitude,
-        lon: longitude
-    }))
+    const response = await fetch (baseUrlElement1
+              + longitude + ', ' + latitude
+              + baseUrlElement2 + ACCESS_TOKEN
+              )
     return response.json() // parses JSON response into native JavaScript objects
   }
-
-// Get missing cities (REST)
-async function getCity(postalCode) {
-    const response = await fetch(url + '?' + new URLSearchParams({
-        apikey: apiKey,
-        codes: postalCode,
-        country: 'CH'
-    }))
-    return response.json() // parses JSON response into native JavaScript objects
-}
 
 // Prepare corrected date which is legible to MongoDB
 const prepareDate = (originalDate) => {
@@ -54,7 +45,7 @@ newRawMedia.forEach (
         let metadata = {
             name: prepareName(media),
             dateTime: new Date(),
-            location: {
+            geometry: {
                 type: "", 
                 coordinates: {} 
             },
@@ -72,21 +63,31 @@ newRawMedia.forEach (
                 metadata.altitude = data.GPSAltitude.description
                 let latitude = data.GPSLatitude.description
                 let longitude = data.GPSLongitude.description
-                metadata.location.type = "Point"
-                metadata.location.coordinates.latitude = latitude
-                metadata.location.coordinates.longitude = longitude
+                metadata.geometry.type = "Point"
+                metadata.geometry.coordinates.latitude = latitude
+                metadata.geometry.coordinates.longitude = longitude
                 getReverseGeoData(latitude, longitude).then(
                     data => {
+
+/*
                         // Get the reverse geo data
                         metadata.country =  data.address.country // JSON data parsed by `data.json()` call
                         metadata.city = data.address.city
                         metadata.postalCode = data.address.postcode
                         metadata.suburb = data.address.suburb
                         metadata.road = data.address.road
+
+
+*/
+
                         // Feed metadata into Mongoose model
                         const document = new Island(metadata)
                         // Save document to DB
                         document.save()
+
+
+
+
                     }
                 )}
             )

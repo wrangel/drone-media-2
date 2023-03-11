@@ -1,6 +1,7 @@
 const baseUrlElement1 = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
 const baseUrlElement2 = '.json?access_token='
-const ACCESS_TOKEN = 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ';
+const ACCESS_TOKEN = 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ'
+const addressComponents = ["address", "postcode", "region", "country"]
  
 // Get reverse geo data (REST)
 async function getReverseGeoData(latitude, longitude) {
@@ -12,28 +13,22 @@ async function getReverseGeoData(latitude, longitude) {
 }
 
 
-
 async function grab(){
   // Get all the metadata on the db
   const docs = await __Island.find({})
   docs.forEach (async doc => {
-    const latitude = doc.location.coordinates.latitude
-    const longitude = doc.location.coordinates.longitude
-    //console.log(latitude, longitude)
-
-    //let c = await reverseGeocoding(latitude, longitude)
-
+    const latitude = doc.geometry.coordinates.latitude
+    const longitude = doc.geometry.coordinates.longitude
     getReverseGeoData(latitude, longitude).then(
-      data => {
-        console.log("--------------")
-        console.log(data.features[0].place_name)
+      data => {       
+        everything = [] 
+        addressComponents.forEach(addressComponent => {
+            everything.push(data.features.filter(doc => doc.id.startsWith(addressComponent))
+              .map(doc => doc.text)[0])
+        })
+        console.log(everything)
       })
-
-
     })
-
-  //
-  
 }
 
 grab()
