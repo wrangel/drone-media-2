@@ -18,6 +18,10 @@ const prepareDate = date => {
   return new Intl.DateTimeFormat("en-US", options).format(date)
 }
 
+const prepareRoad = road => {
+  return road == undefined ? '' : ', above ' + road
+}
+
 // Prepare all metadata
 async function grab() {
   // Get all the metadata on the db
@@ -45,7 +49,7 @@ async function grab() {
             region: dbMetadata.region,
             location: dbMetadata.location,
             postalCode: dbMetadata.postalCode,
-            road: dbMetadata.road,
+            road: prepareRoad(dbMetadata.road),
             noViews: 0 // TODO
           }
       })

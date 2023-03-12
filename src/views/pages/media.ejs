@@ -22,28 +22,20 @@
                             <img class="thumbnail" src= <%= "media/thumbnails/" + element.name + ".webp" %> alt="Drone Media Here">
                         </a>
                     </div>
-
-
-
                     <div class="media-info-grid">
 						<div class="author-picture">
 							<img class="profile-picture" src="media/author_pictures/elias.webp" alt="Channel Picture Here">
 						</div>
 						<div>
-							<p class="media-title"><%= element.location %>  &#183; <%= element.region %> &#183; <%= element.country %></p>
-                            <p class="media-stats"><%= element.dateTime %>  &#183; <%= element.altitude %> </p>
-							<p class="media-stats"> 
-                                    <%= element.author %>
-                                    <%= element.latitude %> 
-                                    <%= element.longitude %> 
-                                    <%= element.postalCode %> 
-                                    <%= element.road %> 
-                            </p>
+							<p class="media-title"><%= element.location %> &#183; <%= element.region %> &#183; <%= element.country %></p>
+                            <p class="media-stats"><%= element.dateTime %> </p>
+                            <p class="media-stats">Altitude: <%= element.altitude %> MSL<%= element.road %></p>
+							<p class="media-stats">Coordinates: <%= element.latitude %>, <%= element.longitude %></p>
+                                <!--  <%= element.author %> TODO -->
+                                <!-- <%= element.postalCode %> -->
 							<!-- <p id="media-counter"><%= element.noViews %> Views</p> TODO --> 
 						</div>
 					</div>
-                
-
                 </div>
             <% }) %>
         </section>
