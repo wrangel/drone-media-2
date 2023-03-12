@@ -18,8 +18,15 @@ const prepareDate = date => {
   return new Intl.DateTimeFormat("en-US", options).format(date)
 }
 
+// Prepare location
 const prepareRoad = road => {
   return road == undefined ? '' : ', above ' + road
+}
+
+// Prepare altitude
+const prepareAltitude = altitude => {
+  const components = altitude.split(' ')
+  return Number(components[0]).toFixed(2) + ' ' + components[1]
 }
 
 // Prepare all metadata
@@ -44,7 +51,7 @@ async function grab() {
             dateTime: prepareDate(dbMetadata.dateTime),
             latitude: dbMetadata.geometry.coordinates.latitude,
             longitude: dbMetadata.geometry.coordinates.longitude,
-            altitude: dbMetadata.altitude,
+            altitude: prepareAltitude(dbMetadata.altitude),
             country: dbMetadata.country,
             region: dbMetadata.region,
             location: dbMetadata.location,
