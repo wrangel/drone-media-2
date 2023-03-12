@@ -14,7 +14,7 @@ const islandSchema = new mongoose.Schema({
   },
   author: String,
   dateTime: Date,
-  geometry: {},
+  geometry: {}, // TODO improve schema
   altitude: String,
   country: String,
   region: String,

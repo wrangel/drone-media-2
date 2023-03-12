@@ -1,6 +1,23 @@
 const glob = require('glob')
 const globParent = require('glob-parent')
 
+// Prepare date for website
+const prepareDate = date => {
+  options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+    timeZone: "CET",
+    timeZoneName: "short"
+  }
+  return new Intl.DateTimeFormat("en-US", options).format(date)
+}
+
 // Prepare all metadata
 async function grab() {
   // Get all the metadata on the db
@@ -20,7 +37,7 @@ async function grab() {
             type: type,
             viewer: viewer,
             author: "", // TODO
-            dateTime: dbMetadata.dateTime,
+            dateTime: prepareDate(dbMetadata.dateTime),
             latitude: dbMetadata.geometry.coordinates.latitude,
             longitude: dbMetadata.geometry.coordinates.longitude,
             altitude: dbMetadata.altitude,
