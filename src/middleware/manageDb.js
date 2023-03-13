@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false)
 
-const connectionString = 'mongodb://localhost:27017/'
+const connectionString = 'mongodb://mongo:27017/'
 const db = 'ellesmereDB'
 
 mongoose.connect(connectionString + db)
