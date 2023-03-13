@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false)
 
-const connectionString = 'mongodb://mongo:27017/'
+// Set connection specifics
+// Use the same mongo service name as in docker-compose.yml
+const mongoHost = __runsDockerized == true ? 'mongo' : 'localhost' 
+const connectionString = 'mongodb://' + mongoHost + ':27017/'
 const db = 'ellesmereDB'
 
 mongoose.connect(connectionString + db)

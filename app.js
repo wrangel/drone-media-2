@@ -11,6 +11,8 @@ const pagesPath = __path.join(sourcePath, 'views', 'pages')
 global.__mediaPath = __path.join(__dirname, 'media')
 global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
 
+// Determine node.js run environment
+global.__runsDockerized = false
 
 /// MANAGE METADATA
 // Load Mongoose model

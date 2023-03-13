@@ -1,7 +1,8 @@
 const fs = require('fs')
 
-// Define path constants
-const rawMediaRepo = '/Users/matthiaswettstein/SynologyDrive/Matthias/DJI/'
+// Define path constants 
+// for dockerized node, mount to the volume specified in docker-compose.yml
+const rawMediaRepo = __runsDockerized == true ? '/mnt/DJI' : '/Users/matthiaswettstein/SynologyDrive/Matthias/DJI/'
 const rawMediaPrefix = 'Einzelfotos'
 const rawMediaSuffix = '.tif'
 
