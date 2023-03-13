@@ -12,7 +12,7 @@ global.__mediaPath = __path.join(__dirname, 'media')
 global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
 
 // Determine node.js run environment
-global.__runsDockerized = false
+global.__runsDockerized = true
 
 /// MANAGE METADATA
 // Load Mongoose model
