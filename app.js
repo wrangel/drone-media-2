@@ -11,12 +11,17 @@ const pagesPath = __path.join(sourcePath, 'views', 'pages')
 global.__mediaPath = __path.join(__dirname, 'media')
 global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
 
-// Determine node.js run environment
-global.__runsDockerized = true
+/* Determine node.js run environment
+  1) run locally in VSC
+  2) run locally from within Docker Containers
+  3) run on Synology NAS within Docker Containers
+*/
+global.__runEnv = 1
 
 /// MANAGE METADATA
 // Load Mongoose model
 global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
+
 
 // Collect new metadata
 require(__path.join(__middlewarePath, 'manageBooks'))

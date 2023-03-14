@@ -2,7 +2,8 @@ const fs = require('fs')
 
 // Define path constants 
 // for dockerized node, mount to the volume specified in docker-compose.yml
-const rawMediaRepo = __runsDockerized == true ? '/mnt/DJI' : '/Users/matthiaswettstein/SynologyDrive/Matthias/DJI/'
+const rawMediaRepo = __runEnv == 1 ? __runEnv == 2 ? '/mnt/originals' : '/Volumes/docker/ellesmere/originals' : ''; // TODO
+
 const rawMediaPrefix = 'Einzelfotos'
 const rawMediaSuffix = '.tif'
 
@@ -32,12 +33,15 @@ async function main() {
   // Get all existing metadata on db
   const existingMetadata = (await __Island.find({})
     .select('name -_id'))
-    .map(element => element.name)    
+    .map(element => element.name)  
+    
+    
     // Get all images which are newly added to the web app
     const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
+  
     if (newMedia.length > 0) {
-        // Loop through media and check if they have been added since the last dump of metadata to the DB
         newRawMedia = []
+        // Loop through media and check if they have been added since the last dump of metadata to the DB
         newMedia.forEach (
         medium => {
             const folder = medium.folder

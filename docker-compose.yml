@@ -9,8 +9,10 @@ services:
     depends_on:
       - "mongo"
     volumes:
-    - /Users/matthiaswettstein/SynologyDrive/Matthias/DJI:/mnt/DJI
+    - /Volumes/ellesmere/originals:/mnt/originals
+    
   mongo:
     image: "mongo"
     ports:
       - "27017:27017"
+    # platform: "linux/amd64"
