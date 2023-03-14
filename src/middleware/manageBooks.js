@@ -2,7 +2,7 @@ const fs = require('fs')
 
 // Define path constants 
 // for dockerized node, mount to the volume specified in docker-compose.yml
-const rawMediaRepo = __runEnv == 1 ? __runEnv == 2 ? '/mnt/originals' : '/Volumes/docker/ellesmere/originals' : ''; // TODO
+const rawMediaRepo = __runDockerized == true ? '/mnt/originals' : '/Volumes/docker/ellesmere/originals'
 
 const rawMediaPrefix = 'Einzelfotos'
 const rawMediaSuffix = '.tif'

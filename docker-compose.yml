@@ -9,8 +9,7 @@ services:
     depends_on:
       - "mongo"
     volumes:
-    - /Volumes/ellesmere/originals:/mnt/originals
-    
+    - /Volumes/docker/ellesmere/originals:/mnt/originals
   mongo:
     image: "mongo"
     ports:

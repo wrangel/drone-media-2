@@ -3,7 +3,7 @@ mongoose.set('strictQuery', false)
 
 // Set connection specifics
 // Use the same mongo service name as in docker-compose.yml
-const mongoHost = [2,3].includes(__runEnv) ? 'mongo' : 'localhost' 
+const mongoHost = __runDockerized == true ? 'mongo' : 'localhost' 
 const connectionString = 'mongodb://' + mongoHost + ':27017/'
 const db = 'ellesmereDB'
 
