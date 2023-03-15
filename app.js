@@ -16,6 +16,17 @@ global.__runDockerized = false
 // Load Mongoose model
 global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 
+// Collect and save new metadata as well as existing media
+async function saveMetadata() {
+  const [newRawMedia, existingMedia] = await require(__path.join(__middlewarePath, 'manageBooks'))
+
+  // Save the new metadata to the db
+  module.exports = newRawMedia
+  await require(__path.join(__middlewarePath, 'saveMetadata')) 
+
+  return existingMedia
+}
+
 
 /// RENDER
 // Initialise Express and set port
@@ -49,20 +60,18 @@ app.get('/pano-viewer', (req, res, next) => {
 })
 
 
-/// RENDER MEDIA BASED ROUTES
-// Collect new media as well as existing media
-async function renderMedia() {
-  const [newRawMedia, existingMedia] = await require(__path.join(__middlewarePath, 'manageBooks'))
+async function main() {
+  const existingMedia = await saveMetadata()
 
-  // Save the new metadata to the db
-  module.exports = newRawMedia
-  await require(__path.join(__middlewarePath, 'saveMetadata')) 
+  const getMetadata = require(__path.join(__middlewarePath, 'getMetadata'))
+  const metadata = await getMetadata.grab(existingMedia)
+ 
+}
 
-  /*
 
-  // Grab the metadata
-  module.exports = existingMedia
-  const metadata = await require(__path.join(__middlewarePath, 'getMetadata'))
+main()
+
+    /*
 
   // Route media folders, provide them with 'media' data
   __mediaFolders.forEach(element => {
@@ -72,11 +81,8 @@ async function renderMedia() {
       })
     })
   })
-  
+
 */
 
-}
 
 
-
-renderMedia()

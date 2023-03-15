@@ -8,7 +8,7 @@ const ACCESS_TOKEN = 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmx
 const panoFirstImageName = 'DJI_0001'
 const addressComponents = ["address", "postcode", "place", "region", "country"]
 
-// Get reverse geo data (REST)
+// GET reverse geo data
 async function getReverseGeoData(latitude, longitude) {
     const response = await fetch (baseUrlElement1
               + longitude + ', ' + latitude
@@ -32,8 +32,7 @@ const prepareName = (filePath) => {
     return correctedName
 }
 
-
-// Loop through media
+// Loop through media, load each piece into db
 newRawMedia.forEach (
     async media => {
         // Instantiate document
@@ -53,47 +52,24 @@ newRawMedia.forEach (
         metadata.geometry.coordinates.longitude = exifdata.GPSLongitude.description
 
         // Attach reverse geo information based on geometry
-        const reverseGeoMetadata = await getReverseGeoData(metadata.geometry.coordinates.latitude, metadata.geometry.coordinates.longitude)
+        const reverseGeoMetadata = await getReverseGeoData(
+            metadata.geometry.coordinates.latitude, metadata.geometry.coordinates.longitude
+            )
         // Fuzzy match the Mapbox output
         everything = []
         addressComponents.forEach(addressComponent => {
             everything.push(reverseGeoMetadata.features.filter(doc => doc.id.startsWith(addressComponent))
                 .map(doc => doc.text)[0])
         })
-        console.log(everything)
-    }
-    
+        metadata.road = everything[0]
+        metadata.postalCode = everything[1]
+        metadata.location = everything[2]
+        metadata.region = everything[3]
+        metadata.country = everything[4]
+
+        // Feed metadata into Mongoose model
+        const document = new __Island(metadata)
+        // Save document to DB
+        await document.save()
+    } 
 )
-
-
-
-/*
-
-async function save() {
-       
-                            
-                            
-                            addressComponents.forEach(addressComponent => {
-                                everything.push(data.features.filter(doc => doc.id.startsWith(addressComponent))
-                                    .map(doc => doc.text)[0])
-                            })
-                            metadata.road = everything[0]
-                            metadata.postalCode = everything[1]
-                            metadata.location = everything[2]
-                            metadata.region = everything[3]
-                            metadata.country = everything[4]
-
-                            // Feed metadata into Mongoose model
-                            const document = new __Island(metadata)
-                            // Save document to DB
-                            document.save()
-                       
-    }
-
-save().then(
-    console.log("Saved new metadata to the db")
-).catch((error) => {
-    console.error("Could not save metadata to the db:" + error)
-  })
-  
-  */

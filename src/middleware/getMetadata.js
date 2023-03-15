@@ -1,5 +1,3 @@
-const existingMedia = require(__path.join(__basePath, 'app'))
-
 // Prepare date for website
 const prepareDate = date => {
   options = {
@@ -29,9 +27,10 @@ const prepareAltitude = altitude => {
 }
 
 // Prepare all metadata
-async function grab() {
+exports.grab = async function(existingMedia) {
   // Get all the metadata on the db
   const docs = await __Island.find({})
+  console.log(docs)
 
   // Compile the needed metadata (there might me more on the db)
   return existingMedia.map (
@@ -39,6 +38,9 @@ async function grab() {
       const name = medium.key
       const type = medium.folder
       const dbMetadata = docs.filter(i => i.name === name)[0]
+      console.log(dbMetadata)
+
+      /*
       return {
         name: name,
         type: type,
@@ -55,8 +57,7 @@ async function grab() {
         road: prepareRoad(dbMetadata.road),
         noViews: 0 // TODO
       }
+      */
     }
   ).reverse()
 }
-
-module.exports = grab()
