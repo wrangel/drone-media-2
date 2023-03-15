@@ -49,8 +49,7 @@ app.get('/pano-viewer', (req, res, next) => {
 })
 
 
-
-
+/// RENDER MEDIA BASED ROUTES
 // Collect new media as well as existing media
 async function renderMedia() {
   const [newRawMedia, existingMedia] = await require(__path.join(__middlewarePath, 'manageBooks'))
@@ -62,29 +61,16 @@ async function renderMedia() {
   // Grab the metadata
   module.exports = existingMedia
   const metadata = await require(__path.join(__middlewarePath, 'getMetadata'))
-  console.log(metadata)
 
+  // Route media folders, provide them with 'media' data
+  __mediaFolders.forEach(element => {
+    app.get('/' + element, (req, res, next) => {
+      res.render(__path.join(pagesPath, 'media'), {
+          data: metadata.filter(f => f.type == element)
+      })
+    })
+  })
 
 }
 
 renderMedia()
-
-/*
-
-// Get the media and their metadata (a Promise)
-require(__path.join(__middlewarePath, 'getMetadata'))
-  .then(
-      media => {
-        // Route media folders, provide them with 'media' data
-        __mediaFolders.forEach(element => {
-          app.get('/' + element, (req, res, next) => {
-            res.render(__path.join(pagesPath, 'media'), {
-                data: media.filter(f => f.type == element)
-            })
-          })
-        })
-      }
-  )
-  .catch((error) => { console.log(error) })
-
-*/
