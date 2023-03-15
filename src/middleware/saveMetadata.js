@@ -22,8 +22,7 @@ const prepareDate = (originalDate) => {
     const [year, mon, day, hour, min, sec] = originalDate
         .split(" ").flatMap(e1 => e1.split(":")).map(e2 => parseInt(e2))
     // Correct month (JS starts at month 0)
-    const correctedMonth = mon == 1 ? 12 : mon - 1
-    return new Date(Date.UTC(year, correctedMonth, day, hour, min, sec))
+    return new Date(Date.UTC(year, mon - 1, day, hour, min, sec))
 }
 
 // Construct a unique identifier on MongoDB based on DJIs internal media numbering
@@ -33,6 +32,29 @@ const prepareName = (filePath) => {
     return correctedName
 }
 
+
+newRawMedia.forEach (
+    async media => {
+        /*
+        ExifReader.load(media)
+            .then(
+                a => console.log(a)
+            )
+            */
+        let metadata = await ExifReader.load(media)
+        console.log(metadata.DateTimeOriginal.description, prepareDate(metadata.DateTimeOriginal.description))
+        prepareDate(metadata.DateTimeOriginal.description)
+        metadata.GPSAltitude.description
+        //metadata.geometry.type = "Point"
+        metadata.GPSLatitude.description
+        metadata.GPSLongitude.description
+        
+        
+    }
+)
+
+
+/*
 async function save() {
     // Loop through media
     newRawMedia.forEach (
@@ -46,10 +68,17 @@ async function save() {
                     coordinates: {} 
                 }
             }
+
+
+
+            /*
             // Get the exif data
             ExifReader.load(media)
                 .then(data => {
                     console.log(data)
+
+
+
                     metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
                     metadata.altitude = data.GPSAltitude.description
                     metadata.geometry.type = "Point"
@@ -78,6 +107,7 @@ async function save() {
                     })
                 }
             )
+           
     }
 
 save().then(
@@ -85,3 +115,4 @@ save().then(
 ).catch((error) => {
     console.error("Could not save metadata to the db:" + error)
   })
+  */
