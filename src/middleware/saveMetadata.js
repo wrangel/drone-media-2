@@ -33,7 +33,7 @@ const prepareName = (filePath) => {
     return correctedName
 }
 
-async function main() {
+async function save() {
     // Loop through media
     newRawMedia.forEach (
         media => {
@@ -76,7 +76,11 @@ async function main() {
                         })
                     })
                 }
-            ) 
+            )
     }
 
-module.exports = main()
+save().then(
+    console.log("Saved new metadata to the db")
+).catch((error) => {
+    console.error("Could not save metadata to the db:" + error)
+  })
