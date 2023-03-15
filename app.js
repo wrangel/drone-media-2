@@ -4,32 +4,18 @@ const express = require('express')
 global.__path = require('path')
 
 // Set and export web app directories
-global.__basedir = __dirname
 const sourcePath = __path.join(__dirname, 'src')
-global.__middlewarePath = __path.join(sourcePath, 'middleware')
 const pagesPath = __path.join(sourcePath, 'views', 'pages')
+global.__basePath = __dirname
+global.__middlewarePath = __path.join(sourcePath, 'middleware')
 global.__mediaPath = __path.join(__dirname, 'media')
 global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
 
 // Determine node.js run environment
 global.__runDockerized = false
-
-/// MANAGE METADATA
 // Load Mongoose model
 global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 
-
-// Collect new media files
-async function main() {
-  const books = await require(__path.join(__middlewarePath, 'manageBooks'))
-  const newRawMedia = books
-  console.log(newRawMedia)
-
-}
-  
-main()
-
-/*
 
 /// RENDER
 // Initialise Express and set port
@@ -61,6 +47,34 @@ app.get('/img-viewer', (req, res, next) => {
 app.get('/pano-viewer', (req, res, next) => {
   res.render(__path.join(pagesPath, 'pano-viewer'), { img: req.query.img } )
 })
+
+
+
+
+// Collect new media files
+async function renderMedia() {
+  const books = await require(__path.join(__middlewarePath, 'manageBooks'))
+  const newRawMedia = books
+
+  module.exports = newRawMedia
+  require(__path.join(__middlewarePath, 'saveMetadata'))
+
+
+
+}
+  
+
+
+renderMedia()
+
+/*
+
+// Save document to Mongo DB
+const saveMetadata = files => {
+  // Store new file's metadata in DB
+  module.exports = files
+  require(__path.join(__middlewarePath, 'saveMetadata'))
+}
 
 // Get the media and their metadata (a Promise)
 require(__path.join(__middlewarePath, 'getMetadata'))

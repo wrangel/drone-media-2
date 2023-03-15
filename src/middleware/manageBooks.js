@@ -31,6 +31,7 @@ async function main() {
     // Get all images which are newly added to the web app
     const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
   
+    // Initialize new raw media container
     newRawMedia = []
 
     if (newMedia.length > 0) {
@@ -61,18 +62,3 @@ async function main() {
 }
 
 module.exports = main()
-
-
-/*
-
-main().then(
-  newRawMedia => console.log(newRawMedia)
-)
-
-// Save document to Mongo DB
-const saveMetadata = files => {
-  // Store new file's metadata in DB
-  module.exports = files
-  require(__path.join(__middlewarePath, 'saveMetadata'))
-}
-*/

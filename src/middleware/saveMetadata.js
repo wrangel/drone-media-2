@@ -1,7 +1,6 @@
 const ExifReader = require('exifreader')
-
-// Get Mongoose model
-const Island = require(__path.join(__middlewarePath, 'manageDb'))
+const newRawMedia = require(__path.join(__basePath, 'app'))
+console.log(newRawMedia)
 
 // Define REST constants
 const baseUrlElement1 = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
@@ -9,7 +8,6 @@ const baseUrlElement2 = '.json?access_token='
 const ACCESS_TOKEN = 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ'
 const panoFirstImageName = 'DJI_0001'
 const addressComponents = ["address", "postcode", "place", "region", "country"]
-
 
 // Get reverse geo data (REST)
 async function getReverseGeoData(latitude, longitude) {
@@ -70,11 +68,12 @@ newRawMedia.forEach (
                         metadata.location = everything[2]
                         metadata.region = everything[3]
                         metadata.country = everything[4]
+
                         // Feed metadata into Mongoose model
-                        const document = new Island(metadata)
+                        const document = new __Island(metadata)
                         // Save document to DB
                         document.save()
                     })
                 })
             }
-        )
+        )    
