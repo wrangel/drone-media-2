@@ -1,6 +1,7 @@
 /// PREPARE
 // Load Node modules
-const express = require('express')
+import express from 'express'
+import path from 'path'
 global.__path = require('path')
 
 // Set and export web app directories
@@ -16,16 +17,22 @@ global.__runDockerized = false
 // Load Mongoose model
 global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 
+/*
+
+
 // Collect and save new metadata as well as existing media
 async function saveMetadata() {
   const [newRawMedia, existingMedia] = await require(__path.join(__middlewarePath, 'manageBooks'))
 
   // Save the new metadata to the db
   module.exports = newRawMedia
-  await require(__path.join(__middlewarePath, 'saveMetadata')) 
+  const a = await require(__path.join(__middlewarePath, 'saveMetadata')) 
 
-  return existingMedia
+  console.log(a)
+  //return existingMedia
 }
+
+saveMetadata()
 
 
 /// RENDER
@@ -60,18 +67,10 @@ app.get('/pano-viewer', (req, res, next) => {
 })
 
 
-async function main() {
-  const existingMedia = await saveMetadata()
+
 
   const getMetadata = require(__path.join(__middlewarePath, 'getMetadata'))
   const metadata = await getMetadata.grab(existingMedia)
- 
-}
-
-
-main()
-
-    /*
 
   // Route media folders, provide them with 'media' data
   __mediaFolders.forEach(element => {

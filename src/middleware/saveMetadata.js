@@ -32,24 +32,18 @@ const prepareName = (filePath) => {
     return correctedName
 }
 
+newRawMedia.map(
+    media => {
+        const exifdata = ExifReader.load(media)
+    }
+)
+
+/*
+
 // Loop through media, load each piece into db
 newRawMedia.forEach (
-    async media => {
-        // Instantiate document
-        let metadata = {
-            name: prepareName(media),
-            dateTime: new Date(),
-            geometry: {
-                type: "", 
-                coordinates: {} 
-            }
-        }
-        const exifdata = await ExifReader.load(media)
-        metadata.dateTime = prepareDate(exifdata.DateTimeOriginal.description)
-        metadata.altitude = exifdata.GPSAltitude.description
-        metadata.geometry.type = "Point"
-        metadata.geometry.coordinates.latitude = exifdata.GPSLatitude.description
-        metadata.geometry.coordinates.longitude = exifdata.GPSLongitude.description
+    
+       
 
         // Attach reverse geo information based on geometry
         const reverseGeoMetadata = await getReverseGeoData(
@@ -68,8 +62,11 @@ newRawMedia.forEach (
         metadata.country = everything[4]
 
         // Feed metadata into Mongoose model
-        const document = new __Island(metadata)
+        t document = new __Island(metadata)
         // Save document to DB
-        await document.save()
+        //////await document.save()
     } 
 )
+*/
+
+module.exports = a
