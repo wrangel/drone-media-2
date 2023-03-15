@@ -1,6 +1,5 @@
 const ExifReader = require('exifreader')
 const newRawMedia = require(__path.join(__basePath, 'app'))
-console.log(newRawMedia)
 
 // Define REST constants
 const baseUrlElement1 = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
@@ -34,46 +33,50 @@ const prepareName = (filePath) => {
     return correctedName
 }
 
-// Loop through media
-newRawMedia.forEach (
-    media => {
-          // Instantiate document
-        let metadata = {
-            name: prepareName(media),
-            dateTime: new Date(),
-            geometry: {
-                type: "", 
-                coordinates: {} 
+async function main() {
+    // Loop through media
+    newRawMedia.forEach (
+        media => {
+            // Instantiate document
+            let metadata = {
+                name: prepareName(media),
+                dateTime: new Date(),
+                geometry: {
+                    type: "", 
+                    coordinates: {} 
+                }
             }
-        }
-        // Get the exif data
-        ExifReader.load(media)
-            .then(data => {
-                metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
-                metadata.altitude = data.GPSAltitude.description
-                metadata.geometry.type = "Point"
-                metadata.geometry.coordinates.latitude = data.GPSLatitude.description
-                metadata.geometry.coordinates.longitude = data.GPSLongitude.description
-                // Attach reverse geo information based on geometry
-                getReverseGeoData(metadata.geometry.coordinates.latitude, metadata.geometry.coordinates.longitude).then(
-                    data => {       
-                        everything = []
-                        // Fuzzy match the Mapbox output
-                        addressComponents.forEach(addressComponent => {
-                            everything.push(data.features.filter(doc => doc.id.startsWith(addressComponent))
-                                .map(doc => doc.text)[0])
-                        })
-                        metadata.road = everything[0]
-                        metadata.postalCode = everything[1]
-                        metadata.location = everything[2]
-                        metadata.region = everything[3]
-                        metadata.country = everything[4]
+            // Get the exif data
+            ExifReader.load(media)
+                .then(data => {
+                    metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
+                    metadata.altitude = data.GPSAltitude.description
+                    metadata.geometry.type = "Point"
+                    metadata.geometry.coordinates.latitude = data.GPSLatitude.description
+                    metadata.geometry.coordinates.longitude = data.GPSLongitude.description
+                    // Attach reverse geo information based on geometry
+                    getReverseGeoData(metadata.geometry.coordinates.latitude, metadata.geometry.coordinates.longitude).then(
+                        data => {       
+                            everything = []
+                            // Fuzzy match the Mapbox output
+                            addressComponents.forEach(addressComponent => {
+                                everything.push(data.features.filter(doc => doc.id.startsWith(addressComponent))
+                                    .map(doc => doc.text)[0])
+                            })
+                            metadata.road = everything[0]
+                            metadata.postalCode = everything[1]
+                            metadata.location = everything[2]
+                            metadata.region = everything[3]
+                            metadata.country = everything[4]
 
-                        // Feed metadata into Mongoose model
-                        const document = new __Island(metadata)
-                        // Save document to DB
-                        document.save()
+                            // Feed metadata into Mongoose model
+                            const document = new __Island(metadata)
+                            // Save document to DB
+                            document.save()
+                        })
                     })
-                })
-            }
-        )    
+                }
+            ) 
+    }
+
+module.exports = main()
