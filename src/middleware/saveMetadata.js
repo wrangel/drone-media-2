@@ -49,6 +49,7 @@ async function save() {
             // Get the exif data
             ExifReader.load(media)
                 .then(data => {
+                    console.log(data)
                     metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
                     metadata.altitude = data.GPSAltitude.description
                     metadata.geometry.type = "Point"
