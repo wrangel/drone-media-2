@@ -53,8 +53,9 @@ app.get('/pano-viewer', (req, res, next) => {
 
 // Collect new media files
 async function renderMedia() {
-  const keepBooks = await require(__path.join(__middlewarePath, 'manageBooks'))
+  const [newRawMedia, existingMedia] = await require(__path.join(__middlewarePath, 'manageBooks'))
 
+  console.log(newRawMedia, existingMedia)
   /*
   module.exports = keepBooks
   await require(__path.join(__middlewarePath, 'saveMetadata')) 

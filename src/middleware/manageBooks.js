@@ -57,7 +57,11 @@ async function manage() {
             }   
         )
     }
-  return newRawMedia
+  return [newRawMedia, existingMedia]
 }
 
+/*
+manage().then(
+  data => console.log(data)
+)*/
 module.exports = manage()
