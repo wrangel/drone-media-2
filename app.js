@@ -12,7 +12,7 @@ global.__mediaPath = __path.join(__dirname, 'media')
 global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
 
 // Determine node.js run environment
-global.__runDockerized = false
+global.__runDockerized = true
 
 /// MANAGE METADATA
 // Load Mongoose model
@@ -22,6 +22,7 @@ global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 // Collect new metadata
 require(__path.join(__middlewarePath, 'manageBooks'))
 
+/*
 
 /// RENDER
 // Initialise Express and set port
@@ -69,3 +70,6 @@ require(__path.join(__middlewarePath, 'getMetadata'))
       }
   )
   .catch((error) => { console.log(error) })
+
+
+  */
