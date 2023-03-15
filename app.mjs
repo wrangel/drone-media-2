@@ -1,27 +1,22 @@
 /// PREPARE
-// Load Node modules
 import express from 'express'
-import path from 'path'
-global.__path = require('path')
 
-// Set and export web app directories
-const sourcePath = __path.join(__dirname, 'src')
-const pagesPath = __path.join(sourcePath, 'views', 'pages')
-global.__basePath = __dirname
-global.__middlewarePath = __path.join(sourcePath, 'middleware')
-global.__mediaPath = __path.join(__dirname, 'media')
-global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
-
-// Determine node.js run environment
-global.__runDockerized = false
 // Load Mongoose model
-global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
-
-/*
-
+import { Island } from './src/middleware/manageDb.mjs'
 
 // Collect and save new metadata as well as existing media
+import './src/middleware/manageBooks.mjs'
+
+
+
+
+/*
+//import { add, subtract } from './math.mjs'
+
+saveMetadata()
+
 async function saveMetadata() {
+
   const [newRawMedia, existingMedia] = await require(__path.join(__middlewarePath, 'manageBooks'))
 
   // Save the new metadata to the db

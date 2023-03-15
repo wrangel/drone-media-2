@@ -1,9 +1,11 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose'
+import Constants from '../middleware/constants.mjs'
+
 mongoose.set('strictQuery', false)
 
 // Set connection specifics
 // Use the same mongo service name as in docker-compose.yml
-const mongoHost = __runDockerized == true ? 'mongo' : 'localhost'
+const mongoHost = Constants.RUN_DOCKERIZED == true ? 'mongo' : 'localhost'
 const connectionString = 'mongodb://' + mongoHost + ':27017/'
 const db = 'ellesmereDB'
 
@@ -29,4 +31,4 @@ const islandSchema = new mongoose.Schema({
 
 const Island = mongoose.model('Island', islandSchema)
 
-module.exports = Island
+export { Island }

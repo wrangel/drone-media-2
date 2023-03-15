@@ -1,4 +1,7 @@
-const ExifReader = require('exifreader')
+import ExifReader from 'exifreader'
+
+/*
+
 const newRawMedia = require(__path.join(__basePath, 'app'))
 
 // Define REST constants
@@ -67,6 +70,7 @@ newRawMedia.forEach (
         //////await document.save()
     } 
 )
-*/
 
-module.exports = a
+
+
+*/
