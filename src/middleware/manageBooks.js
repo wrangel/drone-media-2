@@ -9,13 +9,6 @@ const rawMediaSuffix = '.tif'
 
 // Filter hidden files
 filterDots = file => !file.startsWith('.')
-
-// Save document to Mongo DB
-const saveMetadata = (files) => {
-  // Store new file's metadata in DB
-  module.exports = files
-  require(__path.join(__middlewarePath, 'saveMetadata'))
-}
           
 // Get existing media
 let existingMedia = []
@@ -35,12 +28,12 @@ async function main() {
     .select('name -_id'))
     .map(element => element.name)  
     
-    
     // Get all images which are newly added to the web app
     const newMedia = existingMedia.filter(({key}) => !existingMetadata.includes(key))
   
+    newRawMedia = []
+
     if (newMedia.length > 0) {
-        newRawMedia = []
         // Loop through media and check if they have been added since the last dump of metadata to the DB
         newMedia.forEach (
         medium => {
@@ -62,8 +55,24 @@ async function main() {
             newRawMedia.push(originalFile)
             }   
         )
-        saveMetadata(newRawMedia)
+        ////////await saveMetadata(newRawMedia)
     }
+  return newRawMedia
 }
 
-main()
+module.exports = main()
+
+
+/*
+
+main().then(
+  newRawMedia => console.log(newRawMedia)
+)
+
+// Save document to Mongo DB
+const saveMetadata = files => {
+  // Store new file's metadata in DB
+  module.exports = files
+  require(__path.join(__middlewarePath, 'saveMetadata'))
+}
+*/

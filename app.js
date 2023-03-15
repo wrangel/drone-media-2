@@ -12,15 +12,22 @@ global.__mediaPath = __path.join(__dirname, 'media')
 global.__mediaFolders = ['hdr', 'pano', 'wide_angle']
 
 // Determine node.js run environment
-global.__runDockerized = true
+global.__runDockerized = false
 
 /// MANAGE METADATA
 // Load Mongoose model
 global.__Island = require(__path.join(__middlewarePath, 'manageDb'))
 
 
-// Collect new metadata
-require(__path.join(__middlewarePath, 'manageBooks'))
+// Collect new media files
+async function main() {
+  const books = await require(__path.join(__middlewarePath, 'manageBooks'))
+  const newRawMedia = books
+  console.log(newRawMedia)
+
+}
+  
+main()
 
 /*
 
@@ -71,5 +78,4 @@ require(__path.join(__middlewarePath, 'getMetadata'))
   )
   .catch((error) => { console.log(error) })
 
-
-  */
+*/
