@@ -55,8 +55,10 @@ app.get('/pano-viewer', (req, res, next) => {
 async function renderMedia() {
   const keepBooks = await require(__path.join(__middlewarePath, 'manageBooks'))
 
+  /*
   module.exports = keepBooks
   await require(__path.join(__middlewarePath, 'saveMetadata')) 
+  */
 
 }
   
@@ -65,17 +67,6 @@ async function renderMedia() {
 renderMedia()
 
 /*
-
-
-  
-  
-
-// Save document to Mongo DB
-const saveMetadata = files => {
-  // Store new file's metadata in DB
-  module.exports = files
-  require(__path.join(__middlewarePath, 'saveMetadata'))
-}
 
 // Get the media and their metadata (a Promise)
 require(__path.join(__middlewarePath, 'getMetadata'))

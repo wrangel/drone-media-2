@@ -22,7 +22,7 @@ __mediaFolders.forEach(
   }
 )
 
-async function main() {
+async function manage() {
   // Get all existing metadata on db
   const existingMetadata = (await __Island.find({})
     .select('name -_id'))
@@ -56,9 +56,8 @@ async function main() {
             newRawMedia.push(originalFile)
             }   
         )
-        ////////await saveMetadata(newRawMedia)
     }
   return newRawMedia
 }
 
-module.exports = main()
+module.exports = manage()
