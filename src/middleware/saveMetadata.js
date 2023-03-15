@@ -33,62 +33,46 @@ const prepareName = (filePath) => {
 }
 
 
+// Loop through media
 newRawMedia.forEach (
     async media => {
-        /*
-        ExifReader.load(media)
-            .then(
-                a => console.log(a)
-            )
-            */
-        let metadata = await ExifReader.load(media)
-        console.log(metadata.DateTimeOriginal.description, prepareDate(metadata.DateTimeOriginal.description))
-        prepareDate(metadata.DateTimeOriginal.description)
-        metadata.GPSAltitude.description
-        //metadata.geometry.type = "Point"
-        metadata.GPSLatitude.description
-        metadata.GPSLongitude.description
-        
-        
+        // Instantiate document
+        let metadata = {
+            name: prepareName(media),
+            dateTime: new Date(),
+            geometry: {
+                type: "", 
+                coordinates: {} 
+            }
+        }
+        const exifdata = await ExifReader.load(media)
+        metadata.dateTime = prepareDate(exifdata.DateTimeOriginal.description)
+        metadata.altitude = exifdata.GPSAltitude.description
+        metadata.geometry.type = "Point"
+        metadata.geometry.coordinates.latitude = exifdata.GPSLatitude.description
+        metadata.geometry.coordinates.longitude = exifdata.GPSLongitude.description
+
+        // Attach reverse geo information based on geometry
+        const reverseGeoMetadata = await getReverseGeoData(metadata.geometry.coordinates.latitude, metadata.geometry.coordinates.longitude)
+        // Fuzzy match the Mapbox output
+        everything = []
+        addressComponents.forEach(addressComponent => {
+            everything.push(reverseGeoMetadata.features.filter(doc => doc.id.startsWith(addressComponent))
+                .map(doc => doc.text)[0])
+        })
+        console.log(everything)
     }
+    
 )
 
 
+
 /*
+
 async function save() {
-    // Loop through media
-    newRawMedia.forEach (
-        media => {
-            // Instantiate document
-            let metadata = {
-                name: prepareName(media),
-                dateTime: new Date(),
-                geometry: {
-                    type: "", 
-                    coordinates: {} 
-                }
-            }
-
-
-
-            /*
-            // Get the exif data
-            ExifReader.load(media)
-                .then(data => {
-                    console.log(data)
-
-
-
-                    metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
-                    metadata.altitude = data.GPSAltitude.description
-                    metadata.geometry.type = "Point"
-                    metadata.geometry.coordinates.latitude = data.GPSLatitude.description
-                    metadata.geometry.coordinates.longitude = data.GPSLongitude.description
-                    // Attach reverse geo information based on geometry
-                    getReverseGeoData(metadata.geometry.coordinates.latitude, metadata.geometry.coordinates.longitude).then(
-                        data => {       
-                            everything = []
-                            // Fuzzy match the Mapbox output
+       
+                            
+                            
                             addressComponents.forEach(addressComponent => {
                                 everything.push(data.features.filter(doc => doc.id.startsWith(addressComponent))
                                     .map(doc => doc.text)[0])
@@ -103,11 +87,7 @@ async function save() {
                             const document = new __Island(metadata)
                             // Save document to DB
                             document.save()
-                        })
-                    })
-                }
-            )
-           
+                       
     }
 
 save().then(
@@ -115,4 +95,5 @@ save().then(
 ).catch((error) => {
     console.error("Could not save metadata to the db:" + error)
   })
+  
   */
