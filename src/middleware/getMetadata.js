@@ -1,5 +1,6 @@
 const glob = require('glob')
 const globParent = require('glob-parent')
+const existingMedia = require(__path.join(__basePath, 'app'))
 
 // Prepare date for website
 const prepareDate = date => {
@@ -33,7 +34,23 @@ const prepareAltitude = altitude => {
 async function grab() {
   // Get all the metadata on the db
   const docs = await __Island.find({})
+
+
+
+  console.log(existingMedia)
+
+  const media = glob.sync(__mediaPath + '/*('+ __mediaFolders.toString().replaceAll(',', '|') + ')/*')
+      .map(path => {
+          const tmp = globParent(path)
+          const type = tmp.substring(tmp.lastIndexOf('/') + 1, tmp.length)
+          const viewer = type == 'pano' ? 'pano' : 'img'
+          const id = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
+          console.log(type, viewer, id)
+      }
+      )
   
+
+  /*
   // Create dict with all media files and their respective metadata
     const media = glob.sync(__mediaPath + '/*('+ __mediaFolders.toString().replaceAll(',', '|') + ')/*')
       .map(path => {
@@ -41,6 +58,9 @@ async function grab() {
           const type = tmp.substring(tmp.lastIndexOf('/') + 1, tmp.length)
           const viewer = type == 'pano' ? 'pano' : 'img'
           const id = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
+
+
+          
           // Get the respective db metadata
           const dbMetadata = docs.filter(i => i.name === id)[0]
           return {
@@ -62,6 +82,7 @@ async function grab() {
       })
 
     return media.reverse()
+    */
 }
 
 module.exports = grab()

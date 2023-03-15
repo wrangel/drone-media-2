@@ -59,6 +59,10 @@ async function renderMedia() {
   module.exports = newRawMedia
   await require(__path.join(__middlewarePath, 'saveMetadata')) 
 
+  // Grab the metadata
+  module.exports = existingMedia
+  await require(__path.join(__middlewarePath, 'getMetadata'))
+
 
 }
   
