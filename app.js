@@ -61,12 +61,11 @@ async function renderMedia() {
 
   // Grab the metadata
   module.exports = existingMedia
-  await require(__path.join(__middlewarePath, 'getMetadata'))
+  const metadata = await require(__path.join(__middlewarePath, 'getMetadata'))
+  console.log(metadata)
 
 
 }
-  
-
 
 renderMedia()
 
