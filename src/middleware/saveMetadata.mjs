@@ -4,12 +4,6 @@ import ExifReader from 'exifreader'
 
 const newRawMedia = require(__path.join(__basePath, 'app'))
 
-// Define REST constants
-const baseUrlElement1 = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
-const baseUrlElement2 = '.json?access_token='
-const ACCESS_TOKEN = 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ'
-const panoFirstImageName = 'DJI_0001'
-const addressComponents = ["address", "postcode", "place", "region", "country"]
 
 // GET reverse geo data
 async function getReverseGeoData(latitude, longitude) {
