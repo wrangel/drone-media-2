@@ -1,11 +1,8 @@
 /// PREPARE
 import express from 'express'
 
-// Load Mongoose model
-import { Island } from './src/middleware/manageDb.mjs'
-
 // Collect and save new metadata as well as existing media
-import './src/middleware/manageBooks.mjs'
+import { manage } from './src/middleware/manageBooks.mjs'
 
 
 
