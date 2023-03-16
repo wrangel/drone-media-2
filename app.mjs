@@ -1,27 +1,20 @@
 /// PREPARE
 import express from 'express'
 
-// Collect and save new metadata as well as existing media
+// Collect new metadata
 import { manage } from './src/middleware/manageBooks.mjs'
-const a = await manage()
+const newMedia = await manage()
 
+// Save new metadata
+/*import { save } from './src/middleware/saveMetadata.mjs'
+const x = save(newMedia) // TODO await!
+console.log(x)*/
+import './src/middleware/saveMetadata.mjs'
 
 
 /*
 //import { add, subtract } from './math.mjs'
 
-
-
-async function saveMetadata() {
-
-  module.exports = newRawMedia
-  const a = await require(__path.join(__middlewarePath, 'saveMetadata')) 
-
-  console.log(a)
-  //return existingMedia
-}
-
-saveMetadata()
 
 
 /// RENDER

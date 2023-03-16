@@ -42,16 +42,17 @@ async function manage() {
     .select('name -_id'))
     .map(element => element.name)
 
-    // Get all media which are newly added to the web app
-    const newMedia = existingMedia
-      .filter(({key}) => !existingMetadata.includes(key))
+  // Get all media which are newly added to the web app
+  const newMedia = existingMedia
+    .filter(({key}) => !existingMetadata.includes(key))
 
-      // TODO put that directly above to the existingMetadata
-      .map(medium => {
-        const folder = medium.folder
-        const key = medium.key
-        return {key: key, folder: folder, filePath: getFilePath(folder, key)}
-      })
+    // TODO put that directly above to the existingMetadata
+    .map(medium => {
+      const folder = medium.folder
+      const key = medium.key
+      return {key: key, folder: folder, filePath: getFilePath(folder, key)}
+    })
+  return newMedia
 }
 
 export { manage }
