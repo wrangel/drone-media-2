@@ -11,8 +11,10 @@ export default {
     BASE_URL_ELEMENT_2: '.json?access_token=',
     MEDIA_FOLDERS: ['hdr', 'pano', 'wide_angle'],
     PANO_FIRST_IMAGE: 'DJI_0001',
+    PORT: 8080,
     RAW_MEDIA_PREFIX: 'Einzelfotos',
     RAW_MEDIA_REPO,
     RAW_MEDIA_SUFFIX: '.tif',
     RUN_DOCKERIZED,
+    
 }

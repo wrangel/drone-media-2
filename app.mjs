@@ -1,5 +1,6 @@
 /// PREPARE
 import express from 'express'
+import Constants from './src/middleware/constants.mjs'
 
 // Load Mongoose model
 import { Island } from './src/middleware/manageDb.mjs'
@@ -8,37 +9,40 @@ import { Island } from './src/middleware/manageDb.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 const newMedia = await manage()
 
-
 // Save new metadata (in form of Mongoose Models)
 import {prepare} from './src/middleware/prepareMetadata.mjs'
 const metadata = await prepare(newMedia)
 
-// Save document to DB
-Island.insertMany(
-  metadata
-)
 
 /*
+// Save document to DB
+const save = await Island.insertMany(metadata)
+console.log(save)
+
+
+
+
 /// RENDER
 // Initialise Express and set port
 const app = express()
-const port = 8080
 
 // Render static files (css, ..)
-app.use(express.static(__dirname))
+app.use(express.static('./'))
 
 // Tell Express server to use ejs view engine
 app.set('view engine', 'ejs')
 
 // Determine port website will run on
-app.listen(port, (req, res) => {
-  console.log(`App is running on port ${port}`)
+app.listen(Constants.PORT, (req, res) => {
+  console.log(`App is running on port ${Constants.PORT}`)
 })
+
+
 
 // *** GET Routes - display pages ***
 //    Root Route
 //    --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data from the front-end to the server (usually via a form) typically before a page is rendered and the uploaded data is somehow used
-//    --> The ‘/’ specifies the URL of the website the code will activate on
+//    --> The ‘/’ specifies the URL o©f the website the code will activate on
 app.get('/', (req, res, next) => res.render(__path.join(pagesPath, 'index')))
 app.get('/about', (req, res, next) => res.render(__path.join(pagesPath, 'about')))
 

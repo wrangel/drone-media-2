@@ -1,5 +1,6 @@
-import exifr from 'exifr/dist/full.esm.mjs'
+import ExifReader from 'exifreader'
 import Constants from './constants.mjs'
+
 
 // Load Mongoose model
 import { Island } from './manageDb.mjs'
@@ -10,12 +11,25 @@ async function prepare(media) {
     // Get and aggregate all exifdata promises to one
     const exifdataPromise = Promise.all(media.map(
         media => {
-            return exifr.parse(media.filePath)
+            return ExifReader.load(media.filePath) // Slow, but reliable (exifr is fast, but omits timezone offset)
         }
     ))
 
     // wait ..
     const exifdata = await exifdataPromise
+
+        exifdata.forEach (
+            ed => {
+                console.log(
+                    ed.DateTimeOriginal.description,
+                    ed.GPSLatitude.description,
+                    ed.GPSLongitude.description,
+                    ed.GPSAltitude.description
+                )
+            }
+        )
+
+
 
     // Get the urls for the reverse engineering call
     const urls = exifdata.map (
@@ -62,18 +76,17 @@ async function prepare(media) {
         let exif = exifdata[i]
         metadata.name = media[i].key
         metadata.author = '' // TODO
-        metadata.dateTime = exif.DateTimeOriginal // TODO GMT + 1 (nicht GMT)
+        metadata.dateTime = exif.DateTimeOriginal.description
         metadata.geometry.type = "Point"
-        metadata.geometry.coordinates.latitude = exif.latitude
-        metadata.geometry.coordinates.longitude = exif.longitude
-        metadata.altitude = exif.GPSAltitude
+        metadata.geometry.coordinates.latitude = exif.GPSLatitude.description
+        metadata.geometry.coordinates.longitude = exif.GPSLongitude.description
+        metadata.altitude = exif.GPSAltitude.description
         metadata.country = reverse.country
         metadata.region = reverse.region
         metadata.location = reverse.place
         metadata.postalCode = reverse.postcode
         metadata.road = reverse.address
         metadata.noViews = 0
-        // Feed metadata into Mongoose model
         return new Island(metadata)
     })
 
