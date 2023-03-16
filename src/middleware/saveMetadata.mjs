@@ -235,13 +235,16 @@ exifdata.forEach(
 */
 
 
-
+// Get the urls for the reverse engineering call
 const urls = exifdata.map (
     ed => {
-        return Constants.BASE_URL_ELEMENT_1 + ed.longitude + ', ' + ed.latitude + Constants.BASE_URL_ELEMENT_2 + Constants.ACCESS_TOKEN
+        return Constants.BASE_URL_ELEMENT_1 + 
+        ed.longitude + ', ' + ed.latitude + 
+        Constants.BASE_URL_ELEMENT_2 + Constants.ACCESS_TOKEN
     }
 )
 
+// Get the jsons from the reverse engineering call
 const jsons = await Promise.all(
     urls.map(async url => {
         const resp = await fetch(url)
@@ -259,7 +262,7 @@ let a = jsons.map (
     }
 )
 
-console.log(a)
+//console.log(a)
 
 
 /*
