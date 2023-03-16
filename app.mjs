@@ -9,8 +9,8 @@ const newMedia = await manage()
 /*import { save } from './src/middleware/saveMetadata.mjs'
 const x = save(newMedia) // TODO await!
 console.log(x)*/
-import './src/middleware/saveMetadata.mjs'
-
+import {save} from './src/middleware/saveMetadata.mjs'
+await save(newMedia)
 
 /*
 //import { add, subtract } from './math.mjs'
