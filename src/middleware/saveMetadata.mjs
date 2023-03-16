@@ -223,18 +223,6 @@ const exifdataPromise = Promise.all(media.map(
 // wait ..
 const exifdata = await exifdataPromise
 
-/*
-exifdata.forEach(
-    i => {
-        console.log(i.GPSAltitude)
-        console.log(i.latitude)
-        console.log(i.longitude)
-        console.log(i.DateTimeOriginal)
-    }
-)
-*/
-
-
 // Get the urls for the reverse engineering call
 const urls = exifdata.map (
     ed => {
@@ -253,50 +241,61 @@ const jsons = await Promise.all(
     )
 )
 
-
-//console.log(jsons)
-
-let a = jsons.map (
+// Get the reverse geocoding data
+let reverseData = jsons.map (
     json => {
-        return json.features
+        let rd = []
+        Constants.ADDRESS_COMPONENTS.forEach(addressComponent => {
+            rd.push(json.features.filter(doc => doc.id.startsWith(addressComponent))
+                .map(doc => doc.text)[0])
+        })
+        return rd
     }
 )
 
-//console.log(a)
+let zip = reverseData.map(function (e, i) {
+    let exifdataElement = exifdata[i]
+    return [
+        media[i],
+        e, 
+        exifdataElement.latitude, 
+        exifdataElement.longitude,
+        exifdataElement.GPSAltitude,
+        exifdataElement.DateTimeOriginal
+    ]
+  })
+
+  console.log(zip);
 
 
 /*
-const response = 
-response.json()
-*/
-
-
-/*
-.then(data => {
-                metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
-                metadata.altitude = data.GPSAltitude.description
-                metadata.geometry.type = "Point"
-                metadata.geometry.coordinates.latitude = data.GPSLatitude.description
-                metadata.geometry.coordinates.longitude = data.GPSLongitude.description
-                // Attach reverse geo information based on geometry
-
 
 async function save(media) {
 }
 export { save }
-    
-       
 
-        // Attach reverse geo information based on geometry
-        const reverseGeoMetadata = await getReverseGeoData(
-            metadata.geometry.coordinates.latitude, metadata.geometry.coordinates.longitude
-            )
-        // Fuzzy match the Mapbox output
-        everything = []
-        addressComponents.forEach(addressComponent => {
-            everything.push(reverseGeoMetadata.features.filter(doc => doc.id.startsWith(addressComponent))
-                .map(doc => doc.text)[0])
-        })
+const islandSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    unique: true
+  },
+  author: String,
+  dateTime: Date,
+  geometry: {}, // TODO improve schema
+  altitude: String,
+  country: String,
+  region: String,
+  location: String,
+  postalCode: String,
+  road: String,
+  noViews: Number
+})
+
+ metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
+metadata.geometry.type = "Point"
+metadata.geometry.coordinates.latitude = data.GPSLatitude.description
+metadata.geometry.coordinates.longitude = data.GPSLongitude.description
+
         metadata.road = everything[0]
         metadata.postalCode = everything[1]
         metadata.location = everything[2]
@@ -307,9 +306,5 @@ export { save }
         t document = new __Island(metadata)
         // Save document to DB
         //////await document.save()
-    } 
-)
-
-
-
+    
 */
