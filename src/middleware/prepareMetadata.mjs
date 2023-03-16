@@ -1,6 +1,9 @@
 import exifr from 'exifr/dist/full.esm.mjs'
 import Constants from './constants.mjs'
 
+// Load Mongoose model
+import { Island } from './manageDb.mjs'
+
 // Save the data to the db
 async function prepare(media) {
 
@@ -70,7 +73,8 @@ async function prepare(media) {
         metadata.postalCode = reverse.postcode
         metadata.road = reverse.address
         metadata.noViews = 0
-        return metadata
+        // Feed metadata into Mongoose model
+        return new Island(metadata)
     })
 
     return combined   

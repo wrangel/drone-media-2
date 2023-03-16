@@ -4,31 +4,21 @@ import express from 'express'
 // Load Mongoose model
 import { Island } from './src/middleware/manageDb.mjs'
 
-// Collect new metadata
+// Manage the bookkeeping
 import { manage } from './src/middleware/manageBooks.mjs'
 const newMedia = await manage()
 
-// Save new metadata
-/*import { save } from './src/middleware/saveMetadata.mjs'
-const x = save(newMedia) // TODO await!
-console.log(x)*/
+
+// Save new metadata (in form of Mongoose Models)
 import {prepare} from './src/middleware/prepareMetadata.mjs'
 const metadata = await prepare(newMedia)
-console.log(metadata)
 
-
-
+// Save document to DB
+Island.insertMany(
+  metadata
+)
 
 /*
-
- // Feed metadata into Mongoose model
- const document = new Island(metadata)
-
- // Save document to DB
- await document.save()
-
-
-
 /// RENDER
 // Initialise Express and set port
 const app = express()
@@ -61,8 +51,6 @@ app.get('/pano-viewer', (req, res, next) => {
 })
 
 
-
-
   const getMetadata = require(__path.join(__middlewarePath, 'getMetadata'))
   const metadata = await getMetadata.grab(existingMedia)
 
@@ -76,6 +64,3 @@ app.get('/pano-viewer', (req, res, next) => {
   })
 
 */
-
-
-
