@@ -1,6 +1,9 @@
 /// PREPARE
 import express from 'express'
 
+// Load Mongoose model
+import { Island } from './src/middleware/manageDb.mjs'
+
 // Collect new metadata
 import { manage } from './src/middleware/manageBooks.mjs'
 const newMedia = await manage()
@@ -9,11 +12,20 @@ const newMedia = await manage()
 /*import { save } from './src/middleware/saveMetadata.mjs'
 const x = save(newMedia) // TODO await!
 console.log(x)*/
-import {save} from './src/middleware/saveMetadata.mjs'
-await save(newMedia)
+import {prepare} from './src/middleware/prepareMetadata.mjs'
+const metadata = await prepare(newMedia)
+console.log(metadata)
+
+
+
 
 /*
-//import { add, subtract } from './math.mjs'
+
+ // Feed metadata into Mongoose model
+ const document = new Island(metadata)
+
+ // Save document to DB
+ await document.save()
 
 
 

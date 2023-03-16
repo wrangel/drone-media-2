@@ -1,3 +1,4 @@
+
 const RUN_DOCKERIZED = false // Determine node.js run environment
 
 // for dockerized node, mount to the volume specified in docker-compose.yml
