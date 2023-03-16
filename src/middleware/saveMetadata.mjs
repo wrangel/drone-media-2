@@ -1,15 +1,7 @@
-import ExifReader from 'exifreader'
+import exifr from 'exifr/dist/full.esm.mjs'
+import Constants from '../middleware/constants.mjs'
 
-// GET reverse geo data
-async function getReverseGeoData(latitude, longitude) {
-    const response = await fetch (baseUrlElement1
-        + longitude + ', ' + latitude
-        + baseUrlElement2 + ACCESS_TOKEN
-    )
-    return response.json() // parses JSON response into native JavaScript objects
-}
-
-// Prepare corrected date which is legible to MongoDB
+// Prepare corrected date which is legible to MongoDB ////// TODO needed?
 const prepareDate = (originalDate) => {
     const [year, mon, day, hour, min, sec] = originalDate
         .split(" ").flatMap(e1 => e1.split(":")).map(e2 => parseInt(e2))
@@ -219,62 +211,76 @@ const media =
     }
   ]
 
-const exifdata = Promise.all(media.map(
+
+
+// Get and aggregate all exifdata promises to one
+const exifdataPromise = Promise.all(media.map(
     media => {
-        const rawData = ExifReader.load(media.filePath)
-        const a = rawData
-        
-        return rawData
+        return exifr.parse(media.filePath)
     }
 ))
 
-const d = await exifdata
-console.log(d)
-d.forEach(
+// wait ..
+const exifdata = await exifdataPromise
+
+/*
+exifdata.forEach(
     i => {
-        console.log("------------------------------------------------------------------------")
-        console.log(i)
+        console.log(i.GPSAltitude)
+        console.log(i.latitude)
+        console.log(i.longitude)
+        console.log(i.DateTimeOriginal)
+    }
+)
+*/
+
+
+
+const urls = exifdata.map (
+    ed => {
+        return Constants.BASE_URL_ELEMENT_1 + ed.longitude + ', ' + ed.latitude + Constants.BASE_URL_ELEMENT_2 + Constants.ACCESS_TOKEN
     }
 )
 
+const jsons = await Promise.all(
+    urls.map(async url => {
+        const resp = await fetch(url)
+        return resp.json()
+        }
+    )
+)
 
 
+//console.log(jsons)
 
-const allPromise2 = Promise.all([
-    //resolveTimeout(['potatoes', 'tomatoes'], 1000),
-    //resolveTimeout(['oranges', 'apples'], 1000),
-    ExifReader.load('/Volumes/docker/ellesmere/originals/wide_angle/Einzelfotos/100_0148/DJI_0001.JPG')
-  ]);
+let a = jsons.map (
+    json => {
+        return json.features
+    }
+)
 
-// wait...
-const lists2 = await allPromise2;
-console.log
-//console.log(lists2); 
+console.log(a)
 
 
-  /*
+/*
+const response = 
+response.json()
+*/
+
+
+/*
+.then(data => {
+                metadata.dateTime = prepareDate(data.DateTimeOriginal.description)
+                metadata.altitude = data.GPSAltitude.description
+                metadata.geometry.type = "Point"
+                metadata.geometry.coordinates.latitude = data.GPSLatitude.description
+                metadata.geometry.coordinates.longitude = data.GPSLongitude.description
+                // Attach reverse geo information based on geometry
 
 
 async function save(media) {
-    console.log(media)
-   const a = media.map(
-        media => {
-            ExifReader.load(media.filePath)
-        })
-    const b = Promise.all(a)
-    const c = await b
-    console.log(c)
 }
-
-
 export { save }
-
-
-
-
-
-// Loop through media, load each piece into db
-newRawMedia.forEach (
     
        
 
