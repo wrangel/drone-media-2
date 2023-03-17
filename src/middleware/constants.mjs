@@ -6,8 +6,7 @@ const RUN_DOCKERIZED = false
 export default {
     ACCESS_TOKEN: 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ', // TODO secret
     ADDRESS_COMPONENTS: ["address", "postcode", "place", "region", "country"],
-    BASE_URL_ELEMENT_1: 'https://api.mapbox.com/geocoding/v5/mapbox.places/',
-    BASE_URL_ELEMENT_2: '.json?access_token=',
+    REVERSE_GEO_URL_ELEMENTS: ['https://api.mapbox.com/geocoding/v5/mapbox.places/','.json?access_token='],
     MEDIA_FOLDERS: ['hdr', 'pano', 'wide_angle'],
     PANO_FIRST_IMAGE: 'DJI_0001',
     PORT: 8080,
