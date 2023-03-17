@@ -10,7 +10,9 @@ const prepareTimestamp = datetimeString => {
       element => element.split(':')
     )
       .map (element => parseInt(element))
-    return new Date(Date.UTC(y,m,d,h,M,s))
+    // Correct for 1 month
+    const rawDate = new Date(Date.UTC(y,m,d,h,M,s))
+    return rawDate.setMonth(rawDate.getMonth() - 1)
   }
 
 // Save the data to the db

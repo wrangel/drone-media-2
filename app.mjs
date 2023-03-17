@@ -1,7 +1,7 @@
 /// PREPARE
 import express from 'express'
 import Constants from './src/middleware/constants.mjs'
-import { Island } from './src/middleware/manageDb.mjs' ////////
+import { Island } from './src/middleware/manageDb.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 import {prepare} from './src/middleware/prepareMetadata.mjs'
 import {beautify} from './src/middleware/beautifyMetadata.mjs'
@@ -14,7 +14,6 @@ const newMetadata = await prepare(newMedia)
 
 // Save document to DB
 const save = await Island.insertMany(newMetadata)
-//////console.log(save)
 
 
 /// RENDER
