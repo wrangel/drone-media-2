@@ -23,9 +23,9 @@ const prepareRoad = road => {
   return road == undefined ? '' : ', above ' + road
 }
 
+// Get all the metadata from the db
 async function grab() {
   const docs = Island.find({})
-  console.log("sdfsdfsd")
   return docs
 }
 
@@ -34,21 +34,6 @@ export { grab }
 
 /*
 
-// Prepare all metadata
-exports.grab = async function(existingMedia) {
-  // Get all the metadata on the db
-  const docs = await __Island.find({})
-  console.log(docs)
-
-  // Compile the needed metadata (there might me more on the db)
-  return existingMedia.map (
-    medium => {
-      const name = medium.key
-      const type = medium.folder
-      const dbMetadata = docs.filter(i => i.name === name)[0]
-      console.log(dbMetadata)
-
-      /////
       return {
         name: name,
         type: type,

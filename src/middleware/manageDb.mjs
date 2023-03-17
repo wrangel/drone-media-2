@@ -17,6 +17,7 @@ const islandSchema = new mongoose.Schema({
     type: String,
     unique: true
   },
+  type: String,
   author: String,
   dateTime: Date,
   geometry: {}, // TODO improve schema

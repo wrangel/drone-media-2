@@ -68,8 +68,10 @@ async function prepare(media) {
 
     // Combine everything into the Mongoose compatible metadata
     const combined = reverseData.map(function (reverse, i) {
-        let exif = exifdata[i]
-        metadata.name = media[i].key
+        const base = media[i]
+        const exif = exifdata[i]
+        metadata.name = base.key
+        metadata.type = base.folder
         metadata.author = '' // TODO
         metadata.dateTime = prepareTimestamp(exif.DateTimeOriginal.description)
         metadata.geometry.type = 'Point'

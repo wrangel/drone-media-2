@@ -9,8 +9,6 @@ import { Island } from './src/middleware/manageDb.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 const newMedia = await manage()
 
-/*
-
 // Save new metadata (in form of Mongoose Models)
 import {prepare} from './src/middleware/prepareMetadata.mjs'
 const newMetadata = await prepare(newMedia)
@@ -19,7 +17,7 @@ const newMetadata = await prepare(newMedia)
 const save = await Island.insertMany(newMetadata)
 console.log(save)
 
-
+/*
 /// RENDER
 // Initialise Express
 const app = express()
@@ -38,13 +36,13 @@ app.listen(Constants.PORT, (req, res) => {
   console.log(`App is running on port ${Constants.PORT}`)
 })
 
--- *** GET Routes - display pages ***
+/* *** GET Routes - display pages ***
     Root Route
     --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data 
         from the front-end to the server (usually via a form) typically before a page is rendered and 
         the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
---
+
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 

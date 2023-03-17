@@ -49,8 +49,7 @@ async function manage() {
   const removableKeys = existingMetadata.filter(x => !existingMediaKeys.includes(x))
   const deleted = await Island.deleteMany( { name : { $in : removableKeys } } )
   console.log(deleted)
-    
-
+  
   // Get all media which are newly added to the web app
   const newMedia = existingMedia
     .filter(({key}) => !existingMetadata.includes(key))
