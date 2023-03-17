@@ -4,14 +4,13 @@ import Constants from '../middleware/constants.mjs'
 mongoose.set('strictQuery', false)
 
 // Set connection specifics
-// Use the same mongo service name as in docker-compose.yml
-const mongoHost = Constants.RUN_DOCKERIZED == true ? 'mongo' : 'localhost'
-const connectionString = 'mongodb://' + mongoHost + ':27017/'
+const user = 'f984hjn3d23'
+const password = 'cXtNUDejRZ8MNpcv4x4dPQddyw2sCjs2RpLNj8h4P4Uy4sw3ZWfmUJ74J4dgEefxUMg4qqFqmAwtrxPCXnmudPLaDTrdTccjeusQ'
 const db = 'ellesmereDB'
 
-mongoose.connect(connectionString + db)
-// TODO use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
+mongoose.connect(`mongodb+srv://${user}:${password}@baffin.eo7kmjw.mongodb.net/${db}?retryWrites=true&w=majority`)
 
+// Create Mongoose schema
 const islandSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -30,6 +29,7 @@ const islandSchema = new mongoose.Schema({
   noViews: Number
 })
 
+// Create Mongoose model
 const Island = mongoose.model('Island', islandSchema)
 
 export { Island }
