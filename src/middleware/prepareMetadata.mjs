@@ -87,6 +87,7 @@ async function prepare(media) {
         return new Island(metadata)
     })
 
+    console.log("Added records to metadata")
     return combined
 }
 

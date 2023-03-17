@@ -1,3 +1,5 @@
+import { Island } from './manageDb.mjs'
+
 // Prepare date for website
 const prepareDate = date => {
   const options = {
@@ -16,7 +18,12 @@ const prepareDate = date => {
 }
 
 // Adapt metadata to show prettily on the website
-const beautify = docs => {
+const beautify = async mediaFolder => {
+
+  const docs = await Island.find({ type : mediaFolder})
+        .sort({ name: -1 })
+        .lean()
+        
   const makePretty = docs.map (doc => {
     return {
       name: doc.name,
@@ -25,7 +32,7 @@ const beautify = docs => {
       dateTime: prepareDate(doc.dateTime),
       latitude: doc.geometry.coordinates.latitude,
       longitude: doc.geometry.coordinates.longitude,
-      altitude: doc.altitude,
+      altitude: doc.altitude + 'm',
       country: doc.country,
       region: doc.region,
       location: doc.location,

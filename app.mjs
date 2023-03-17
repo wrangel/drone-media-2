@@ -1,7 +1,7 @@
 /// PREPARE
 import express from 'express'
 import Constants from './src/middleware/constants.mjs'
-import { Island } from './src/middleware/manageDb.mjs'
+import { Island } from './src/middleware/manageDb.mjs' ////////
 import { manage } from './src/middleware/manageBooks.mjs'
 import {prepare} from './src/middleware/prepareMetadata.mjs'
 import {beautify} from './src/middleware/beautifyMetadata.mjs'
@@ -53,38 +53,16 @@ app.get('/pano-viewer', (req, res, next) => {
   res.render('pages/pano-viewer', { img: req.query.img } )
 })
 
-
-
-
-
 async function render() {
     // Route media folders, provide them with  metadata
     Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
-
-      // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
-      const docs = await Island.find({ type : mediaFolder})
-        .sort({ name: -1 })
-        .lean()
-      
-      const prettyDocs = beautify(docs)
-      
-      console.log(prettyDocs)
-      console.log("-----------------------------------")
-      
-    })
-
-}
-
-render()
-    
-
-/*
-  __mediaFolders.forEach(element => {
-    app.get('/' + element, (req, res, next) => {
-      res.render(__path.join(pagesPath, 'media'), {
-          data: metadata.filter(f => f.type == element)
+        // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
+        const prettyDocs = await beautify(mediaFolder)
+        // Call the media.ejs for each of the media types, with the respective metadata
+        app.get('/' + mediaFolder, (req, res, next) => {
+          res.render('pages/media', {data: prettyDocs})
       })
     })
-  })
+  }
 
-*/
+  render()
