@@ -18,41 +18,32 @@ const prepareDate = date => {
   return new Intl.DateTimeFormat("en-US", options).format(date)
 }
 
-// Prepare location
-const prepareRoad = road => {
-  return road == undefined ? '' : ', above ' + road
-}
-
 // Get all the metadata from the db
 async function grab() {
   const docs = Island.find({})
+  
   return docs
+
+
+  /*
+  console.log(docs.dateTime)
+  return {
+    name: docs.name,
+    type: docs.type,
+    viewer: docs.type == 'pano' ? 'pano' : 'img',
+    author: "", // TODO
+    dateTime: prepareDate(docs.dateTime),
+    latitude: docs.geometry.coordinates.latitude,
+    longitude: docs.geometry.coordinates.longitude,
+    altitude: docs.altitude,
+    country: docs.country,
+    region: docs.region,
+    location: docs.location,
+    postalCode: docs.postalCode,
+    road: docs.road == undefined ? '' : ', above ' + docs.road,
+    noViews: 0
+  }.reverse()
+  */
 }
 
 export { grab }
-
-
-/*
-
-      return {
-        name: name,
-        type: type,
-        viewer: type == 'pano' ? 'pano' : 'img',
-        author: "", // TODO
-        dateTime: prepareDate(dbMetadata.dateTime),
-        latitude: dbMetadata.geometry.coordinates.latitude,
-        longitude: dbMetadata.geometry.coordinates.longitude,
-        altitude: prepareAltitude(dbMetadata.altitude),
-        country: dbMetadata.country,
-        region: dbMetadata.region,
-        location: dbMetadata.location,
-        postalCode: dbMetadata.postalCode,
-        road: prepareRoad(dbMetadata.road),
-        noViews: 0 // TODO
-      }
-      ///////
-    }
-  ).reverse()
-}
-
-*/

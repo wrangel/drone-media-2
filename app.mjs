@@ -17,7 +17,7 @@ const newMetadata = await prepare(newMedia)
 const save = await Island.insertMany(newMetadata)
 console.log(save)
 
-/*
+
 /// RENDER
 // Initialise Express
 const app = express()
@@ -32,7 +32,7 @@ app.use(express.static('.'))
 app.set('view engine', 'ejs')
 
 // Determine port website will run on
-app.listen(Constants.PORT, (req, res) => {
+app.listen(Constants.PORT, (req, res, next) => {
   console.log(`App is running on port ${Constants.PORT}`)
 })
 
@@ -42,7 +42,7 @@ app.listen(Constants.PORT, (req, res) => {
         from the front-end to the server (usually via a form) typically before a page is rendered and 
         the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
-
+*/
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
@@ -54,19 +54,39 @@ app.get('/pano-viewer', (req, res, next) => {
   res.render('pages/pano-viewer', { img: req.query.img } )
 })
 
+
+
+/*
 // Get the metadata from the db
 import {grab} from './src/middleware/getMetadata.mjs'
 const metadata = await grab()
 console.log(metadata)
+*/
 
 
+
+
+async function render() {
+
+  const selected = await Island.find({ type : { $in : Constants.MEDIA_FOLDERS} })
+  //console.log(selected)
+
+
+    Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
+        const a = await Island.find({ type : mediaFolder} )
+        console.log(a)
+        console.log("-------------------------------------------------")
+        //return a
+    })
+
+}
+
+render()
+    
 
 
 
 /*
-const getMetadata = require(__path.join(__middlewarePath, 'getMetadata'))
-
-  const metadata = await getMetadata.grab(existingMedia)
 
   // Route media folders, provide them with 'media' data
   __mediaFolders.forEach(element => {

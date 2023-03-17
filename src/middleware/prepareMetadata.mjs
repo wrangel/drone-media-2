@@ -18,8 +18,8 @@ async function prepare(media) {
  
     // Get and aggregate all exifdata promises to one
     const exifdataPromise = Promise.all(media.map(
-        media => {
-            return ExifReader.load(media.filePath) // Slow, but reliable (exifr is fast, but omits timezone offset)
+        medium => {
+            return ExifReader.load(medium.filePath) // Slow, but reliable (exifr is fast, but omits timezone offset)
         }
     ))
 
