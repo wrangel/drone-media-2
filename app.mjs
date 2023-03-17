@@ -1,16 +1,15 @@
 /// PREPARE
 import express from 'express'
 import Constants from './src/middleware/constants.mjs'
-
-// Load Mongoose model
 import { Island } from './src/middleware/manageDb.mjs'
+import { manage } from './src/middleware/manageBooks.mjs'
+import {prepare} from './src/middleware/prepareMetadata.mjs'
+import {beautify} from './src/middleware/beautifyMetadata.mjs'
 
 // Update the media metadata, if necessary
-import { manage } from './src/middleware/manageBooks.mjs'
 const newMedia = await manage()
 
 // Save new metadata (in form of Mongoose Models)
-import {prepare} from './src/middleware/prepareMetadata.mjs'
 const newMetadata = await prepare(newMedia)
 
 // Save document to DB
@@ -56,7 +55,7 @@ app.get('/pano-viewer', (req, res, next) => {
 
 
 
-import { beautify } from './src/middleware/beautifyMetadata.mjs'
+
 
 async function render() {
     // Route media folders, provide them with  metadata
