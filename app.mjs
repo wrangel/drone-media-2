@@ -56,15 +56,21 @@ app.get('/pano-viewer', (req, res, next) => {
 
 
 
-
+import { beautify } from './src/middleware/beautifyMetadata.mjs'
 
 async function render() {
     // Route media folders, provide them with  metadata
     Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
-        const metadata = await Island.find({ type : mediaFolder}).sort({ name: -1 })
-        console.log(metadata)
-        console.log("-----------------------------------")
 
+      // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
+      const docs = await Island.find({ type : mediaFolder})
+        .sort({ name: -1 })
+        .lean()
+      
+      const prettyDocs = beautify(docs)
+      
+      console.log(prettyDocs)
+      console.log("-----------------------------------")
       
     })
 
