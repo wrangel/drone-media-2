@@ -36,23 +36,26 @@ app.listen(Constants.PORT, (req, res) => {
   console.log(`App is running on port ${Constants.PORT}`)
 })
 
-// *** GET Routes - display pages ***
-//    Root Route
-//    --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data from the front-end to the server (usually via a form) typically before a page is rendered and the uploaded data is somehow used
-//    --> The ‘/’ specifies the URL o©f the website the code will activate on
+/* *** GET Routes - display pages ***
+    Root Route
+    --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data 
+        from the front-end to the server (usually via a form) typically before a page is rendered and 
+        the uploaded data is somehow used
+    --> The ‘/’ specifies the URL of the website the code will activate on
+*/
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
-/*
-
 app.get('/img-viewer', (req, res, next) => {
-  res.render(__path.join(pagesPath, 'img-viewer'), { type: req.query.type, img: req.query.img } )
+  res.render('pages/img-viewer', { type: req.query.type, img: req.query.img } )
 })
 
 app.get('/pano-viewer', (req, res, next) => {
-  res.render(__path.join(pagesPath, 'pano-viewer'), { img: req.query.img } )
+  res.render('pages/pano-viewer', { img: req.query.img } )
 })
 
+
+/*
 
   const getMetadata = require(__path.join(__middlewarePath, 'getMetadata'))
   const metadata = await getMetadata.grab(existingMedia)
