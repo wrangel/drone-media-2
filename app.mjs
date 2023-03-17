@@ -56,27 +56,16 @@ app.get('/pano-viewer', (req, res, next) => {
 
 
 
-/*
-// Get the metadata from the db
-import {grab} from './src/middleware/getMetadata.mjs'
-const metadata = await grab()
-console.log(metadata)
-*/
-
-
 
 
 async function render() {
-
-  const selected = await Island.find({ type : { $in : Constants.MEDIA_FOLDERS} })
-  //console.log(selected)
-
-
+    // Route media folders, provide them with  metadata
     Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
-        const a = await Island.find({ type : mediaFolder} )
-        console.log(a)
-        console.log("-------------------------------------------------")
-        //return a
+        const metadata = await Island.find({ type : mediaFolder}).sort({ name: -1 })
+        console.log(metadata)
+        console.log("-----------------------------------")
+
+      
     })
 
 }
@@ -84,11 +73,7 @@ async function render() {
 render()
     
 
-
-
 /*
-
-  // Route media folders, provide them with 'media' data
   __mediaFolders.forEach(element => {
     app.get('/' + element, (req, res, next) => {
       res.render(__path.join(pagesPath, 'media'), {

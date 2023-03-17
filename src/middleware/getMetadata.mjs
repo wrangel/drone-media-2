@@ -1,6 +1,3 @@
-// Load Mongoose model
-import { Island } from './manageDb.mjs'
-
 // Prepare date for website
 const prepareDate = date => {
   options = {
@@ -18,20 +15,12 @@ const prepareDate = date => {
   return new Intl.DateTimeFormat("en-US", options).format(date)
 }
 
-// Get all the metadata from the db
-async function grab() {
-  const docs = Island.find({})
-  
-  return docs
-
 
   /*
-  console.log(docs.dateTime)
   return {
     name: docs.name,
     type: docs.type,
     viewer: docs.type == 'pano' ? 'pano' : 'img',
-    author: "", // TODO
     dateTime: prepareDate(docs.dateTime),
     latitude: docs.geometry.coordinates.latitude,
     longitude: docs.geometry.coordinates.longitude,
@@ -42,8 +31,5 @@ async function grab() {
     postalCode: docs.postalCode,
     road: docs.road == undefined ? '' : ', above ' + docs.road,
     noViews: 0
-  }.reverse()
+  }
   */
-}
-
-export { grab }
