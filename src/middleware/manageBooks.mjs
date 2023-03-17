@@ -38,9 +38,15 @@ const getFilePath = (folder, key) => {
 // Get all the newly added media
 async function manage() {
   // Get all existing metadata on db
-  const existingMetadata = (await Island.find({})
-    .select('name -_id'))
+  const existingMetadata = (
+    await Island.find({})
+    .select('name -_id')
+  )
     .map(element => element.name)
+
+  console.log(existingMetadata)
+
+  // Remove all metadata from db which is not in the app's media folder
 
   // Get all media which are newly added to the web app
   const newMedia = existingMedia

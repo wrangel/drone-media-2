@@ -1,3 +1,6 @@
+// Load Mongoose model
+import { Island } from './manageDb.mjs'
+
 // Prepare date for website
 const prepareDate = date => {
   options = {
@@ -20,11 +23,16 @@ const prepareRoad = road => {
   return road == undefined ? '' : ', above ' + road
 }
 
-// Prepare altitude
-const prepareAltitude = altitude => {
-  const components = altitude.split(' ')
-  return Number(components[0]).toFixed(2) + ' ' + components[1]
+async function grab() {
+  const docs = Island.find({})
+  console.log("sdfsdfsd")
+  return docs
 }
+
+export { grab }
+
+
+/*
 
 // Prepare all metadata
 exports.grab = async function(existingMedia) {
@@ -40,7 +48,7 @@ exports.grab = async function(existingMedia) {
       const dbMetadata = docs.filter(i => i.name === name)[0]
       console.log(dbMetadata)
 
-      /*
+      /////
       return {
         name: name,
         type: type,
@@ -57,7 +65,9 @@ exports.grab = async function(existingMedia) {
         road: prepareRoad(dbMetadata.road),
         noViews: 0 // TODO
       }
-      */
+      ///////
     }
   ).reverse()
 }
+
+*/
