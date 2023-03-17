@@ -13,14 +13,12 @@ const newMedia = await manage()
 import {prepare} from './src/middleware/prepareMetadata.mjs'
 const metadata = await prepare(newMedia)
 
-
-/*
 // Save document to DB
 const save = await Island.insertMany(metadata)
 console.log(save)
 
 
-
+/*
 
 /// RENDER
 // Initialise Express and set port
