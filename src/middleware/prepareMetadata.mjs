@@ -15,7 +15,7 @@ const prepareTimestamp = datetimeString => {
 
 // Save the data to the db
 async function prepare(media) {
-
+ 
     // Get and aggregate all exifdata promises to one
     const exifdataPromise = Promise.all(media.map(
         media => {
@@ -28,9 +28,9 @@ async function prepare(media) {
 
     // Get the urls for the reverse engineering call
     const urls = exifdata.map (
-        ed => {
+        exif => {
             return Constants.BASE_URL_ELEMENT_1 + 
-            ed.longitude + ', ' + ed.latitude + 
+            exif.GPSLongitude.description + ', ' + exif.GPSLatitude.description + 
             Constants.BASE_URL_ELEMENT_2 + Constants.ACCESS_TOKEN
         }
     )
@@ -45,16 +45,16 @@ async function prepare(media) {
     )
 
     // Get the reverse geocoding data
-    let reverseData = jsons.map (
+    const reverseData = jsons.map (
         json => {
-            let rd = {}
+            let data = {}
             Constants.ADDRESS_COMPONENTS.forEach(addressComponent => {
-                rd[addressComponent] = 
+                data[addressComponent] = 
                     json.features
                         .filter(doc => doc.id.startsWith(addressComponent))
                         .map(doc => doc.text)[0]
             })
-            return rd
+            return data
         }
     )
 
@@ -72,7 +72,7 @@ async function prepare(media) {
         metadata.name = media[i].key
         metadata.author = '' // TODO
         metadata.dateTime = prepareTimestamp(exif.DateTimeOriginal.description)
-        metadata.geometry.type = "Point"
+        metadata.geometry.type = 'Point'
         metadata.geometry.coordinates.latitude = exif.GPSLatitude.description
         metadata.geometry.coordinates.longitude = exif.GPSLongitude.description
         metadata.altitude = parseFloat(exif.GPSAltitude.description.replace(' m', ''))
@@ -85,7 +85,7 @@ async function prepare(media) {
         return new Island(metadata)
     })
 
-    return combined   
+    return combined
 }
 
 export { prepare }

@@ -5,7 +5,7 @@ import Constants from './src/middleware/constants.mjs'
 // Load Mongoose model
 import { Island } from './src/middleware/manageDb.mjs'
 
-// Manage the bookkeeping
+// Update the media metadata, if necessary
 import { manage } from './src/middleware/manageBooks.mjs'
 const newMedia = await manage()
 
@@ -18,10 +18,8 @@ const save = await Island.insertMany(metadata)
 console.log(save)
 
 
-/*
-
 /// RENDER
-// Initialise Express and set port
+// Initialise Express
 const app = express()
 
 // Render static files (css, ..)
@@ -37,12 +35,27 @@ app.listen(Constants.PORT, (req, res) => {
 
 
 
+
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+console.log(__dirname)
+
+
 // *** GET Routes - display pages ***
 //    Root Route
 //    --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data from the front-end to the server (usually via a form) typically before a page is rendered and the uploaded data is somehow used
 //    --> The ‘/’ specifies the URL o©f the website the code will activate on
-app.get('/', (req, res, next) => res.render(__path.join(pagesPath, 'index')))
+app.get('/', (req, res, next) => res.render('index'))
+
+/*
+
 app.get('/about', (req, res, next) => res.render(__path.join(pagesPath, 'about')))
+
+console.log("ssdfsdf")
+
+
 
 app.get('/img-viewer', (req, res, next) => {
   res.render(__path.join(pagesPath, 'img-viewer'), { type: req.query.type, img: req.query.img } )
