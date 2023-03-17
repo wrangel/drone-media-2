@@ -1,3 +1,4 @@
+// Load Mongoose model
 import { Island } from './manageDb.mjs'
 
 // Prepare date for website
