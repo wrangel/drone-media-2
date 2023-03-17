@@ -86,8 +86,6 @@ async function prepare(media) {
         metadata.noViews = 0
         return new Island(metadata)
     })
-
-    console.log("Added records to metadata")
     return combined
 }
 

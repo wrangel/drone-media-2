@@ -14,7 +14,7 @@ const newMetadata = await prepare(newMedia)
 
 // Save document to DB
 const save = await Island.insertMany(newMetadata)
-console.log(save)
+//////console.log(save)
 
 
 /// RENDER
