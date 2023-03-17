@@ -22,8 +22,11 @@ console.log(save)
 // Initialise Express
 const app = express()
 
-// Render static files (css, ..)
-app.use(express.static('./'))
+// Set views directory
+app.set('views', './src/views')
+
+// Render static files from root folder (css, ..)
+app.use(express.static('.'))
 
 // Tell Express server to use ejs view engine
 app.set('view engine', 'ejs')
@@ -33,29 +36,14 @@ app.listen(Constants.PORT, (req, res) => {
   console.log(`App is running on port ${Constants.PORT}`)
 })
 
-
-
-
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-console.log(__dirname)
-
-
 // *** GET Routes - display pages ***
 //    Root Route
 //    --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data from the front-end to the server (usually via a form) typically before a page is rendered and the uploaded data is somehow used
 //    --> The ‘/’ specifies the URL o©f the website the code will activate on
-app.get('/', (req, res, next) => res.render('index'))
+app.get('/', (req, res, next) => res.render('pages/index'))
+app.get('/about', (req, res, next) => res.render('pages/about'))
 
 /*
-
-app.get('/about', (req, res, next) => res.render(__path.join(pagesPath, 'about')))
-
-console.log("ssdfsdf")
-
-
 
 app.get('/img-viewer', (req, res, next) => {
   res.render(__path.join(pagesPath, 'img-viewer'), { type: req.query.type, img: req.query.img } )
