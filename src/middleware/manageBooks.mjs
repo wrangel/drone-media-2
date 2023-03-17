@@ -44,9 +44,12 @@ async function manage() {
   )
     .map(element => element.name)
 
-  console.log(existingMetadata)
-
   // Remove all metadata from db which is not in the app's media folder
+  const existingMediaKeys = existingMedia.map(element => {return element.key})
+  const removableKeys = existingMetadata.filter(x => !existingMediaKeys.includes(x))
+  const deleted = await Island.deleteMany( { name : { $in : removableKeys } } )
+  console.log(deleted)
+    
 
   // Get all media which are newly added to the web app
   const newMedia = existingMedia
