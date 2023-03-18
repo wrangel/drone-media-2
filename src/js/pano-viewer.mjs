@@ -1,4 +1,4 @@
-//import { Viewer } from './app.mjs'
+//import { Viewer } from './app.mjs' // TODO
 
 const panoMaxFov = 110 // 90, zoom out
 const panoMinFov = 10 // 30, zoom in
@@ -10,7 +10,7 @@ const animatedValues = {
     fisheye: { start: 2, end: 0 },
 }
 
-const viewer = new Viewer({
+const viewer = new PhotoSphereViewer.Viewer({
     container: document.querySelector('#viewer'),
     panorama: './media/pano/' + img+ '.jpeg',
     maxFov: panoMaxFov, 
