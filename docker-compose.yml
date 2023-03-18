@@ -3,15 +3,8 @@ services:
   web:
     image: wrangel/ellesmere:latest
     build: .
-    command: "node app.js"
+    command: "node app.mjs"
     ports:
       - "8080:8080"
-    depends_on:
-      - "mongo"
     volumes:
-    - /Volumes/docker/ellesmere/originals:/mnt/originals
-  mongo:
-    image: "mongo"
-    ports:
-      - "27017:27017"©
-    # platform: "linux/amd64"
+      - /Volumes/docker/ellesmere/originals/:/mnt/originals

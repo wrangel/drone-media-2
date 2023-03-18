@@ -22,7 +22,7 @@ const prepareDate = date => {
 const beautify = async mediaFolder => {
 
   const docs = await Island.find({ type : mediaFolder })
-        .sort({ name: -1 })
+        .sort({ dateTime: -1 })
         .lean()
         
   const makePretty = docs.map (doc => {
