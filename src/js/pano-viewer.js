@@ -1,5 +1,5 @@
-const panoMaxFov = 110; // 90, zoom out
-const panoMinFov = 10; // 30, zoom in
+const panoMaxFov = 110 // 90, zoom out
+const panoMinFov = 10 // 30, zoom in
 
 const animatedValues = {
     pitch: { start: -Math.PI / 2, end: -0.1 }, // end: 0.2
@@ -8,11 +8,9 @@ const animatedValues = {
     fisheye: { start: 2, end: 0 },
 }
 
-console.log(__path.join(__mediaPath, 'pano', img + '.jpeg'))
-
 const viewer = new PhotoSphereViewer.Viewer({
     container: document.querySelector('#viewer'),
-    panorama: __path.join(__mediaPath, 'pano', img + '.jpeg'),
+    panorama: './media/pano/' + img+ '.jpeg',
     maxFov: panoMaxFov, 
     minFov: panoMinFov,
     defaultPitch: animatedValues.pitch.start,
@@ -43,7 +41,7 @@ const viewer = new PhotoSphereViewer.Viewer({
             title: 'Panorama view',
             className: 'panorama-button',
             onClick: (viewer) => {
-                intro();
+                intro()
             },
         },
     ],
@@ -58,7 +56,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 })
 
 // Get autorotate plugin
-const autorotate = viewer.getPlugin(PhotoSphereViewer.AutorotatePlugin);
+const autorotate = viewer.getPlugin(PhotoSphereViewer.AutorotatePlugin)
 
 function intro() {
     autorotate.stop()
@@ -68,11 +66,11 @@ function intro() {
         easing: 'inOutQuad',
         onTick: (properties) => {
             viewer.setOption('fisheye', properties.fisheye);
-            viewer.rotate({ yaw: properties.yaw, pitch: properties.pitch });
+            viewer.rotate({ yaw: properties.yaw, pitch: properties.pitch })
             viewer.zoom(properties.zoom);
         },
     }).then(() => {
-        autorotate.start();
+        autorotate.start()
     })
 }
 

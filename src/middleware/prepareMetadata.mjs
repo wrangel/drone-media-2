@@ -31,9 +31,9 @@ async function prepare(media) {
     // Get the urls for the reverse engineering call
     const urls = exifdata.map (
         exif => {
-            return Constants.REVERSE_GEO_URL_ELEMENTS + 
+            return Constants.REVERSE_GEO_URL_ELEMENTS[0] + 
             exif.GPSLongitude.description + ', ' + exif.GPSLatitude.description + 
-            Constants.BASE_URL_ELEMENT_2 + Constants.ACCESS_TOKEN
+            Constants.REVERSE_GEO_URL_ELEMENTS[1] + Constants.ACCESS_TOKEN
         }
     )
 
