@@ -1,19 +1,17 @@
 import ExifReader from 'exifreader'
+import { raw } from 'express'
 import Constants from './constants.mjs'
 
 // Load Mongoose model
 import { Island } from './manageDb.mjs'
 
-// Converts the timestamp string into a UTC date (that is what exifr is doing wrong!)
-const prepareTimestamp = datetimeString => {
-    const [y,m,d,h,M,s] = datetimeString.split(' ').flatMap(
-      element => element.split(':')
-    )
-      .map (element => parseInt(element))
-    // Correct for 1 month
-    const rawDate = new Date(Date.UTC(y,m,d,h,M,s))
-    return rawDate.setMonth(rawDate.getMonth() - 1)
-  }
+/*  Converts the timestamp string into a GMT / Local date (that is what exifr is doing wrong!)
+    https://stackoverflow.com/questions/43083993/javascript-how-to-convert-exif-date-time-data-to-timestamp
+*/
+const getDate = s => { 
+    const [year, month, date, hour, min, sec] = s.split(/\D/) 
+    return new Date(year, month - 1 ,date, hour, min, sec) 
+}
 
 // Save the data to the db
 async function prepare(media) {
@@ -74,8 +72,9 @@ async function prepare(media) {
         const exif = exifdata[i]
         metadata.name = base.key
         metadata.type = base.folder
-        metadata.author = '' // TODO
-        metadata.dateTime = prepareTimestamp(exif.DateTimeOriginal.description)
+        metadata.author = ''
+        metadata.dateTimeString = exif.DateTimeOriginal.description
+        metadata.dateTime = getDate(exif.DateTimeOriginal.description)
         metadata.geometry.type = 'Point'
         metadata.geometry.coordinates.latitude = exif.GPSLatitude.description
         metadata.geometry.coordinates.longitude = exif.GPSLongitude.description
