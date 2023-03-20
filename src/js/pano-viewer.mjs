@@ -12,7 +12,7 @@ const animatedValues = {
 
 const viewer = new PhotoSphereViewer.Viewer({
     container: document.querySelector('#viewer'),
-    panorama: './media/pano/' + img+ '.jpeg',
+    panorama: './media/pan/' + img+ '.jpeg',
     maxFov: panoMaxFov, 
     minFov: panoMinFov,
     defaultPitch: animatedValues.pitch.start,
@@ -21,7 +21,6 @@ const viewer = new PhotoSphereViewer.Viewer({
     fisheye: animatedValues.fisheye.start,
     navbar: [
         'autorotate',
-        
         'zoom',
         'fullscreen',
         { // create custom button for fisheye

@@ -13,8 +13,7 @@ const newMedia = await manage()
 const newMetadata = await prepare(newMedia)
 
 // Save document to DB
-const save = await Island.insertMany(newMetadata)
-
+await Island.insertMany(newMetadata)
 
 /// RENDER
 // Initialise Express
@@ -44,14 +43,15 @@ app.listen(Constants.PORT, (req, res, next) => {
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
-app.get('/img-viewer', (req, res, next) => {
+
+  app.get('/img-viewer', (req, res, next) => {
   res.render('pages/img-viewer', { type: req.query.type, img: req.query.img } )
 })
 
 app.get('/pano-viewer', (req, res, next) => {
   res.render('pages/pano-viewer', { img: req.query.img } )
 })
-
+ 
 function render() {
     // Route media folders, provide them with  metadata
     Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {

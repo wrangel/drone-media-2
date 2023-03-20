@@ -1,4 +1,4 @@
-// Load Mongoose model
+import Constants from './constants.mjs'
 import { Island } from './manageDb.mjs'
 
 // Prepare date for website
@@ -29,7 +29,7 @@ const beautify = async mediaFolder => {
     return {
       name: doc.name,
       type: doc.type,
-      viewer: doc.type == 'pano' ? 'pano' : 'img',
+      viewer: doc.type == Constants.MEDIA_FOLDERS[1] ? 'pano' : 'img',
       dateTime: prepareDate(doc.dateTime),
       latitude: doc.geometry.coordinates.latitude,
       longitude: doc.geometry.coordinates.longitude,

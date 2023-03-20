@@ -1,5 +1,4 @@
 import ExifReader from 'exifreader'
-import { raw } from 'express'
 import Constants from './constants.mjs'
 
 // Load Mongoose model
