@@ -52,7 +52,7 @@ app.get('/pano-viewer', (req, res, next) => {
   res.render('pages/pano-viewer', { img: req.query.img } )
 })
 
-async function render() {
+function render() {
     // Route media folders, provide them with  metadata
     Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
         // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
