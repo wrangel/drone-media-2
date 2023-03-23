@@ -4,7 +4,6 @@ const RUN_DOCKERIZED = false
 
 
 export default {
-    ACCESS_TOKEN: 'pk.eyJ1IjoiYmF0aGh1cnN0IiwiYSI6ImNsZjN0eDg1bjB2d2czeHIwMmxra2QyODQifQ.I_CDtcMoSDmCjQErpayFCQ', // TODO secret
     ADDRESS_COMPONENTS: ["address", "postcode", "place", "region", "country"],
     REVERSE_GEO_URL_ELEMENTS: ['https://api.mapbox.com/geocoding/v5/mapbox.places/','.json?access_token='],
     MEDIA_FOLDERS: ['hdr', 'pan', 'wide_angle'], // MUST be sorted alphabetically
