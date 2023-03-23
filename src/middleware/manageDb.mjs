@@ -1,14 +1,11 @@
 import mongoose from 'mongoose'
-import Constants from '../middleware/constants.mjs'
+import Constants from './constants.mjs'
 
 mongoose.set('strictQuery', false)
 
-// Set connection specifics
-const user = 'f984hjn3d23'
-const password = 'cXtNUDejRZ8MNpcv4x4dPQddyw2sCjs2RpLNj8h4P4Uy4sw3ZWfmUJ74J4dgEefxUMg4qqFqmAwtrxPCXnmudPLaDTrdTccjeusQ'
-const db = 'ellesmereDB'
-
-mongoose.connect(`mongodb+srv://${user}:${password}@baffin.eo7kmjw.mongodb.net/${db}?retryWrites=true&w=majority`)
+mongoose.connect(
+  `mongodb+srv://${Constants.DB_USER}:${Constants.DB_PASSWORD}@baffin.eo7kmjw.mongodb.net/${Constants.DB}?retryWrites=true&w=majority`
+  )
 
 // Create Mongoose schema
 const islandSchema = new mongoose.Schema({

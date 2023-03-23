@@ -1,7 +1,5 @@
 import ExifReader from 'exifreader'
 import Constants from './constants.mjs'
-import dotenv from 'dotenv'
-dotenv.config()
 
 // Load Mongoose model
 import { Island } from './manageDb.mjs'
@@ -32,7 +30,7 @@ async function prepare(media) {
         exif => {
             return Constants.REVERSE_GEO_URL_ELEMENTS[0] + 
             exif.GPSLongitude.description + ', ' + exif.GPSLatitude.description + 
-            Constants.REVERSE_GEO_URL_ELEMENTS[1] +  process.env.ACCESS_TOKEN
+            Constants.REVERSE_GEO_URL_ELEMENTS[1] +  Constants.ACCESS_TOKEN
         }
     )
 

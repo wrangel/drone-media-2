@@ -3,8 +3,8 @@ import express from 'express'
 import Constants from './src/middleware/constants.mjs'
 import { Island } from './src/middleware/manageDb.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
-import {prepare} from './src/middleware/prepareMetadata.mjs'
-import {beautify} from './src/middleware/beautifyMetadata.mjs'
+import {prepare } from './src/middleware/prepareMetadata.mjs'
+import { beautify } from './src/middleware/beautifyMetadata.mjs'
 
 // Update the media metadata, if necessary
 const newMedia = await manage()
@@ -20,7 +20,7 @@ await Island.insertMany(newMetadata)
 const app = express()
 
 // Set views directory
-app.set('views', './src/views')
+app.set(Constants.VIEWS, './src/' + Constants.VIEWS)
 
 // Render static files from root folder (css, ..)
 app.use(express.static('.'))
