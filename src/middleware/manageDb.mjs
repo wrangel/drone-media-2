@@ -81,11 +81,39 @@ const authorSchema = new mongoose.Schema({
 const Author = mongoose.model('Author', authorSchema)
 
 
+const b = await Island.find({})
+    .select('name -_id')
 
+    const c = await Island.find({})
+    .select('name -_id')
 
+  /*console.log("Island", b)
+  console.log("author", c)*/
 
+  //mongoose.model('Island')
 
+const a = await Island.aggregate([
+  {
+    $lookup: {
+      from: 'authors',
+      localField: 'name', 
+      foreignField: 'name',
+      as: 'author'
+    },
+  },
+ { 
+  $unwind: '$author'
+ },
+ {
+  $addFields: {
+   "author": "$author.author",
+  }
+ }
+]).exec()
 
+console.log(a)
+
+//.find({}).select('name -_id')
 
  /*
 export { Island }
