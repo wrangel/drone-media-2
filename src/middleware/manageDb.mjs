@@ -24,7 +24,8 @@ const islandSchema = new mongoose.Schema({
   location: String,
   postalCode: String,
   road: String,
-  noViews: Number
+  noViews: Number,
+  signedUrl: String
 })
 
 // Create Mongoose model

@@ -29,7 +29,7 @@ app.use(express.static('.'))
 app.set('view engine', 'ejs')
 
 // Determine port website will run on
-app.listen(Constants.PORT, (req, res, next) => {
+app.listen(Constants.PORT, _ => {
   console.log(`App is running on port ${Constants.PORT}`)
 })
 
