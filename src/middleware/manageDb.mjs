@@ -7,7 +7,7 @@ mongoose.connect(
   `mongodb+srv://${Constants.DB_USER}:${Constants.DB_PASSWORD}@baffin.eo7kmjw.mongodb.net/${Constants.DB}?retryWrites=true&w=majority`
   )
 
-// Create Mongoose schema
+// Create Mongoose Schemas
 const islandSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -62,9 +62,6 @@ const islandSchema = new mongoose.Schema({
   }
 })
 
-// Create Mongoose model
-const Island = mongoose.model('Island', islandSchema)
-
 const authorSchema = new mongoose.Schema({
   name: {
     type: String, 
@@ -77,22 +74,12 @@ const authorSchema = new mongoose.Schema({
   }
 })
 
-// Create Mongoose model
+// Create Mongoose Models
+const Island = mongoose.model('Island', islandSchema)
 const Author = mongoose.model('Author', authorSchema)
 
-
-const b = await Island.find({})
-    .select('name -_id')
-
-    const c = await Island.find({})
-    .select('name -_id')
-
-  /*console.log("Island", b)
-  console.log("author", c)*/
-
-  //mongoose.model('Island')
-
-const a = await Island.aggregate([
+// Enrich islands with authors
+await Island.aggregate([
   {
     $lookup: {
       from: 'authors',
@@ -100,22 +87,23 @@ const a = await Island.aggregate([
       foreignField: 'name',
       as: 'author'
     },
-  },
- { 
-  $unwind: '$author'
- },
- {
+  }, { 
+    $unwind: '$author'
+   }, {
+    "$replaceRoot": {
+       "newRoot": {
+          "$mergeObjects": [ '$author', '$$ROOT' ]
+       }
+    }
+ }, {
   $addFields: {
    "author": "$author.author",
   }
- }
+},
+  { "$merge": "islands" }
+
 ]).exec()
+console.log("Merged authors")
 
-console.log(a)
 
-//.find({}).select('name -_id')
-
- /*
 export { Island }
-
-*/
