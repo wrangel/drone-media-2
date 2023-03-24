@@ -1,19 +1,18 @@
+
+
+
+/*
+
 /// PREPARE
 import express from 'express'
 import Constants from './src/middleware/constants.mjs'
-/*
 import { Island } from './src/middleware/manageDb.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 import {prepare } from './src/middleware/prepareMetadata.mjs'
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
-*/
 
-
-
-import './src/middleware/manageDb.mjs'
-
-
-/*
+// Update database
+import './src/middleware/updateDB.mjs'
 
 // Update the media metadata, if necessary
 const newMedia = await manage()

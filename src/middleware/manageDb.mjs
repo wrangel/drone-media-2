@@ -7,7 +7,7 @@ mongoose.connect(
   `mongodb+srv://${Constants.DB_USER}:${Constants.DB_PASSWORD}@baffin.eo7kmjw.mongodb.net/${Constants.DB}?retryWrites=true&w=majority`
   )
 
-// Create Mongoose Schemas
+// Create Mongoose Schema
 const islandSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -62,48 +62,7 @@ const islandSchema = new mongoose.Schema({
   }
 })
 
-const authorSchema = new mongoose.Schema({
-  name: {
-    type: String, 
-    required: true,
-    unique: true
-  },
-  author: {
-    type: String, 
-    required: true
-  }
-})
-
-// Create Mongoose Models
+// Create Mongoose Model
 const Island = mongoose.model('Island', islandSchema)
-const Author = mongoose.model('Author', authorSchema)
-
-// Enrich islands with authors
-await Island.aggregate([
-  {
-    $lookup: {
-      from: 'authors',
-      localField: 'name', 
-      foreignField: 'name',
-      as: 'author'
-    },
-  }, { 
-    $unwind: '$author'
-   }, {
-    "$replaceRoot": {
-       "newRoot": {
-          "$mergeObjects": [ '$author', '$$ROOT' ]
-       }
-    }
- }, {
-  $addFields: {
-   "author": "$author.author",
-  }
-},
-  { "$merge": "islands" }
-
-]).exec()
-console.log("Merged authors")
-
 
 export { Island }
