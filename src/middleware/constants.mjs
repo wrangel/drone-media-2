@@ -11,7 +11,7 @@ export default {
     ACCESS_TOKEN: process.env.ACCESS_TOKEN,
     ADDRESS_COMPONENTS: ["address", "postcode", "place", "region", "country"],
     DB: 'ellesmereDB',
-    DB_USER: prcess.env.DB_USER,
+    DB_USER: process.env.DB_USER,
     DB_PASSWORD: process.env.DB_PASSWORD,
     MEDIA_FOLDERS: ['hdr', 'pan', 'wide_angle'], // MUST be sorted alphabetically
     PANO_FIRST_IMAGE: 'DJI_0001',

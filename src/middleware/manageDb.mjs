@@ -11,24 +11,83 @@ mongoose.connect(
 const islandSchema = new mongoose.Schema({
   name: {
     type: String,
+    required: true,
     unique: true
   },
-  type: String,
+  type: {
+    type: String,
+    required: true
+  },
   author: String,
-  dateTimeString: String,
-  dateTime: Date,
-  geometry: {}, // TODO improve schema
-  altitude: Number,
-  country: String,
-  region: String,
-  location: String,
-  postalCode: String,
+  dateTimeString: {
+    type: String,
+    required: true
+  },
+  dateTime: {
+    type: Date,
+    required: true
+  },
+  geometry: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
+  altitude: {
+    type: Number,
+    required: true
+  },
+  country: {
+    type: String,
+    required: true
+  },
+  region: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  postalCode: {
+    type: String,
+    required: true
+  },
   road: String,
-  noViews: Number,
-  signedUrl: String
+  noViews: {
+    type: Number,
+    min: 0
+  },
+  signedUrl: {
+    type: String,
+    required: true
+  }
 })
 
 // Create Mongoose model
 const Island = mongoose.model('Island', islandSchema)
 
+const authorSchema = new mongoose.Schema({
+  name: {
+    type: String, 
+    required: true,
+    unique: true
+  },
+  author: {
+    type: String, 
+    required: true
+  }
+})
+
+// Create Mongoose model
+const Author = mongoose.model('Author', authorSchema)
+
+
+
+
+
+
+
+
+ /*
 export { Island }
+
+*/
