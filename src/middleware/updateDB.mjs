@@ -17,7 +17,6 @@ await Island.aggregate([
     $addFields: { "author": "$author.author" }
   },
     { "$merge": "islands" }
-  
-  ]).exec()
+]).exec()
 
-  console.log("Merged authors")
+console.log("Merged authors")
