@@ -18,14 +18,14 @@
             <% data.forEach(element => { %>
                 <div>
                     <div class="thumbnail-row">
-                        <a target="_blank" rel="noopener noreferrer" href= <%= element.viewer + "-viewer?type=" + element.type + "&img=" + element.name %> >
+                        <a target="_blank" rel="noopener noreferrer" href= <%= element.viewer + "-viewer?type=" + element.type + "&img=" + element.actual_url %> >
                             <img class="thumbnail" src=<%= element.thumbnail_url %> alt="Drone media thumbnail here">
                         </a>
                     </div>
                     <div class="media-info-grid">
 						<div class="author-picture">
-                             <!--  <%= element.author %> TODO -->
-							<img class="profile-picture" src="media/author_pictures/elias.webp" alt="Channel Picture Here">
+
+                            <img class="profile-picture" src=<%= element.author %> alt="Channel picture here">
 						</div>
 						<div>
 							<p class="media-title"><%= element.location %> &#183; <%= element.region %> &#183; <%= element.country %></p>

@@ -10,9 +10,12 @@ const animatedValues = {
     fisheye: { start: 2, end: 0 },
 }
 
+console.log("panorama:" + img)
+
 const viewer = new PhotoSphereViewer.Viewer({
     container: document.querySelector('#viewer'),
-    panorama: './media/pan/' + img+ '.jpeg',
+    ////panorama: './media/pan/' + img+ '.jpeg',
+    panorama: img,
     maxFov: panoMaxFov, 
     minFov: panoMinFov,
     defaultPitch: animatedValues.pitch.start,
