@@ -1,15 +1,18 @@
 /// PREPARE
-import './src/middleware/getSignedUrl.mjs'
-
-/*
-
 import express from 'express'
+import { getUrls } from './src/middleware/getSignedUrl.mjs'
 import Constants from './src/middleware/constants.mjs'
 import { Island } from './src/middleware/manageDb.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 import {prepare } from './src/middleware/prepareMetadata.mjs'
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
 
+
+// Get presigned URLs from AWS S3
+const urls = await getUrls()
+console.log(urls)
+
+/*
 // Update database // TODO only for new images
 import './src/middleware/updateDB.mjs'
 

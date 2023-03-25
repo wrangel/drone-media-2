@@ -18,8 +18,10 @@ export default {
     DB: 'ellesmereDB',
     DB_USER: process.env.DB_USER,
     DB_PASSWORD: process.env.DB_PASSWORD,
-    // Misc
+    // Reverse Geocoding
     ACCESS_TOKEN: process.env.ACCESS_TOKEN,
+    REVERSE_GEO_URL_ELEMENTS: ['https://api.mapbox.com/geocoding/v5/mapbox.places/','.json?access_token='],
+    // Misc 
     AUTHOR_PICTURES_PATH: 'media/author_pictures/',
     AUTHOR_PICTURE_FORMAT: '.svg',
     ADDRESS_COMPONENTS: ["address", "postcode", "place", "region", "country"],
@@ -28,8 +30,7 @@ export default {
     PORT: 8080,
     RAW_MEDIA_PREFIX: 'Einzelfotos',
     RAW_MEDIA_REPO: RUN_DOCKERIZED == true ? '/mnt/originals' : '/Volumes/docker/ellesmere/originals', // TODO kill?
-    RAW_MEDIA_SUFFIX: '.tif',
-    REVERSE_GEO_URL_ELEMENTS: ['https://api.mapbox.com/geocoding/v5/mapbox.places/','.json?access_token='],
+    RAW_MEDIA_FORMAT: '.tif',
     RUN_DOCKERIZED,
     VIEWS: 'views'
 }

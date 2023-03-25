@@ -65,7 +65,7 @@ async function getUrls() {
   })
 
   // Create new key value pair
-  const finalResult = sortedResult.map(elem => {
+  return sortedResult.map(elem => {
     let actual_url = Object.values(Object.values(elem.data)[0])[1]
     let thumbnail_url = Object.values(Object.values(elem.data)[1])[1]
     return {name: elem.id, urls: {actual: actual_url, thumbnail: thumbnail_url}}
@@ -73,4 +73,4 @@ async function getUrls() {
 
 }
 
-getUrls()
+export { getUrls }
