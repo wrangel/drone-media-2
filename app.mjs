@@ -7,7 +7,7 @@ import {prepare } from './src/middleware/prepareMetadata.mjs'
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
 
 /*
-// Update database
+// Update database // TODO only for new images
 import './src/middleware/updateDB.mjs'
 
 // Update the media metadata, if necessary
@@ -19,7 +19,6 @@ const newMetadata = await prepare(newMedia)
 // Save document to DB
 await Island.insertMany(newMetadata)
 */
-
 
 /// RENDER
 // Initialise Express
@@ -57,7 +56,7 @@ app.get('/about', (req, res, next) => res.render('pages/about'))
 app.get('/pano-viewer', (req, res, next) => {
   res.render('pages/pano-viewer', { img: req.query.img } )
 })
- 
+
 function render() {
     // Route media folders, provide them with  metadata
     Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {

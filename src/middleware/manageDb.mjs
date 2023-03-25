@@ -56,8 +56,8 @@ const islandSchema = new mongoose.Schema({
     type: Number,
     min: 0
   },
-  signedUrl: {
-    type: String,
+  urls: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true
   }
 })

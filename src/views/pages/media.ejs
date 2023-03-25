@@ -19,11 +19,12 @@
                 <div>
                     <div class="thumbnail-row">
                         <a target="_blank" rel="noopener noreferrer" href= <%= element.viewer + "-viewer?type=" + element.type + "&img=" + element.name %> >
-                            <img class="thumbnail" src= <%= "media/thumbnails/" + element.name + ".webp" %> alt="Drone Media Here">
+                            <img class="thumbnail" src=<%= element.thumbnail_url %> alt="Drone media thumbnail here">
                         </a>
                     </div>
                     <div class="media-info-grid">
 						<div class="author-picture">
+                             <!--  <%= element.author %> TODO -->
 							<img class="profile-picture" src="media/author_pictures/elias.webp" alt="Channel Picture Here">
 						</div>
 						<div>
@@ -31,8 +32,6 @@
                             <p class="media-stats"><%= element.dateTime %> </p>
                             <p class="media-stats">Altitude: <%= element.altitude %><%= element.road %></p>
 							<p class="media-stats">Coordinates: <%= element.latitude %>, <%= element.longitude %></p>
-                                <!--  <%= element.author %> TODO -->
-                                <!-- <%= element.postalCode %> -->
 							<!-- <p id="media-counter"><%= element.noViews %> Views</p> TODO --> 
 						</div>
 					</div>

@@ -24,7 +24,7 @@ const beautify = async mediaFolder => {
   const docs = await Island.find({ type : mediaFolder })
         .sort({ dateTime: -1 })
         .lean()
-        
+
   const makePretty = docs.map (doc => {
     return {
       name: doc.name,
@@ -39,7 +39,9 @@ const beautify = async mediaFolder => {
       location: doc.location,
       postalCode: doc.postalCode,
       road: doc.road == undefined ? '' : ', above ' + doc.road,
-      noViews: 0
+      noViews: 0,
+      thumbnail_url: doc.urls.thumbnail,
+      actual_url: doc.urls.actual
     }
   })
   return makePretty
