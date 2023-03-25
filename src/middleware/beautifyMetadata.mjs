@@ -19,13 +19,20 @@ const prepareDate = date => {
 }
 
 // Adapt metadata to show prettily on the website
-const beautify = async mediaFolder => {
+const beautify = async (mediaFolder, presignedUrls) => {
 
   const docs = await Island.find({ type : mediaFolder })
         .sort({ dateTime: -1 })
         .lean()
 
   const makePretty = docs.map (doc => {
+    // Get the current presigned urls for the medium
+    const urls = presignedUrls.filter(element => {
+      return element.name === doc.name
+    }).map(element => {
+      return element.urls
+    })
+    // Prepare output
     return {
       name: doc.name,
       type: doc.type,
@@ -41,11 +48,13 @@ const beautify = async mediaFolder => {
       postalCode: doc.postalCode,
       road: doc.road == undefined ? '' : ', above ' + doc.road,
       noViews: 0,
-      thumbnail_url: doc.urls.thumbnail,
-      actual_url: doc.urls.actual
+      thumbnailUrl: urls[0].actual,
+      actualUrl: urls[0].thumbnail
     }
   })
+
   return makePretty
+   
 }
 
 export { beautify } 

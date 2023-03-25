@@ -55,10 +55,6 @@ const islandSchema = new mongoose.Schema({
   noViews: {
     type: Number,
     min: 0
-  },
-  urls: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
   }
 })
 
