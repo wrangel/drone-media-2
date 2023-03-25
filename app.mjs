@@ -10,6 +10,8 @@ import { beautify } from './src/middleware/beautifyMetadata.mjs'
 // Get presigned URLs from AWS S3
 const presignedUrls = await getUrls()
 
+/////console.log(presignedUrls)
+
 /*
 // Update database // TODO only for new images
 import './src/middleware/updateDB.mjs'
@@ -63,16 +65,15 @@ app.get('/pano-viewer', (req, res, next) => {
 })
 
 function render() {
-    // Route media folders, provide them with  metadata
-    Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
-        // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
-        const prettyDocs = await beautify(mediaFolder, presignedUrls)
-        console.log(prettyDocs)
-        // Call the media.ejs for each of the media types, with the respective metadata
-        app.get('/' + mediaFolder, (req, res, next) => {
-          res.render('pages/media', {data: prettyDocs})
-      })
+  // Route media folders, provide them with  metadata
+  Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
+    // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
+    const prettyDocs = await beautify(mediaFolder, presignedUrls)
+    // Call the media.ejs for each of the media types, with the respective metadata
+    app.get('/' + mediaFolder, (req, res, next) => {
+      res.render('pages/media', {data: prettyDocs})
     })
-  }
+  })
+}
 
-  render()
+render()

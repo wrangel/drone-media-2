@@ -22,7 +22,7 @@ async function getUrls() {
   const list = await s3.send(new ListObjectsCommand( { Bucket: Constants.BUCKET_NAME } ))
 
   // Get presigned url
-  const arr = await Promise.all(
+  const arr0 = await Promise.all(
     list.Contents.map(async content => {
       const key = content.Key
       const type = key.substring(0, key.indexOf('/')) == 'thumbnails' ? 'thumbnails' : 'actual'
@@ -37,7 +37,7 @@ async function getUrls() {
   )
 
   // Reduce the info on the id
-  const result = arr.reduce((acc, d) => {
+  const arr1 = arr0.reduce((acc, d) => {
     const found = acc.find(a => a.id === d.id)
     const value = { type: d.type, sigUrl: d.sigUrl } // the element in data property
     if (!found) {
@@ -49,9 +49,9 @@ async function getUrls() {
     return acc
   }, 
   [])
-  
-  // sort urls based on type (actual, thumbnail)
-  const sortedResult = result.map(r => {
+
+  // sort urls based on type (first: actual, second: thumbnail)
+  const arr2 = arr1.map(r => {
     const sorted = r.data.sort(function (a, b) {
       if (a.type < b.type) {
         return -1;
@@ -65,9 +65,9 @@ async function getUrls() {
   })
 
   // Create new key value pair
-  return sortedResult.map(elem => {
-    let actual_url = Object.values(Object.values(elem.data)[0])[1]
-    let thumbnail_url = Object.values(Object.values(elem.data)[1])[1]
+  return arr2.map(elem => {
+    let actual_url = Object.values(elem.data)[0].sigUrl
+    let thumbnail_url = Object.values(elem.data)[1].sigUrl
     return {name: elem.id, urls: {actual: actual_url, thumbnail: thumbnail_url}}
   })
 

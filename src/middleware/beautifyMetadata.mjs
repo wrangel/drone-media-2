@@ -32,6 +32,7 @@ const beautify = async (mediaFolder, presignedUrls) => {
     }).map(element => {
       return element.urls
     })
+    console.log(urls)
     // Prepare output
     return {
       name: doc.name,
@@ -48,8 +49,8 @@ const beautify = async (mediaFolder, presignedUrls) => {
       postalCode: doc.postalCode,
       road: doc.road == undefined ? '' : ', above ' + doc.road,
       noViews: 0,
-      thumbnailUrl: urls[0].actual,
-      actualUrl: urls[0].thumbnail
+      thumbnailUrl: urls[0].thumbnail,
+      actualUrl: urls[0].actual
     }
   })
 
