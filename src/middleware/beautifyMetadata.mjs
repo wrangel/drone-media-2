@@ -25,14 +25,17 @@ const beautify = async (mediaFolder, presignedUrls) => {
         .sort({ dateTime: -1 })
         .lean()
 
-  const makePretty = docs.map (doc => {
+  return docs.map (doc => {
     // Get the current presigned urls for the medium
     const urls = presignedUrls.filter(element => {
       return element.name === doc.name
     }).map(element => {
       return element.urls
     })
-    console.log(urls)
+    // Prepare the url of the actual image
+    let urlComponents = new URL(urls[0].actual)
+    let url = urlComponents.origin + urlComponents.pathname
+    let querystring = encodeURIComponent(urlComponents.search)
     // Prepare output
     return {
       name: doc.name,
@@ -50,12 +53,10 @@ const beautify = async (mediaFolder, presignedUrls) => {
       road: doc.road == undefined ? '' : ', above ' + doc.road,
       noViews: 0,
       thumbnailUrl: urls[0].thumbnail,
-      actualUrl: urls[0].actual
+      actualUrl: url,
+      actualQueryString: querystring
     }
-  })
-
-  return makePretty
-   
+  })   
 }
 
 export { beautify } 
