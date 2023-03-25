@@ -1,4 +1,8 @@
 /// PREPARE
+import './src/middleware/getSignedUrl.mjs'
+
+/*
+
 import express from 'express'
 import Constants from './src/middleware/constants.mjs'
 import { Island } from './src/middleware/manageDb.mjs'
@@ -6,7 +10,6 @@ import { manage } from './src/middleware/manageBooks.mjs'
 import {prepare } from './src/middleware/prepareMetadata.mjs'
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
 
-/*
 // Update database // TODO only for new images
 import './src/middleware/updateDB.mjs'
 
@@ -18,7 +21,7 @@ const newMetadata = await prepare(newMedia)
 
 // Save document to DB
 await Island.insertMany(newMetadata)
-*/
+
 
 /// RENDER
 // Initialise Express
@@ -44,7 +47,7 @@ app.listen(Constants.PORT, _ => {
         from the front-end to the server (usually via a form) typically before a page is rendered and 
         the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
-*/
+--
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
@@ -70,3 +73,5 @@ function render() {
   }
 
   render()
+
+  */
