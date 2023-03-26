@@ -69,6 +69,7 @@ function render() {
   Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
     // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
     const prettyDocs = await beautify(mediaFolder, presignedUrls)
+    console.log(prettyDocs)
     // Call the media.ejs for each of the media types, with the respective metadata
     app.get('/' + mediaFolder, (req, res, next) => {
       res.render('pages/media', {data: prettyDocs})
