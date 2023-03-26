@@ -57,10 +57,9 @@ app.listen(Constants.PORT, _ => {
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
-
 app.get('/img-viewer', (req, res, next) => {
   // req.query refers to the querystring components sent by media.ejs
-  res.render('pages/img-viewer', { type: req.query.type, img: req.query.img } )
+  res.render('pages/img-viewer', { type: req.query.type, url: req.query.url, qs: req.query.qs } )
 })
 
 app.get('/pano-viewer', (req, res, next) => {

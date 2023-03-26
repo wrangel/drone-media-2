@@ -8,21 +8,16 @@
 	<body>
 		<script>
 			/* Get the passed-on parameters */
-			const image_type = '<%-type%>'
-			//////const image_name = '<%-img%>'
-			const image_url = '<%-img%>'
+			const type = '<%-type%>'
+			const url = '<%-url%>'
+			const qs = '<%-qs%>'
 			
+			// Construct the pano S3 presigned URL
+			const img = url + decodeURIComponent(qs)
 
-			
-			const style = "--image: url('../media/hdr/100_0508.webp')"
-			//const style = "--image: url('../media/" + image_type + '/' + image_name + ".webp')"
-			//const style = `--image: url(${image_url})`
-			//const style = "--image: url(https://melville-island.s3.eu-central-1.amazonaws.com/hdr/100_0029.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAU77EYV2ZLLN6C35Y%2F20230325%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20230325T081627Z&X-Amz-Expires=900&X-Amz-Signature=7dd693f32ce73f75c24b6b4ee022f8a352ee0f49bed029ad0e9f6d247e7fb936&X-Amz-SignedHeaders=host&x-id=GetObject)"
-			
-			//https://melville-island.s3.eu-central-1.amazonaws.com/hdr/100_0029.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAU77EYV2ZLLN6C35Y%2F20230325%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20230325T081627Z&X-Amz-Expires=900&X-Amz-Signature=7dd693f32ce73f75c24b6b4ee022f8a352ee0f49bed029ad0e9f6d247e7fb936&X-Amz-SignedHeaders=host&x-id=GetObject
-			//const style = "--image: url('tinyurl.com/mrbx7t5z')"
-			
-			/* Add a div to the body which acts as the container for the background image */
+			// Pass the image to the CSS
+			const style = "--image: url('" + img + "')"
+			// Add a div to the body which acts as the container for the background image
 			const el = document.createElement('div');
 			el.className = "bg-image"
 			el.style = style
