@@ -10,7 +10,7 @@ const animatedValues = {
     fisheye: { start: 2, end: 0 },
 }
 
-console.log("panorama:" + img)
+console.log("panorama:" + url)
 
 const viewer = new PhotoSphereViewer.Viewer({
     container: document.querySelector('#viewer'),

@@ -18,7 +18,7 @@
             <% data.forEach(element => { %>
                 <div>
                     <div class="thumbnail-row">
-                        <a target="_blank" rel="noopener noreferrer" href= <%= element.viewer + "-viewer?type=" + element.type + "&img=" + element.actualUrl %> >
+                        <a target="_blank" rel="noopener noreferrer" href= <%= element.viewer + "-viewer?type=" + element.type + "&url=" + element.actualUrl %> >
                             <img class="thumbnail" src=<%- element.thumbnailUrl %> alt="Drone media thumbnail here">
                         </a>
                     </div>

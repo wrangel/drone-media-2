@@ -61,7 +61,7 @@ app.get('/about', (req, res, next) => res.render('pages/about'))
 })
 
 app.get('/pano-viewer', (req, res, next) => {
-  res.render('pages/pano-viewer', { img: req.query.img } )
+  res.render('pages/pano-viewer', { url: req.query.url } )
 })
 
 function render() {
