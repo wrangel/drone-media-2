@@ -2,9 +2,7 @@
 import express from 'express'
 import { getUrls } from './src/middleware/getSignedUrl.mjs'
 import Constants from './src/middleware/constants.mjs'
-import { Island } from './src/middleware/manageDb.mjs'
-import { manage } from './src/middleware/manageBooks.mjs'
-import {prepare } from './src/middleware/prepareMetadata.mjs'
+
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
 import cors from 'cors'
 
@@ -12,6 +10,11 @@ import cors from 'cors'
 const presignedUrls = await getUrls()
 
 /*
+
+import { Island } from './src/middleware/manageDb.mjs'
+import { manage } from './src/middleware/manageBooks.mjs'
+import {prepare } from './src/middleware/prepareMetadata.mjs'
+
 // Update database // TODO only for new images
 import './src/middleware/updateDB.mjs'
 
