@@ -8,12 +8,11 @@ const animatedValues = {
     fisheye: { start: 2, end: 0 },
 }
 
+// Construct the pano S3 presigned URL
 const pano = url + decodeURIComponent(qs)
-console.log("pano: ", pano)
 
 const viewer = new PhotoSphereViewer.Viewer({
     container: document.querySelector('#viewer'),
-    ////panorama: './media/pan/' + img+ '.jpeg',
     panorama: pano,
     maxFov: panoMaxFov, 
     minFov: panoMinFov,

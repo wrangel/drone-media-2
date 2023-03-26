@@ -27,7 +27,7 @@ export default {
     ADDRESS_COMPONENTS: ["address", "postcode", "place", "region", "country"],
     MEDIA_FOLDERS: ['hdr', 'pan', 'wide_angle'], // MUST be sorted alphabetically
     PANO_FIRST_IMAGE: 'DJI_0001',
-    PORT: 8080,
+    PORT: 37009,
     RAW_MEDIA_PREFIX: 'Einzelfotos',
     RAW_MEDIA_REPO: RUN_DOCKERIZED == true ? '/mnt/originals' : '/Volumes/docker/ellesmere/originals', // TODO kill?
     RAW_MEDIA_FORMAT: '.tif',
