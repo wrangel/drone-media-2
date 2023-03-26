@@ -14,8 +14,11 @@
 			<div id="viewer"></div>
 		</div>
 
-		<!-- Pass EJS variable from server to client, run the client-side PSV -->
-		<script>const url = '<%-url%>'</script>
+		<!-- Pass EJS variables from server to client, run the client-side PSV -->
+		<script>
+			const url = '<%-url%>'
+			const qs = '<%-qs%>'
+		</script>
 		<script src="src/js/pano-viewer.mjs"></script>
 	</body>
 </html>

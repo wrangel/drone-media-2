@@ -6,11 +6,10 @@ import { Island } from './src/middleware/manageDb.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 import {prepare } from './src/middleware/prepareMetadata.mjs'
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
+import cors from 'cors'
 
 // Get presigned URLs from AWS S3
 const presignedUrls = await getUrls()
-
-/////console.log(presignedUrls)
 
 /*
 // Update database // TODO only for new images
@@ -56,12 +55,14 @@ app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
 
-  app.get('/img-viewer', (req, res, next) => {
+app.get('/img-viewer', (req, res, next) => {
+  // req.query refers to the querystring components sent by media.ejs
   res.render('pages/img-viewer', { type: req.query.type, img: req.query.img } )
 })
 
 app.get('/pano-viewer', (req, res, next) => {
-  res.render('pages/pano-viewer', { url: req.query.url } )
+  // req.query refers to the querystring components sent by media.ejs
+  res.render('pages/pano-viewer', { url: req.query.url, qs: req.query.qs } )
 })
 
 function render() {
@@ -69,7 +70,6 @@ function render() {
   Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
     // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
     const prettyDocs = await beautify(mediaFolder, presignedUrls)
-    console.log(prettyDocs)
     // Call the media.ejs for each of the media types, with the respective metadata
     app.get('/' + mediaFolder, (req, res, next) => {
       res.render('pages/media', {data: prettyDocs})

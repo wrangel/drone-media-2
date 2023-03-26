@@ -33,8 +33,9 @@ const beautify = async (mediaFolder, presignedUrls) => {
       return element.urls
     })
     // Prepare the url of the actual image
-    let url = new URL(urls[0].actual)
-    let urlComponents = [url.origin + url.pathname, encodeURIComponent(url.search)]
+    const url = new URL(urls[0].actual)
+    const url1 = url.origin + url.pathname
+    const url2 = encodeURIComponent(url.search)
     // Prepare output
     return {
       name: doc.name,
@@ -52,7 +53,8 @@ const beautify = async (mediaFolder, presignedUrls) => {
       road: doc.road == undefined ? '' : ', above ' + doc.road,
       noViews: 0,
       thumbnailUrl: urls[0].thumbnail,
-      actualUrl: urlComponents
+      actualUrl: url1,
+      actualQueryString: url2
     }
   })   
 }
