@@ -2,9 +2,9 @@
 import express from 'express'
 import { getUrls } from './src/middleware/getSignedUrl.mjs'
 import Constants from './src/middleware/constants.mjs'
-
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
-import cors from 'cors'
+
+////////////// bookkeeping here
 
 // Get presigned URLs from AWS S3
 const presignedUrls = await getUrls()
@@ -27,7 +27,7 @@ const newMetadata = await prepare(newMedia)
 // Save document to DB
 await Island.insertMany(newMetadata)
 
-  */
+*/
 
 /// RENDER
 // Initialise Express
