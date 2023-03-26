@@ -41,7 +41,7 @@ const beautify = async (mediaFolder, presignedUrls) => {
       name: doc.name,
       type: doc.type,
       viewer: doc.type == Constants.MEDIA_FOLDERS[1] ? 'pano' : 'img',
-      author: Constants.AUTHOR_PICTURES_PATH + doc.author + Constants.AUTHOR_PICTURE_FORMAT,
+      author: Constants.AUTHOR_PICTURES_PATH + doc.author + '.svg',
       dateTime: prepareDate(doc.dateTime),
       latitude: doc.geometry.coordinates.latitude,
       longitude: doc.geometry.coordinates.longitude,

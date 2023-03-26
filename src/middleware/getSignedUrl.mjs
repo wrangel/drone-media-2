@@ -10,8 +10,8 @@ const getId = path => {
 // Create instance of S3 Client
 const s3 = new S3Client({
   credentials: {
-    accessKeyId: Constants.ACCESS_KEY,
-    secretAccessKey: Constants.SECRET_ACCESS_KEY
+    accessKeyId: Constants.SITE_ACCESS_KEY,
+    secretAccessKey: Constants.SITE_SECRET_ACCESS_KEY
   },
   region: Constants.BUCKET_REGION
 })
@@ -19,7 +19,7 @@ const s3 = new S3Client({
 // Get the urls
 async function getUrls() {
   // Get all the files in the bucket
-  const list = await s3.send(new ListObjectsCommand( { Bucket: Constants.BUCKET_NAME } ))
+  const list = await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))
 
   // Get presigned url
   const arr0 = await Promise.all(
@@ -30,7 +30,7 @@ async function getUrls() {
         id: getId(key),
         type, 
         sigUrl: await getSignedUrl(
-          s3, new GetObjectCommand({ Bucket: Constants.BUCKET_NAME,  Key: key }, { expiresIn: Constants.EXPIRY_TIME } )
+          s3, new GetObjectCommand({ Bucket: Constants.SITE_BUCKET,  Key: key }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
         )
       }
     })

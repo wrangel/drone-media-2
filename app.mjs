@@ -34,7 +34,7 @@ await Island.insertMany(newMetadata)
 const app = express()
 
 // Set views directory
-app.set(Constants.VIEWS, './src/' + Constants.VIEWS)
+app.set('views', './src/' + 'views')
 
 // Render static files from root folder (css, ..)
 app.use(express.static('.'))
