@@ -7,8 +7,8 @@ import { S3Client } from '@aws-sdk/client-s3'
 // Create instance of S3 Client
 const s3 = new S3Client({
   credentials: {
-    accessKeyId: Constants.SITE_ACCESS_KEY,
-    secretAccessKey: Constants.SITE_SECRET_ACCESS_KEY
+    accessKeyId: Constants.ACCESS_KEY,
+    secretAccessKey: Constants.SECRET_ACCESS_KEY
   },
   region: Constants.BUCKET_REGION
 })
