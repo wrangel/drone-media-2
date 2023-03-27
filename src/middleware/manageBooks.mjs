@@ -1,14 +1,65 @@
 import fs from 'fs'
 import path from 'path'
 import Constants from '../middleware/constants.mjs'
+import { getId } from '../middleware/functions.mjs'
+import { ListObjectsCommand } from '@aws-sdk/client-s3'
 
 // Load Mongoose model
-import { Island } from './manageDb.mjs'
+import { Island, s3 } from './manageConnections.mjs'
 
 // Filter hidden files // TODO kill?
-const filterDots = file => !file.startsWith('.')
+const filterDots = file => !file.startsWith('.') // TODO kill?
+
+// Remove format suffix from files
+const removeSuffix = filePath => {
+  return filePath.substring(0, filePath.lastIndexOf('.'))
+}
+
+async function manage() {
+  // List original files (which are the master)
+  const originalFileInfo = await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGINALS_BUCKET } ))
+  const originalFiles = originalFileInfo.Contents.map(originalFile => {
+    let path = originalFile.Key
+    return { key: getId(path), location: removeSuffix(path), path: path }
+  })
+  
+  // List the site files
+  const siteFileInfo = await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))
+  const siteFiles = siteFileInfo.Contents.map(siteFile => {
+    let path = siteFile.Key
+    return { key: getId(path), path: path }
+  })
+
+  // A1 New original files
+  const newOriginalFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
+
+  // A2 Outdated site files
+  const outdatedSiteFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
+
+  // TODO remove 100_0500 !!!!
+
+  
+  console.log(outdatedSiteFiles)
+
+  //const newlyAddedFiles = originalFiles.Contents.filter(x => !siteFiles.Contents.map(y => getI(y.Key)).includes(x.Key))
+  
+    // Remove all site files which are not present in the original files
+
+/*
+ 
+  */
+    //
+  
+  /*
+  const existingMediaKeys = existingMedia.map(element => {return element.key})
+  const removableKeys = existingMetadata.filter(x => !existingMediaKeys.includes(x))
+  const deleted = await Island.deleteMany( { name : { $in : removableKeys } } )
+  */
 
 
+}
+
+manage()
 
 
 /*

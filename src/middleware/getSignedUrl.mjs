@@ -1,11 +1,7 @@
 import { S3Client, GetObjectCommand, ListObjectsCommand} from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import Constants from '../middleware/constants.mjs'
-
-// Get image identifyer from image path
-const getId = path => {
-  return path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
-}
+import { getId } from '../middleware/functions.mjs'
 
 // Create instance of S3 Client
 const s3 = new S3Client({

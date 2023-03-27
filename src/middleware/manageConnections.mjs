@@ -1,5 +1,20 @@
 import mongoose from 'mongoose'
 import Constants from './constants.mjs'
+import { S3Client } from '@aws-sdk/client-s3'
+
+/// Set up S3 client
+
+// Create instance of S3 Client
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: Constants.SITE_ACCESS_KEY,
+    secretAccessKey: Constants.SITE_SECRET_ACCESS_KEY
+  },
+  region: Constants.BUCKET_REGION
+})
+
+
+/// Manage Mongo DB
 
 mongoose.set('strictQuery', false)
 
@@ -61,4 +76,4 @@ const islandSchema = new mongoose.Schema({
 // Create Mongoose Model
 const Island = mongoose.model('Island', islandSchema)
 
-export { Island }
+export { Island, s3 }
