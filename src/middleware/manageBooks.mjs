@@ -5,8 +5,13 @@ import Constants from '../middleware/constants.mjs'
 // Load Mongoose model
 import { Island } from './manageDb.mjs'
 
-// Filter hidden files
+// Filter hidden files // TODO kill?
 const filterDots = file => !file.startsWith('.')
+
+
+
+
+/*
 
 // Get existing media
 const existingMedia = Constants.MEDIA_FOLDERS.flatMap(
@@ -64,3 +69,5 @@ async function manage() {
 }
 
 export { manage }
+
+*/
