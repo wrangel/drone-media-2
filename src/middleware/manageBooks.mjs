@@ -6,11 +6,6 @@ import { s3 } from './manageConnections.mjs'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 
-// Remove format suffix from files
-const removeSuffix = filePath => {
-  return filePath.substring(0, filePath.lastIndexOf('.'))
-}
-
 // Convert to WEBP
 const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
   sharpObject.webp({ lossless: losslessFlag })
@@ -25,7 +20,7 @@ async function manage() {
   const originalFileInfo = await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGIN_BUCKET } ))
   const originalFiles = originalFileInfo.Contents.map(originalFile => {
     let path = originalFile.Key
-    return { key: getId(path), location: removeSuffix(path), path: path }
+    return { key: getId(path), path: path }
   })
   
   // List site files
@@ -43,7 +38,6 @@ async function manage() {
     newFiles.map(async content => {
       return {
         key: content.key,
-        location: content.location,
         path: content.path,
         sigUrl: await getSignedUrl(
           s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: content.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
@@ -51,7 +45,7 @@ async function manage() {
       }
     })
   )  
-  
+
   // Save metadata of newly added files to db
   save(signedUrls)
 }

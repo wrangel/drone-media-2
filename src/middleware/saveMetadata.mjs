@@ -10,69 +10,53 @@ const getDate = s => {
     return new Date(year, month - 1 ,date, hour, min, sec) 
 }
 
+// Convert GPS in case string is returned
+const convertGPS = (longitude, latitude) => {
+    return [longitude, latitude].map(coord => {
+        let corrected
+    try {
+        corrected = parseFloat(coord)
+    } catch {
+        corrected = coord.match(/[0-9]/g)
+    }
+    return corrected
+    })
+}
+
 // Save the data to the db
 async function save(signedUrls) {
     // Get exif data for the new files
-    const exifDataP = Promise.all( 
-        signedUrls.map(signedUrl => {
-            console.log(signedUrl)
+    const exifData = await Promise.all( 
+        signedUrls.map(async signedUrl => {
             return {
                     key: signedUrl.key,
-                    location: signedUrl.location,
-                    path: signedUrl.path,
-                    exif: ExifReader.load(signedUrl.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
+                    exif: await ExifReader.load(signedUrl.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
             }
         })
     )
 
-   // console.log(await exifDataP)
-
-    /*
     // Get the urls for the reverse engineering call
     const reverseUrls = exifData.map (
         exif => {
-            return exif.exif
-            /*
-            return Constants.REVERSE_GEO_URL_ELEMENTS[0] + 
-            exif.exif.GPSLongitude.description + ', ' + exif.exif.GPSLatitude.description + 
-            Constants.REVERSE_GEO_URL_ELEMENTS[1] +  Constants.REVERSE_GEO_ACCESS_TOKEN
-            
+            const coords = convertGPS(exif.exif.GPSLongitude.description, exif.exif.GPSLatitude.description)
+            return Constants.REVERSE_GEO_URL_ELEMENTS[0] + coords[0] + ', ' + coords[1] + 
+                Constants.REVERSE_GEO_URL_ELEMENTS[1] + Constants.REVERSE_GEO_ACCESS_TOKEN 
         }
     )
 
-*/
-
-    //console.log(reverseUrls)
-    
-        /*
     // Get the jsons from the reverse engineering call
     const jsons = await Promise.all(
-        reverseUrls.map(async url => {
-            const resp = await fetch(url)
-            return resp.json()
-            }
-        )
+        reverseUrls.map(async reverseUrl => {
+            const resp = await fetch(reverseUrl)
+            return await resp.json()
+        })
     )
-
-
-    c
-    return exifData
-    */
-}
-
-export { save }
-
-/*
-
-    
-
-    
 
     // Get the reverse geocoding data
     const reverseData = jsons.map (
         json => {
             let data = {}
-            Constants.ADDRESS_COMPONENTS.forEach(addressComponent => {
+            Constants.REVERSE_GEO_ADDRESS_COMPONENTS.forEach(addressComponent => {
                 data[addressComponent] = 
                     json.features
                         .filter(doc => doc.id.startsWith(addressComponent))
@@ -81,6 +65,49 @@ export { save }
             return data
         }
     )
+
+    console.log(reverseData)
+
+
+}
+
+export { save }
+
+    /*
+
+
+
+    let a = jsons.map (
+        json => {
+            console.log(json)
+            console.log("-------------------")
+            return json
+        })
+
+    //console.log(a)
+
+
+    
+
+
+
+    let url = reverseUrls[0].reverseUrl
+  
+    let response = await fetch(url);
+    if (response.ok) { // if HTTP-status is 200-299
+        // get the response body (the method explained below)
+        let json = await response.json()
+        console.log(json)
+    } else {
+        alert("HTTP-Error: " + response.status)
+    }
+    
+
+    ////
+
+
+
+    console.log(reverseData)
 
     // Instantiate metadata for the schema
     const metadata = {
