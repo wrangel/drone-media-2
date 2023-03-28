@@ -11,16 +11,14 @@ const getDate = s => {
 }
 
 // Convert GPS in case string is returned
-const convertGPS = (longitude, latitude) => {
-    return [longitude, latitude].map(coord => {
-        let corrected
+const convertGPS = coord => {
+    let corrected
     try {
         corrected = parseFloat(coord)
     } catch {
         corrected = coord.match(/[0-9]/g)
     }
     return corrected
-    })
 }
 
 // Save the data to the db
@@ -29,20 +27,22 @@ async function save(media) {
     // Get exif data for the new files
     const exifData = await Promise.all( 
         media.map(async medium => {
+            const exif = await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
             return {
                     key: medium.key,
-                    exif: await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
+                    path: medium.path,
+                    exif_datetime: exif.DateTimeOriginal.description,
+                    exif_longitude: convertGPS(exif.GPSLongitude.description),
+                    exif_latitude: convertGPS(exif.GPSLatitude.description),
+                    exif_altitude: exif.GPSAltitude.description
             }
         })
     )
 
     // Get the urls for the reverse engineering call
     const reverseUrls = exifData.map (
-        exif => {
-            const coords = convertGPS(exif.exif.GPSLongitude.description, exif.exif.GPSLatitude.description)
-            return Constants.REVERSE_GEO_URL_ELEMENTS[0] + coords[0] + ', ' + coords[1] + 
-                Constants.REVERSE_GEO_URL_ELEMENTS[1] + Constants.REVERSE_GEO_ACCESS_TOKEN 
-        }
+        exif => Constants.REVERSE_GEO_URL_ELEMENTS[0] + exif.exif_longitude + ', ' + exif.exif_latitude + 
+                    Constants.REVERSE_GEO_URL_ELEMENTS[1] + Constants.REVERSE_GEO_ACCESS_TOKEN 
     )
 
     // Get the jsons from the reverse engineering call
@@ -79,7 +79,7 @@ async function save(media) {
     const combined = reverseGeocodingData.map(function (reverse, i) {
         const base = media[i]
         const exif = exifData[i]
-        console.log(base, exif)
+        console.log(base, exif, reverse)
     })
 
 
