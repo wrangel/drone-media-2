@@ -24,13 +24,14 @@ const convertGPS = (longitude, latitude) => {
 }
 
 // Save the data to the db
-async function save(signedUrls) {
+async function save(media) {
+
     // Get exif data for the new files
     const exifData = await Promise.all( 
-        signedUrls.map(async signedUrl => {
+        media.map(async medium => {
             return {
-                    key: signedUrl.key,
-                    exif: await ExifReader.load(signedUrl.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
+                    key: medium.key,
+                    exif: await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
             }
         })
     )
@@ -53,7 +54,7 @@ async function save(signedUrls) {
     )
 
     // Get the reverse geocoding data
-    const reverseData = jsons.map (
+    const reverseGeocodingData = jsons.map (
         json => {
             let data = {}
             Constants.REVERSE_GEO_ADDRESS_COMPONENTS.forEach(addressComponent => {
@@ -66,49 +67,6 @@ async function save(signedUrls) {
         }
     )
 
-    console.log(reverseData)
-
-
-}
-
-export { save }
-
-    /*
-
-
-
-    let a = jsons.map (
-        json => {
-            console.log(json)
-            console.log("-------------------")
-            return json
-        })
-
-    //console.log(a)
-
-
-    
-
-
-
-    let url = reverseUrls[0].reverseUrl
-  
-    let response = await fetch(url);
-    if (response.ok) { // if HTTP-status is 200-299
-        // get the response body (the method explained below)
-        let json = await response.json()
-        console.log(json)
-    } else {
-        alert("HTTP-Error: " + response.status)
-    }
-    
-
-    ////
-
-
-
-    console.log(reverseData)
-
     // Instantiate metadata for the schema
     const metadata = {
         geometry: {
@@ -116,6 +74,21 @@ export { save }
             coordinates: {}
         }
     }
+
+    // Combine everything into the Mongoose compatible metadata
+    const combined = reverseGeocodingData.map(function (reverse, i) {
+        const base = media[i]
+        const exif = exifData[i]
+        console.log(base, exif)
+    })
+
+
+
+}
+
+export { save }
+
+    /*
 
     // Combine everything into the Mongoose compatible metadata
     const combined = reverseData.map(function (reverse, i) {
@@ -140,8 +113,5 @@ export { save }
     })
     return combined
 }
-
-export { prepare }
-
 
 */
