@@ -1,18 +1,24 @@
-import fs from 'fs'
-import path from 'path'
 import Constants from '../middleware/constants.mjs'
 import { getId } from '../middleware/functions.mjs'
-import { ListObjectsCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
-
-// Load Mongoose model
+import { ListObjectsCommand, DeleteObjectCommand, GetObjectAclCommand, GetObjectCommand } from '@aws-sdk/client-s3'
 import { Island, s3 } from './manageConnections.mjs'
+import ExifReader from 'exifreader'
 
-// Filter hidden files // TODO kill?
-const filterDots = file => !file.startsWith('.') // TODO kill?
+//import sharp from 'sharp'
 
 // Remove format suffix from files
 const removeSuffix = filePath => {
   return filePath.substring(0, filePath.lastIndexOf('.'))
+}
+
+// Get exif data
+async function getExif(media) {
+  const exifdataPromise = Promise.all( 
+    media.map(medium => {
+      return ExifReader.load(medium.original) // Slow, but reliable (exifr is fast, but omits timezone offset)
+    })
+  )
+return exifdataPromise
 }
 
 async function manage() {
@@ -31,101 +37,78 @@ async function manage() {
     let path = siteFile.Key
     return { key: getId(path), path: path }
   })
-
-  // Metadata on db
-  const metadata = (await Island.find({})
-    .select('name -_id'))
-    .map(element => element.name)
   
   /// Add
 
   // New files
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
+  
+
+  let a = await s3.send(new GetObjectCommand({Bucket: Constants.ORIGINALS_BUCKET, Key: 'pan/100_0061.tif'}))
+  let b = a.Body
+
+  console.log(b)
+
+/*
+import {Readable} from "stream";
+import {createWriteStream} from "fs";
+pipe(createWriteStream(fileName)
+let b = a.Body.pipe(createWriteStream(fileName))
+
+
+  const a = await Promise.all(
+    newFiles.map(async element => {
+      let b = await s3.send(new GetObjectCommand({Bucket: Constants.ORIGINALS_BUCKET, Key: element.path}))
+      let c = b.Body.pipe(createWriteStream(fileName))
+      return c
+    })
+  )
+
+
+// ID NEW FILES, GET ALL METADATA, STORE ALL METADATA IN DB, SHARP FILES, STORE IN MELVILLE
+  // ID OUTDATED FILES, DELETE THEM IN DB, ON FILES (TRY CATCH)
+  
   // TODO
 
+  /*
   // New metadata
   const newMetadata = originalFiles.filter(x => !metadata.includes(x.key))
-  // TODO
+  const a = await Promise.all(
+    newMetadata.map(async element => {
+      let b = s3.send(new GetObjectCommand({Bucket: Constants.ORIGINALS_BUCKET, Key: element.path}))
+      return b
+    })
+  )
 
-  /// Delete
+
+  console.log(a)
+    */
+
+  ///const exifData = await getExif(newMetadata)
+
+  /*
+  /// Delete TODO -- FILES AND DB AT ONCE
 
   // Outdated site files
   const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
-  console.log("outdated site files:")
+  console.log("Outdated site files:")
   console.log(outdatedFiles)
-  // NOT RUN forEach await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: 'pan/100_0500.tif'}))
+  // TODO forEach await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: 'pan/100_0500.tif'}))
 
   // Outdated metadata
   const outdatedMetadata = metadata.filter(x => !originalFiles.map(y => y.key).includes(x))
-    
+  await Island.deleteMany( { name : { $in : outdatedMetadata } } )
+  console.log("Outdated metadata:")
   console.log(outdatedMetadata)
 
-
-  /*
-  const existingMediaKeys = existingMedia.map(element => {return element.key})
-  const removableKeys = existingMetadata.filter(x => !existingMediaKeys.includes(x))
-  const deleted = await Island.deleteMany( { name : { $in : removableKeys } } )
-  */
+*/
 
 }
 
 manage()
 
+
 /*
-// Get existing media
-const existingMedia = Constants.MEDIA_FOLDERS.flatMap(
-  mediaFolder => {
-    return fs.readdirSync(path.join('./media', mediaFolder), { withFileTypes: false })
-      .filter(filterDots)
-      .map(file => ({key: file.substring(0, file.lastIndexOf('.')), folder: mediaFolder})) 
-  }
-)
-
-// Get the full file path
-const getFilePath = (folder, key) => {
-  let filePath 
-  // Get HDR media
-  if (folder == Constants.MEDIA_FOLDERS[0]) {
-    filePath = path.join(Constants.RAW_MEDIA_REPO, folder, key) + Constants.RAW_MEDIA_SUFFIX
-  } 
-  // Get non-HDE media
-  else {
-    const parentPath = path.join(Constants.RAW_MEDIA_REPO, folder, Constants.RAW_MEDIA_PREFIX, key)
-    // Get the first file in each directory
-    filePath = fs.readdirSync(parentPath, { withFileTypes: false })
-      .filter(filterDots)
-      .map(file => path.join(parentPath, file))[0]
-  }
-  return filePath
-}
-
-// Get all the newly added media
-async function manage() {
-  // Get all existing metadata on db
-  const existingMetadata = (
-    await Island.find({})
-    .select('name -_id')
-  )
-    .map(element => element.name)
-
-  // Remove all metadata from db which is not in the app's media folder
-  const existingMediaKeys = existingMedia.map(element => {return element.key})
-  const removableKeys = existingMetadata.filter(x => !existingMediaKeys.includes(x))
-  const deleted = await Island.deleteMany( { name : { $in : removableKeys } } )
-  console.log(deleted)
-  
-  // Get all media which are newly added to the web app
-  const newMedia = existingMedia
-    .filter(({key}) => !existingMetadata.includes(key))
-
-    // TODO put that directly above to the existingMetadata
-    .map(medium => {
-      const folder = medium.folder
-      const key = medium.key
-      return {key: key, folder: folder, filePath: getFilePath(folder, key)}
-    })
-  return newMedia
-}
 
 export { manage }
 

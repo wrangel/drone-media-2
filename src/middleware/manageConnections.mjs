@@ -13,7 +13,6 @@ const s3 = new S3Client({
   region: Constants.BUCKET_REGION
 })
 
-
 /// Manage Mongo DB
 
 mongoose.set('strictQuery', false)
