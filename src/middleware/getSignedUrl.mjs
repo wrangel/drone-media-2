@@ -9,7 +9,7 @@ async function getUrls() {
   // Get all the files in the bucket
   const list = await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))
 
-  // Get presigned url
+  // Get presigned urls
   const arr0 = await Promise.all(
     list.Contents.map(async content => {
       const key = content.Key

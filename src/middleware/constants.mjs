@@ -6,7 +6,7 @@ export default {
     // AWS
     BUCKET_REGION: process.env.BUCKET_REGION,
     SITE_BUCKET: process.env.SITE_BUCKET,
-    ORIGINALS_BUCKET: process.env.ORIGINALS_BUCKET,
+    ORIGIN_BUCKET: process.env.ORIGINALS_BUCKET,
     ACCESS_KEY: process.env.ACCESS_KEY,    
     SECRET_ACCESS_KEY: process.env.SECRET_ACCESS_KEY,
     EXPIRY_TIME_IN_SECS: 86400,
