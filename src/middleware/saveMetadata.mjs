@@ -1,6 +1,7 @@
 import ExifReader from 'exifreader'
 import Constants from './constants.mjs'
-import { Island } from './manageConnections.mjs'
+import { Island } from './manageSources.mjs'
+import { update } from './updateAuthors.mjs'
 
 /*  Converts the timestamp string into a GMT / Local date (that is what exifr is doing wrong!)
     https://stackoverflow.com/questions/43083993/javascript-how-to-convert-exif-date-time-data-to-timestamp
@@ -51,8 +52,6 @@ async function save(media) {
         })
     )
 
-        console.log(base)
-
     // Get the urls for the reverse engineering call
     const reverseUrls = base.map (
         exif => Constants.REVERSE_GEO_URL_ELEMENTS[0] + exif.exif_longitude + ', ' + exif.exif_latitude + 
@@ -90,46 +89,38 @@ async function save(media) {
     }
 
     // Combine everything into the Mongoose compatible metadata
-    const combined = base.map(function (x, i) {
-        //console.log(x, reverseGeocodingData[i])
-    })
-
-     /*
-    const combined = reverseGeocodingData.map(function (reverse, i) {
-        const base = media[i]
-        const exif = exifData[i]
-        metadata.name = base.key
-        metadata.type = base.path.substring(0, base.path.indexOf('/'))
+    const newIslands = base.map(function (b, i) {
+        let rgcd = reverseGeocodingData[i]
+        metadata.name = b.key
+        metadata.type = b.path.substring(0, b.path.indexOf('/'))
         metadata.author = ''
-        metadata.dateTimeString = exif.exif_datetime
-        metadata.dateTime = getDate(exif.exif_datetime)
+        metadata.dateTimeString = b.exif_datetime
+        metadata.dateTime = getDate(b.exif_datetime)
         metadata.geometry.type = 'Point'
-        metadata.geometry.coordinates.latitude = exif.exif_latitude
-        metadata.geometry.coordinates.longitude = exif.exif_longitude
-    })
-*/
-    //console.log(metadata)
-
-
-}
-
-export { save }
-
-    /*
-
-        
-        
-
-        metadata.altitude = parseFloat(exif.GPSAltitude.description.replace(' m', ''))
-        metadata.country = reverse.country
-        metadata.region = reverse.region
-        metadata.location = reverse.place
-        metadata.postalCode = reverse.postcode
-        metadata.road = reverse.address
+        metadata.geometry.coordinates.latitude = b.exif_latitude
+        metadata.geometry.coordinates.longitude = b.exif_longitude
+        metadata.altitude = b.exif_altitude
+        metadata.country = rgcd.country
+        metadata.region = rgcd.region
+        metadata.location = rgcd.place
+        metadata.postalCode = rgcd.postcode
+        metadata.road = rgcd.address
         metadata.noViews = 0
         return new Island(metadata)
     })
-    return combined
+
+    // Save document to DB
+    try {
+        await Island.insertMany(newIslands)
+        console.log(`Saved ${ newIslands.length } entries into the db: ${ newIslands.map(e => e.key).toString(',') }`)
+    } catch {
+        console.error()
+    }
+
+    // Update with authors
+    update()
+
+    
 }
 
-*/
+export { save }

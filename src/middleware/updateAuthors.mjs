@@ -1,8 +1,9 @@
 // Load Mongoose model
-import { Island } from './manageDb.mjs'
+import { Island } from './manageSources.mjs'
 
 // Enrich islands with authors
-await Island.aggregate([
+async function update() {
+  await Island.aggregate([
     {
       $lookup: { from: 'authors',
         localField: 'name', 
@@ -17,6 +18,9 @@ await Island.aggregate([
     $addFields: { "author": "$author.author" }
   },
     { "$merge": "islands" }
-]).exec()
+  ]).exec()
 
-console.log("Merged authors")
+  console.log("Merged authors")
+}
+
+export { update }

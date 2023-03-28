@@ -12,6 +12,7 @@ export default {
     EXPIRY_TIME_IN_SECS: 86400,
 
     // MongoDB
+    SERVER: process.env.SERVER,
     DB: process.env.DB,
     DB_USER: process.env.DB_USER,
     DB_PASSWORD: process.env.DB_PASSWORD,

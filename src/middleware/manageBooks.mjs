@@ -1,19 +1,23 @@
 import { ListObjectsCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
 import Constants from './constants.mjs'
-import { getId } from './functions.mjs'
 import { save } from './saveMetadata.mjs'
-import { s3 } from './manageConnections.mjs'
+import { s3 } from './manageSources.mjs'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
-
-// Convert to WEBP
-const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
-  sharpObject.webp({ lossless: losslessFlag })
-    .toFile(outputPath + '.webp')
-    .catch(error => console.log(error))
+// Get image identifyer from image path
+const getId = path => {
+  return path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
 }
 
-// Get the urls of all newly added media
+//// MANUAL upload to aws (cli)
+//// MANUAL update authors
+//// Add metadata to db - DONE
+//// updatedb
+//// Add converted files and tn to melville
+//// Remove obsolete metadata and files from db and melville
+
+
+// Manage files and metadata
 async function manage() {
 
   // List original files (which are the master)
@@ -46,30 +50,31 @@ async function manage() {
     })
   )  
 
-  // Save metadata of newly added files to db
-  save(signedUrls)
+  if (newFiles.length > 0) {
+    // Save metadata of newly added files to db
+    save(signedUrls)
+
+
+  }
 }
 
 manage()
 
-export { manage }
+
 
   /* 
-  import sharp from 'sharp'
+    console.log()
 
- 1) upload to aws (cli)
-    2) patrick master
-    3) compare patrick to melville, delete on melville (both actual and thumbnail), add on melville
-    4) compare patrick to db, delete on db (both authors and islands), add on db
-    3/
-  --
+    import sharp from 'sharp'
+
+// Convert to WEBP
+const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
+  sharpObject.webp({ lossless: losslessFlag })
+    .toFile(outputPath + '.webp')
+    .catch(error => console.log(error))
+}
 
 
-  console.log(exifData)
-
-    //// Delete on files, metadata!!!!
-
-  /*
 
   const obj = newFiles[0]
 
@@ -103,8 +108,6 @@ async function convertImages(media) {
       
       await convertImages(newMedia)
 
-  
-
 import {Readable} from "stream";
 import {createWriteStream} from "fs";
 pipe(createWriteStream(fileName)
@@ -119,12 +122,6 @@ let b = a.Body.pipe(createWriteStream(fileName))
     })
   )
 
-
-// ID NEW FILES, GET ALL METADATA, STORE ALL METADATA IN DB, SHARP FILES, STORE IN MELVILLE
-  // ID OUTDATED FILES, DELETE THEM IN DB, ON FILES (TRY CATCH)
-  
-  // TODO
-
   /*
   // New metadata
   const newMetadata = originalFiles.filter(x => !metadata.includes(x.key))
@@ -135,8 +132,6 @@ let b = a.Body.pipe(createWriteStream(fileName))
     })
   )
 
-
-  /// Delete TODO -- FILES AND DB AT ONCE
 
   // Outdated site files
   const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
@@ -233,6 +228,3 @@ async function convertImages(media) {
 await convertImages(newMedia)
 
 */
-
-
-//export { manage }

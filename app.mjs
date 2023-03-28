@@ -1,34 +1,18 @@
 /// PREPARE
+import express from 'express'
 
-import { manage } from './src/middleware/manageBooks.mjs'
-
-
+// Update files and metadata
+import './src/middleware/manageBooks.mjs'
 
 
 /*
-import express from 'express'
+
 import { getUrls } from './src/middleware/getSignedUrl.mjs'
 import Constants from './src/middleware/constants.mjs'
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
-import { Island } from './src/middleware/manageDb.mjs'
-
-import {prepare } from './src/middleware/prepareMetadata.mjs'
 
 // Get presigned URLs from AWS S3
 const presignedUrls = await getUrls()
-
-// Update database // TODO only for new images
-import './src/middleware/updateDB.mjs'
-
-// Update the media metadata, if necessary
-const newMedia = await manage()
-
-// Save new metadata (in form of Mongoose Models)
-const newMetadata = await prepare(newMedia)
-
-// Save document to DB
-await Island.insertMany(newMetadata)
-
 
 
 /// RENDER

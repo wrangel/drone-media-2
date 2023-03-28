@@ -18,7 +18,7 @@ const s3 = new S3Client({
 mongoose.set('strictQuery', false)
 
 mongoose.connect(
-  `mongodb+srv://${Constants.DB_USER}:${Constants.DB_PASSWORD}@baffin.eo7kmjw.mongodb.net/${Constants.DB}?retryWrites=true&w=majority`
+  `mongodb+srv://${Constants.DB_USER}:${Constants.DB_PASSWORD}@${Constants.SERVER}/${Constants.DB}?retryWrites=true&w=majority`
   )
 
 // Create Mongoose Schema
@@ -42,7 +42,7 @@ const islandSchema = new mongoose.Schema({
     required: true
   },
   geometry: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Object,
     required: true
   },
   altitude: {
