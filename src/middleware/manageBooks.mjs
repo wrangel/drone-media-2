@@ -3,8 +3,8 @@ import { getId } from '../middleware/functions.mjs'
 import { ListObjectsCommand, DeleteObjectCommand, GetObjectAclCommand, GetObjectCommand } from '@aws-sdk/client-s3'
 import { Island, s3 } from './manageConnections.mjs'
 import ExifReader from 'exifreader'
-
-//import sharp from 'sharp'
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import sharp from 'sharp'
 
 // Remove format suffix from files
 const removeSuffix = filePath => {
@@ -42,14 +42,26 @@ async function manage() {
 
   // New files
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
-  
 
+
+
+
+  const sigUrl =  await getSignedUrl(
+    s3, new GetObjectCommand({ Bucket: Constants.ORIGINALS_BUCKET,  Key: 'pan/100_0061.tif' }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
+  )
+
+  console.log(sigUrl)
+
+  sharp(sigUrl)
+
+
+  /*
   let a = await s3.send(new GetObjectCommand({Bucket: Constants.ORIGINALS_BUCKET, Key: 'pan/100_0061.tif'}))
   let b = a.Body
 
   console.log(b)
 
-/*
+
 import {Readable} from "stream";
 import {createWriteStream} from "fs";
 pipe(createWriteStream(fileName)
