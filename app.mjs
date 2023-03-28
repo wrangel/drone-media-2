@@ -1,6 +1,6 @@
 /// PREPARE
 
-import './src/middleware/manageBooks.mjs'
+import { manage } from './src/middleware/manageBooks.mjs'
 
 
 
@@ -11,7 +11,7 @@ import { getUrls } from './src/middleware/getSignedUrl.mjs'
 import Constants from './src/middleware/constants.mjs'
 import { beautify } from './src/middleware/beautifyMetadata.mjs'
 import { Island } from './src/middleware/manageDb.mjs'
-import { manage } from './src/middleware/manageBooks.mjs'
+
 import {prepare } from './src/middleware/prepareMetadata.mjs'
 
 // Get presigned URLs from AWS S3

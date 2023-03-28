@@ -19,7 +19,7 @@ const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
 }
 
 // Get the urls of all newly added media
-async function getNewMedia() {
+async function manage() {
 
   // List original files (which are the master)
   const originalFileInfo = await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGIN_BUCKET } ))
@@ -39,34 +39,29 @@ async function getNewMedia() {
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
 
   // Get presigned urls // TODO same as in getSignedUrls for the new files
-  const urls = await Promise.all(
+  const signedUrls = await Promise.all(
     newFiles.map(async content => {
       return {
         key: content.key,
+        location: content.location,
+        path: content.path,
         sigUrl: await getSignedUrl(
           s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: content.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
         )
       }
     })
-  )
+  )  
   
+  // Save metadata of newly added files to db
+  save(signedUrls)
 }
 
-getNewMedia()
+manage()
+
+export { manage }
 
   /* 
-
-
   import sharp from 'sharp'
-
-
-  // Get exif data for the new files
-  const exifData = await Promise.all( 
-    urls.map(url => {
-      return ExifReader.load(url.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
-    })
-  )
-
 
  1) upload to aws (cli)
     2) patrick master

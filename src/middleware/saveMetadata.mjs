@@ -1,7 +1,5 @@
 import ExifReader from 'exifreader'
 import Constants from './constants.mjs'
-
-// Load Mongoose model
 import { Island } from './manageConnections.mjs'
 
 /*  Converts the timestamp string into a GMT / Local date (that is what exifr is doing wrong!)
@@ -12,45 +10,63 @@ const getDate = s => {
     return new Date(year, month - 1 ,date, hour, min, sec) 
 }
 
-
 // Save the data to the db
-async function save(media) {
+async function save(signedUrls) {
+    // Get exif data for the new files
+    const exifDataP = Promise.all( 
+        signedUrls.map(signedUrl => {
+            console.log(signedUrl)
+            return {
+                    key: signedUrl.key,
+                    location: signedUrl.location,
+                    path: signedUrl.path,
+                    exif: ExifReader.load(signedUrl.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
+            }
+        })
+    )
 
+   // console.log(await exifDataP)
+
+    /*
+    // Get the urls for the reverse engineering call
+    const reverseUrls = exifData.map (
+        exif => {
+            return exif.exif
+            /*
+            return Constants.REVERSE_GEO_URL_ELEMENTS[0] + 
+            exif.exif.GPSLongitude.description + ', ' + exif.exif.GPSLatitude.description + 
+            Constants.REVERSE_GEO_URL_ELEMENTS[1] +  Constants.REVERSE_GEO_ACCESS_TOKEN
+            
+        }
+    )
+
+*/
+
+    //console.log(reverseUrls)
+    
+        /*
+    // Get the jsons from the reverse engineering call
+    const jsons = await Promise.all(
+        reverseUrls.map(async url => {
+            const resp = await fetch(url)
+            return resp.json()
+            }
+        )
+    )
+
+
+    c
+    return exifData
+    */
 }
 
 export { save }
 
 /*
 
+    
 
- 
-    // Get and aggregate all exifdata promises to one
-    const exifdataPromise = Promise.all(media.map(
-        medium => {
-            return ExifReader.load(medium.filePath) // Slow, but reliable (exifr is fast, but omits timezone offset)
-        }
-    ))
-
-    // wait ..
-    const exifdata = await exifdataPromise
-
-    // Get the urls for the reverse engineering call
-    const urls = exifdata.map (
-        exif => {
-            return Constants.REVERSE_GEO_URL_ELEMENTS[0] + 
-            exif.GPSLongitude.description + ', ' + exif.GPSLatitude.description + 
-            Constants.REVERSE_GEO_URL_ELEMENTS[1] +  Constants.ACCESS_TOKEN
-        }
-    )
-
-    // Get the jsons from the reverse engineering call
-    const jsons = await Promise.all(
-        urls.map(async url => {
-            const resp = await fetch(url)
-            return resp.json()
-            }
-        )
-    )
+    
 
     // Get the reverse geocoding data
     const reverseData = jsons.map (
