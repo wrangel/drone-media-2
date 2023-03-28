@@ -2,7 +2,7 @@ import ExifReader from 'exifreader'
 import Constants from './constants.mjs'
 
 // Load Mongoose model
-import { Island } from './manageDb.mjs'
+import { Island } from './manageConnections.mjs'
 
 /*  Converts the timestamp string into a GMT / Local date (that is what exifr is doing wrong!)
     https://stackoverflow.com/questions/43083993/javascript-how-to-convert-exif-date-time-data-to-timestamp
@@ -12,8 +12,17 @@ const getDate = s => {
     return new Date(year, month - 1 ,date, hour, min, sec) 
 }
 
+
 // Save the data to the db
-async function prepare(media) {
+async function save(media) {
+
+}
+
+export { save }
+
+/*
+
+
  
     // Get and aggregate all exifdata promises to one
     const exifdataPromise = Promise.all(media.map(
@@ -90,3 +99,6 @@ async function prepare(media) {
 }
 
 export { prepare }
+
+
+*/

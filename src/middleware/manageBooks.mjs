@@ -1,10 +1,10 @@
-import Constants from '../middleware/constants.mjs'
-import { getId } from '../middleware/functions.mjs'
-import { ListObjectsCommand, DeleteObjectCommand, GetObjectAclCommand, GetObjectCommand } from '@aws-sdk/client-s3'
-import { Island, s3 } from './manageConnections.mjs'
-import ExifReader from 'exifreader'
+import { ListObjectsCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import Constants from './constants.mjs'
+import { getId } from './functions.mjs'
+import { save } from './saveMetadata.mjs'
+import { s3 } from './manageConnections.mjs'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import sharp from 'sharp'
+
 
 // Remove format suffix from files
 const removeSuffix = filePath => {
@@ -18,7 +18,8 @@ const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
     .catch(error => console.log(error))
 }
 
-async function manage() {
+// Get the urls of all newly added media
+async function getNewMedia() {
 
   // List original files (which are the master)
   const originalFileInfo = await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGIN_BUCKET } ))
@@ -46,8 +47,18 @@ async function manage() {
           s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: content.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
         )
       }
-    }) 
+    })
   )
+  
+}
+
+getNewMedia()
+
+  /* 
+
+
+  import sharp from 'sharp'
+
 
   // Get exif data for the new files
   const exifData = await Promise.all( 
@@ -57,12 +68,12 @@ async function manage() {
   )
 
 
-  /*  1) upload to aws (cli)
+ 1) upload to aws (cli)
     2) patrick master
     3) compare patrick to melville, delete on melville (both actual and thumbnail), add on melville
     4) compare patrick to db, delete on db (both authors and islands), add on db
     3/
-  */
+  --
 
 
   console.log(exifData)
@@ -234,13 +245,5 @@ await convertImages(newMedia)
 
 */
 
-}
 
-manage()
-
-
-/*
-
-export { manage }
-
-*/
+//export { manage }
