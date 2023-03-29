@@ -23,7 +23,8 @@ export default {
     REVERSE_GEO_URL_ELEMENTS: ['https://api.mapbox.com/geocoding/v5/mapbox.places/','.json?access_token='],
 
     // Misc 
-    PORT: 37009,
     AUTHOR_PICTURES_PATH: 'media/author_pictures/',
-    SITE_MEDIA_FORMAT: '.webp'
+    PORT: 37009,
+    SITE_MEDIA_FORMAT: '.webp',
+    THUMBNAIL_FOLDER: 'thumbnails/'
 }

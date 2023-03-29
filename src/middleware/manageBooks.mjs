@@ -1,4 +1,4 @@
-import { ListObjectsCommand, DeleteObjectCommand, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import { ListObjectsCommand, GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import Constants from './constants.mjs'
 import { s3 } from './manageSources.mjs'
@@ -30,10 +30,11 @@ async function manage() {
   
   // Get new files
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
-  console.log(`${newFiles.length} new files to manage:`)
-  console.log(newFiles)
+  const noFiles = newFiles.length
+  console.log(`${noFiles} new files to manage`)  
 
-  if (newFiles.length > 0) {
+  if (noFiles > 0) {
+    console.log(':'), console.log(newFiles)
 
     const media = await Promise.all(
       newFiles.map(async newFile => {
@@ -45,7 +46,7 @@ async function manage() {
           origin: path, 
           targets: [
               path.replace(/\b(.tif|.jpeg)\b/gi, Constants.SITE_MEDIA_FORMAT), // actual
-              'thumbnails/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail // TODO remove hardcode
+              Constants.THUMBNAIL_FOLDER + key + Constants.SITE_MEDIA_FORMAT // thumbnail
           ],
           sigUrl: await getSignedUrl( // use presigned urls for exif extraction // TODO same as in getSignedUrls for the new files
             s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
@@ -55,7 +56,7 @@ async function manage() {
     )
 
     // Save metadata of newly added files to db
-    ////save(media) // TODO uncomment
+    save(media)
 
     // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
     update(media)
