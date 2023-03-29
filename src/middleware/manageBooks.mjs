@@ -74,6 +74,9 @@ async function manage() {
         position: sharp.strategy.attention
       })
 
+    /*  Create a passthrough stream
+        Thanks, danalloway, https://github.com/lovell/sharp/issues/3313
+    */
     const uploadStream = new PassThrough()
 
     const upload = new Upload({
