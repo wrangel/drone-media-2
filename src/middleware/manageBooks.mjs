@@ -4,8 +4,11 @@ import sharp from 'sharp'
 import Constants from './constants.mjs'
 import { save } from './updateMetadata.mjs'
 import { s3 } from './manageSources.mjs'
+
+
 import { createReadStream } from 'fs'
 import { join } from 'path'
+import stream from 'stream'
 
 
 // Get image identifyer from image path
@@ -64,21 +67,12 @@ async function manage() {
 
   
 
-    /// get a file from s3
-    const params1 = {
-      Bucket: Constants.ORIGIN_BUCKET,
-      Key: medium.origin,
-      //Body: Buffer.from("sdf")
-    }
+    // Get a file from S3 as Readable Stream
+    const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
 
-    const response = (await s3.send(new GetObjectCommand(params1))).Body // Readable stream
-
-    // Read image data from readableStream,
-    // resize to 300 pixels wide,
-    // emit an 'info' event with calculated dimensions
-    // and finally write image data to writableStream
     const transformer = sharp()
-      .webp({ lossless: true }) // TODO add dyn flag
+      .webp( { lossless: false } ) // TODO add dyn flag
+      //.withMetadata()
       .resize({
         width: 2000,
         height: 1300,
@@ -86,24 +80,36 @@ async function manage() {
       })
       .on('info', function(info) {
         console.log(`Image resized to ${info.width}, ${info.height}`)
+      .on('error', console.error)
     })
-    response.pipe(transformer)//.pipe(transformed)
 
-   let file =  join(process.env.PWD, 'media', 'about', '100_0186.webp')
-  
-    const readStream = createReadStream(file) // a ReadStream
+        // and finally write image data to writableStream
+
+    //////////////////////
+
+    // WORKS (getting readable stream from s3, transform it, save it to file)
+    let y = await response.pipe(transformer).toFile(join(process.env.PWD, 'media', 'about', '100_1111.webp'))
+
+  //////////////////////
+
+    // WORKS (uploading readable stream to S3)
+    const readStream = createReadStream(join(process.env.PWD, 'media', 'about', '100_0186.webp'))// a fs.ReadStream extends stream.Readable 
 
     /// put the image on s3
     // Define params
     const params = {
       Bucket: Constants.SITE_BUCKET,
       Key: 'dududu', // target_actual or target_thumbnail, respectively TODO
-      Body: readStream, //readStream,
+      Body: readStream,
       Content: 'image/webp'
     }
 
     // put
     await s3.send(new PutObjectCommand(params))
+
+    //////////////////////
+
+    const pass = new stream.PassThrough();
 
   }
 }
