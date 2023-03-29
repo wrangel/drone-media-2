@@ -14,6 +14,11 @@ const update = media => {
     media.forEach(async medium => {
         console.log(medium) //////
 
+        // Get the file from S3 Origin bucket (Patrick) as a Readable Stream
+        const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
+
+
+        ///------//
         /*  Create a passthrough stream and an upload container
         Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
         */
@@ -29,23 +34,20 @@ const update = media => {
             },
         })
 
-        // Get the file from S3 as a Readable Stream
-        const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
-
         const transformer = sharp()
             .webp( { lossless: false } )
-            .resize({
+            
+        transformer.resize({
             width: 2000,
             height: 1300,
             position: sharp.strategy.attention
         })
+        ///---------///
 
         response.pipe(transformer).pipe(uploadStream)
-        //await upload.done()
+        await upload.done()
 
     })
-
-
 } 
 
 export { update }
