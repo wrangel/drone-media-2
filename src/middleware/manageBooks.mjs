@@ -63,13 +63,11 @@ async function manage() {
     ////save(media) // TODO uncomment
 
     const medium = media[0]
-    console.log(medium)
-
-  
 
     // Get a file from S3 as Readable Stream
     const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
 
+    // Create and apply Sharp transformer
     const transformer = sharp()
       .webp( { lossless: false } ) // TODO add dyn flag
       //.withMetadata()
@@ -83,12 +81,12 @@ async function manage() {
       .on('error', console.error)
     })
 
-        // and finally write image data to writableStream
-
-    //////////////////////
+    let k = await response.pipe(transformer).toBuffer()
 
     // WORKS (getting readable stream from s3, transform it, save it to file)
-    let y = await response.pipe(transformer).toFile(join(process.env.PWD, 'media', 'about', '100_1111.webp'))
+    //await response.pipe(transformer).toFile(join(process.env.PWD, 'media', 'about', '100_1111.webp'))
+
+        // and finally write image data to writableStream 
 
   //////////////////////
 
@@ -99,8 +97,8 @@ async function manage() {
     // Define params
     const params = {
       Bucket: Constants.SITE_BUCKET,
-      Key: 'dududu', // target_actual or target_thumbnail, respectively TODO
-      Body: readStream,
+      Key: 'dududu.webp', // target_actual or target_thumbnail, respectively TODO
+      Body: k,
       Content: 'image/webp'
     }
 
