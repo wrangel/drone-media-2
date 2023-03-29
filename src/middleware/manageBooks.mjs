@@ -81,24 +81,24 @@ async function manage() {
       .on('error', console.error)
     })
 
-    let k = await response.pipe(transformer).toBuffer()
+    // WORKS buffer from stream
+    //const body = await response.pipe(transformer).toBuffer()
 
     // WORKS (getting readable stream from s3, transform it, save it to file)
     //await response.pipe(transformer).toFile(join(process.env.PWD, 'media', 'about', '100_1111.webp'))
 
-        // and finally write image data to writableStream 
-
-  //////////////////////
-
     // WORKS (uploading readable stream to S3)
-    const readStream = createReadStream(join(process.env.PWD, 'media', 'about', '100_0186.webp'))// a fs.ReadStream extends stream.Readable 
+    const body = createReadStream(join(process.env.PWD, 'media', 'about', '100_0186.webp'))// a fs.ReadStream extends stream.Readable 
+
+        // and finally write image data to writableStream 
+        // https://sharp.pixelplumbing.com/api-constructor
 
     /// put the image on s3
     // Define params
     const params = {
       Bucket: Constants.SITE_BUCKET,
       Key: 'dududu.webp', // target_actual or target_thumbnail, respectively TODO
-      Body: k,
+      Body: body,
       Content: 'image/webp'
     }
 
