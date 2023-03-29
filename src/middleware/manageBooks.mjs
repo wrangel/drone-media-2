@@ -1,8 +1,10 @@
 import { ListObjectsCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
-import Constants from './constants.mjs'
-import { save } from './saveMetadata.mjs'
-import { s3 } from './manageSources.mjs'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import sharp from 'sharp'
+import Constants from './constants.mjs'
+import { save } from './updateMetadata.mjs'
+import { s3 } from './manageSources.mjs'
+
 
 // Get image identifyer from image path
 const getId = path => {
@@ -12,10 +14,9 @@ const getId = path => {
 //// MANUAL upload to aws (cli)
 //// MANUAL update authors
 //// Add metadata to db - DONE
-//// updatedb
+//// update authors - DONE
 //// Add converted files and tn to melville
 //// Remove obsolete metadata and files from db and melville
-
 
 // Manage files and metadata
 async function manage() {
@@ -52,8 +53,11 @@ async function manage() {
 
   if (newFiles.length > 0) {
     // Save metadata of newly added files to db
-    save(signedUrls)
+    /////save(signedUrls) TODO uncomment
+    console.log(signedUrls)
 
+
+  
 
   }
 }
@@ -61,11 +65,8 @@ async function manage() {
 manage()
 
 
-
   /* 
     console.log()
-
-    import sharp from 'sharp'
 
 // Convert to WEBP
 const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
@@ -74,14 +75,10 @@ const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
     .catch(error => console.log(error))
 }
 
-
-
   const obj = newFiles[0]
 
-  //const sharpObject = await sharp(sigUrl, obj)
-  //convertToWebp(sharpObject, true, )
-    //console.log(obj)
-
+  const sharpObject = await sharp(sigUrl, obj)
+  convertToWebp(sharpObject, true, )
 
 // Convert data
 async function convertImages(media) {
@@ -142,14 +139,10 @@ let b = a.Body.pipe(createWriteStream(fileName))
   // Outdated metadata
   const outdatedMetadata = metadata.filter(x => !originalFiles.map(y => y.key).includes(x))
   await Island.deleteMany( { name : { $in : outdatedMetadata } } )
-  console.log("Outdated metadata:")
-  console.log(outdatedMetadata)
-
 
   ------
 
   //// metaata management and media conversion
-
 
 import path from 'path'
 import fs from 'fs'

@@ -1,5 +1,5 @@
 import Constants from './constants.mjs'
-import { Island } from './manageDb.mjs'
+import { Island } from './manageSources.mjs'
 
 // Prepare date for website
 const prepareDate = date => {

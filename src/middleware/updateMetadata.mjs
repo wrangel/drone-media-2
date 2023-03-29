@@ -25,14 +25,14 @@ const getAltitude = altitudeString => {
 
 // Convert GPS, if string is returned
 const getCoordinates = coordString => {
-    let coord
-    try {
-        coord = parseFloat(coordString)
-    } catch {
-        coord = coordString.match(/[0-9]/g)
+    let coordinate = parseFloat(coordString)
+    const orientation = coordString.match(/[a-zA-Z]+/g)
+    console.log(orientation)
+    if (['S', 'E'].indexOf(orientation[0]) > - 1) {
+      coordinate = -coordinate
     }
-    return coord
-}
+    return coordinate
+  }
 
 // Save the data to the db
 async function save(media) {
