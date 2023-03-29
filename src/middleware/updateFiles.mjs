@@ -22,42 +22,45 @@ const update = media => {
                 const compressFlag = target.indexOf("thumbnails") > -1 ? true : false
                 const resizeFlag = medium.type === 'hdr' ? false : true
 
+                            ///------//
+                /*  Create a passthrough stream and an upload container
+                Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
+                */
+                const uploadStream = new PassThrough()
+                const upload = new Upload({
+                    client: s3,
+                    queueSize: 1,
+                    params: {
+                        Bucket: Constants.SITE_BUCKET,
+                        ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
+                        Key: medium.key + '.webp', //medium.targets.actual, /////////
+                        Body: uploadStream
+                    },
+                })
 
-                return resizeFlag
+                const transformer = sharp()
+                    .webp( { lossless: false } )
+
+                if(resizeFlag) {
+                    transformer.resize({
+                        width: 2000,
+                        height: 1300,
+                        position: sharp.strategy.attention
+                    })
+                }
+                
+                ///---------///
+
+                response.pipe(transformer).pipe(uploadStream)
+                //return await upload.done()
+
+                return resizeFlag /////
             })
             console.log("----------")
 
-            console.log(a)
+            console.log(a) //////
 
-            ///------//
-            /*  Create a passthrough stream and an upload container
-            Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
-            */
-            const uploadStream = new PassThrough()
-            const upload = new Upload({
-                client: s3,
-                queueSize: 1,
-                params: {
-                    Bucket: Constants.SITE_BUCKET,
-                    ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
-                    Key: medium.key + '.webp', //medium.targets.actual,
-                    Body: uploadStream
-                },
-            })
 
-            const transformer = sharp()
-                .webp( { lossless: false } )
-            
-        
-            transformer.resize({
-                width: 2000,
-                height: 1300,
-                position: sharp.strategy.attention
-            })
-            ///---------///
-
-            response.pipe(transformer).pipe(uploadStream)
-            //return await upload.done()
 
         })
     )
