@@ -11,13 +11,6 @@ const getId = path => {
   return path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
 }
 
-//// MANUAL upload to aws (cli)
-//// MANUAL update authors
-//// Add metadata to db - DONE
-//// update authors - DONE
-//// Add converted files and tn to melville
-//// Remove obsolete metadata and files from db and melville
-
 // Manage files and metadata
 async function manage() {
 
@@ -42,11 +35,15 @@ async function manage() {
 
     const media = await Promise.all(
       newFiles.map(async newFile => {
+        const path = newFile.path
         return {
           key: newFile.key,
-          origin: newFile.path,
-          target_actual: newFile.path.replace('.tif', Constants.SITE_MEDIA_FORMAT).replace('jpeg', Constants.SITE_MEDIA_FORMAT),
-          target_thumbnail: 'thumbnails/' + newFile.key + Constants.SITE_MEDIA_FORMAT,
+          type: path.substring(0, path.indexOf('/')),
+          origin: path, 
+          targets: {
+              actual: path.replace('.tif', Constants.SITE_MEDIA_FORMAT).replace('jpeg', Constants.SITE_MEDIA_FORMAT),
+              thumbnail: 'thumbnails/' + newFile.key + Constants.SITE_MEDIA_FORMAT
+          },
           sigUrl: await getSignedUrl( // use presigned urls for exif extraction // TODO same as in getSignedUrls for the new files
             s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
           )
