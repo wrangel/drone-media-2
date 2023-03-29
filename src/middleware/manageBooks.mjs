@@ -35,14 +35,15 @@ async function manage() {
 
     const media = await Promise.all(
       newFiles.map(async newFile => {
+        const key = newFile.key
         const path = newFile.path
         return {
-          key: newFile.key,
+          key: key,
           type: path.substring(0, path.indexOf('/')),
           origin: path, 
           targets: [
-              path.replace('.tif', Constants.SITE_MEDIA_FORMAT).replace('jpeg', Constants.SITE_MEDIA_FORMAT), // actual
-              'thumbnails/' + newFile.key + Constants.SITE_MEDIA_FORMAT // thumbnail
+              path.replace(/\b(.tif|.jpeg)\b/gi, Constants.SITE_MEDIA_FORMAT), // actual
+              'thumbnails/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail // TODO remove hardcode
           ],
           sigUrl: await getSignedUrl( // use presigned urls for exif extraction // TODO same as in getSignedUrls for the new files
             s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )

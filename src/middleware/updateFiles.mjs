@@ -12,7 +12,6 @@ const update = media => {
 
     Promise.all(
         media.flatMap(async medium => {
-            console.log(medium) //////
 
             // Get the file from S3 Origin bucket (Patrick) as a Readable Stream
             const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
