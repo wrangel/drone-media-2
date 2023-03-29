@@ -22,8 +22,8 @@ const prepareDate = date => {
 const beautify = async (mediaFolder, presignedUrls) => {
 
   const docs = await Island.find({ type : mediaFolder })
-        .sort({ dateTime: -1 })
-        .lean()
+    .sort({ dateTime: -1 })
+    .lean()
 
   return docs.map (doc => {
     // Get the current presigned urls for the medium
