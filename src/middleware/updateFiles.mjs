@@ -49,7 +49,7 @@ const update = media => {
                 }
 
                 response.pipe(transformStream).pipe(uploadStream)
-                return await upload.done()
+                //return await upload.done()
             })
         })
     )

@@ -30,7 +30,7 @@ async function manage() {
   
   // Get new files
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
-  console.log("New files to manage:")
+  console.log(`${newFiles.length} new files to manage:`)
   console.log(newFiles)
 
   if (newFiles.length > 0) {
