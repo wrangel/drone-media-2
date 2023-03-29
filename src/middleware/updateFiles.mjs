@@ -5,7 +5,6 @@ import { PassThrough } from 'stream'
 import sharp from 'sharp'
 import Constants from './constants.mjs'
 import { s3 } from './manageSources.mjs'
-import res from 'express/lib/response.js'
 
 
 // Manipulate and save files
@@ -20,7 +19,7 @@ const update = media => {
             // Loop through targets (for each image, there is an actual and thumbnail image)
             medium.targets.map(async target => {
                 // Determine if image needs compression and / or resizing
-                const compressFlag = target.indexOf("thumbnails") > -1 ? true : false
+                const compressFlag = target.indexOf(Constants.THUMBNAIL_FOLDER) > -1 ? true : false
                 const resizeFlag = compressFlag && medium.type  != 'hdr' ? true : false
                 /*  Create a PassThrough Stream and an upload container
                 Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor

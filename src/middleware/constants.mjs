@@ -26,5 +26,5 @@ export default {
     AUTHOR_PICTURES_PATH: 'media/author_pictures/',
     PORT: 37009,
     SITE_MEDIA_FORMAT: '.webp',
-    THUMBNAIL_FOLDER: 'thumbnails/'
+    THUMBNAIL_FOLDER: 'thumbnails'
 }
