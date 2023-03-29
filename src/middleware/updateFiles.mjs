@@ -18,9 +18,12 @@ const update = media => {
 
             // Loop through targets (for each image, there is an actual and thumbnail image)
             let a = medium.targets.map(target => {
-                // Determine if image needs compression
-                const compress = target.indexOf("thumbnails") > -1 ? true : false
-                return compress
+                // Determine if image needs compression and / or resizing
+                const compressFlag = target.indexOf("thumbnails") > -1 ? true : false
+                const resizeFlag = medium.type === 'hdr' ? false : true
+
+
+                return resizeFlag
             })
             console.log("----------")
 
