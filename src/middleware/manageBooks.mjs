@@ -1,14 +1,11 @@
-import { ListObjectsCommand, DeleteObjectCommand, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import { ListObjectsCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { PassThrough } from 'stream'
 import sharp from 'sharp'
 import Constants from './constants.mjs'
 import { save } from './updateMetadata.mjs'
 import { s3 } from './manageSources.mjs'
-
-
-import { createReadStream } from 'fs'
-import { join } from 'path'
-import stream from 'stream'
 
 
 // Get image identifyer from image path
@@ -72,42 +69,27 @@ async function manage() {
       .webp( { lossless: false } ) // TODO add dyn flag
       //.withMetadata()
       .resize({
-        width: 2000,
+        width: 1200,
         height: 1300,
         position: sharp.strategy.attention
       })
-      .on('info', function(info) {
-        console.log(`Image resized to ${info.width}, ${info.height}`)
-      .on('error', console.error)
-    })
 
-    // WORKS buffer from stream
-    //const body = await response.pipe(transformer).toBuffer()
+    const uploadStream = new PassThrough()
 
-    // WORKS (getting readable stream from s3, transform it, save it to file)
-    //await response.pipe(transformer).toFile(join(process.env.PWD, 'media', 'about', '100_1111.webp'))
+    const upload = new Upload({
+      client: s3,
+      queueSize: 1,
+      params: {
+          Bucket: Constants.SITE_BUCKET,
+          ContentType: 'image/webp',
+          Key: 'dededede.webp',
+          Body: uploadStream
+      },
+  })
 
-    // WORKS (uploading readable stream to S3)
-    const body = createReadStream(join(process.env.PWD, 'media', 'about', '100_0186.webp'))// a fs.ReadStream extends stream.Readable 
+  response.pipe(transformer).pipe(uploadStream)
 
-        // and finally write image data to writableStream 
-        // https://sharp.pixelplumbing.com/api-constructor
-
-    /// put the image on s3
-    // Define params
-    const params = {
-      Bucket: Constants.SITE_BUCKET,
-      Key: 'dududu.webp', // target_actual or target_thumbnail, respectively TODO
-      Body: body,
-      Content: 'image/webp'
-    }
-
-    // put
-    await s3.send(new PutObjectCommand(params))
-
-    //////////////////////
-
-    const pass = new stream.PassThrough();
+  await upload.done()
 
   }
 }
