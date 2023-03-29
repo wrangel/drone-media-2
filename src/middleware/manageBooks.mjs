@@ -6,10 +6,6 @@ import { save } from './updateMetadata.mjs'
 import { update } from './updateFiles.mjs'
 
 
-import { PassThrough } from 'stream'
-import { Upload } from '@aws-sdk/lib-storage'
-import sharp from 'sharp'
-
 // Get image identifyer from image path
 const getId = path => {
   return path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
@@ -49,8 +45,8 @@ async function manage() {
         return {
           key: newFile.key,
           origin: newFile.path,
-          target_actual: newFile.path.replace('.tif', '.webp'),
-          target_thumbnail: 'thumbnails/' + newFile.key + '.webp',
+          target_actual: newFile.path.replace('.tif', Constants.SITE_MEDIA_FORMAT).replace('jpeg', Constants.SITE_MEDIA_FORMAT),
+          target_thumbnail: 'thumbnails/' + newFile.key + Constants.SITE_MEDIA_FORMAT,
           sigUrl: await getSignedUrl( // use presigned urls for exif extraction // TODO same as in getSignedUrls for the new files
             s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
           )
@@ -63,42 +59,6 @@ async function manage() {
 
     // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
     update(media)
-
-    const medium = media[0]
-
-    // Get a file from S3 as Readable Stream
-    const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
-
-    // Create and apply Sharp transformer
-    const transformer = sharp()
-      .webp( { lossless: false } ) // TODO add dyn flag
-      //.withMetadata()
-      .resize({
-        width: 1200,
-        height: 1300,
-        position: sharp.strategy.attention
-      })
-
-    /*  Create a passthrough stream
-        Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
-    */
-    const uploadStream = new PassThrough()
-
-    const upload = new Upload({
-      client: s3,
-      queueSize: 1,
-      params: {
-          Bucket: Constants.SITE_BUCKET,
-          ContentType: 'image/webp',
-          Key: 'dededede.webp',
-          Body: uploadStream
-      },
-  })
-
-  response.pipe(transformer).pipe(uploadStream)
-
-  await upload.done()
-
   }
 }
 

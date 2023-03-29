@@ -25,7 +25,5 @@ export default {
     // Misc 
     PORT: 37009,
     AUTHOR_PICTURES_PATH: 'media/author_pictures/',
-    RAW_MEDIA_FORMAT: '.tif', // TODO kill?
-    MEDIA_FOLDERS: ['hdr', 'pan', 'wide_angle'], // MUST be sorted alphabetically // TODO kill?
-    
+    SITE_MEDIA_FORMAT: '.webp'
 }
