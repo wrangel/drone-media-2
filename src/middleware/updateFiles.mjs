@@ -39,7 +39,7 @@ const update = media => {
                 queueSize: 1,
                 params: {
                     Bucket: Constants.SITE_BUCKET,
-                    ContentType: 'image/webp', //`image/${Constants.SITE_MEDIA_FORMAT}`,
+                    ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
                     Key: medium.key + '.webp', //medium.targets.actual,
                     Body: uploadStream
                 },
@@ -48,7 +48,7 @@ const update = media => {
             const transformer = sharp()
                 .webp( { lossless: false } )
             
-            console.log(medium)
+        
             transformer.resize({
                 width: 2000,
                 height: 1300,
