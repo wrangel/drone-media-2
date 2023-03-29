@@ -41,39 +41,31 @@ async function manage() {
   if (newFiles.length > 0) {
 
     // Get presigned urls // TODO same as in getSignedUrls for the new files
-    const signedUrls = await Promise.all(
-      newFiles.map(async content => {
+    const media = await Promise.all(
+      newFiles.map(async newFile => {
         return {
-          key: content.key,
-          path: content.path,
+          key: newFile.key,
+          target_actual: newFile.path.replace('.tif', '.webp'),
+          target_thumbnail: 'thumbnails/' + newFile.key + '.webp',
           sigUrl: await getSignedUrl(
-            s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: content.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
+            s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
           )
         }
       })
     )  
 
     // Save metadata of newly added files to db
-    /////save(signedUrls) TODO uncomment
-    
-    // XXX
-    const fileContainer = signedUrls.map(signedUrl => {
-      return {
-        origin: signedUrl.path,
-        target_actual: signedUrl.path.replace('.tif', '.webp'),
-        target_thumbnail: 'thumbnails/' + signedUrl.key + '.webp',
-        sigUrl: signedUrl.sigUrl
-      }
-    })
+    ////save(media) // TODO uncomment
 
-    console.log(fileContainer)
 
-    const medium = fileContainer[0]
+    console.log(media)
+
+    //const medium = fileContainer[0]
     //console.log(medium)
 
 
 
-    const sharpObject = sharp(medium.sigUrl)
+    //const sharpObject = sharp(medium.sigUrl)
   
   }
 }

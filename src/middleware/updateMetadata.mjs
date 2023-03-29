@@ -26,10 +26,9 @@ const getAltitude = altitudeString => {
 // Convert GPS, if string is returned
 const getCoordinates = coordString => {
     let coordinate = parseFloat(coordString)
-    const orientation = coordString.match(/[a-zA-Z]+/g)
-    console.log(orientation)
-    if (['S', 'E'].indexOf(orientation[0]) > - 1) {
-      coordinate = -coordinate
+    const orientation = coordString.toString().match(/[a-zA-Z]+/g) 
+    if(orientation != null && ['S', 'W'].indexOf(orientation[0]) > - 1) {
+        coordinate = -coordinate
     }
     return coordinate
   }
@@ -43,7 +42,7 @@ async function save(media) {
             const exif = await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
             return {
                     key: medium.key,
-                    path: medium.path,
+                    target_actual: medium.target_actual,
                     exif_datetime: exif.DateTimeOriginal.description,
                     exif_longitude: getCoordinates(exif.GPSLongitude.description),
                     exif_latitude: getCoordinates(exif.GPSLatitude.description),
@@ -92,7 +91,7 @@ async function save(media) {
     const newIslands = base.map(function (b, i) {
         let rgcd = reverseGeocodingData[i]
         metadata.name = b.key
-        metadata.type = b.path.substring(0, b.path.indexOf('/'))
+        metadata.type = b.target_actual.substring(0, b.target_actual.indexOf('/'))
         metadata.author = ''
         metadata.dateTimeString = b.exif_datetime
         metadata.dateTime = getDate(b.exif_datetime)
@@ -119,7 +118,6 @@ async function save(media) {
 
     // Update with authors
     update()
-
 }
 
 export { save }
