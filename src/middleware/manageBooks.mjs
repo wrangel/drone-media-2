@@ -1,4 +1,4 @@
-import { ListObjectsCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import { ListObjectsCommand, DeleteObjectCommand, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import Constants from './constants.mjs'
 import { s3 } from './manageSources.mjs'
@@ -21,7 +21,7 @@ async function manage() {
     return { key: getId(path), path: path }
   })
   
-  // List site files
+  // Get site files
   const siteFileInfo = await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))
   const siteFiles = siteFileInfo.Contents.map(siteFile => {
     let path = siteFile.Key
@@ -40,10 +40,10 @@ async function manage() {
           key: newFile.key,
           type: path.substring(0, path.indexOf('/')),
           origin: path, 
-          targets: {
-              actual: path.replace('.tif', Constants.SITE_MEDIA_FORMAT).replace('jpeg', Constants.SITE_MEDIA_FORMAT),
-              thumbnail: 'thumbnails/' + newFile.key + Constants.SITE_MEDIA_FORMAT
-          },
+          targets: [
+              path.replace('.tif', Constants.SITE_MEDIA_FORMAT).replace('jpeg', Constants.SITE_MEDIA_FORMAT), // actual
+              'thumbnails/' + newFile.key + Constants.SITE_MEDIA_FORMAT // thumbnail
+          ],
           sigUrl: await getSignedUrl( // use presigned urls for exif extraction // TODO same as in getSignedUrls for the new files
             s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
           )

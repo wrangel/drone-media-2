@@ -7,15 +7,6 @@ import Constants from './constants.mjs'
 import { s3 } from './manageSources.mjs'
 
 
-// Create and apply Sharp transformer
-const transformer = losslessFlag => sharp()
-    .webp( { lossless: losslessFlag } )
-    .resize({
-        width: 1200,
-        height: 1300,
-        position: sharp.strategy.attention
-    })
-
 // Manipulate and save files
 const update = media => {
 
@@ -50,7 +41,7 @@ const update = media => {
         })
 
         response.pipe(transformer).pipe(uploadStream)
-        await upload.done()
+        //await upload.done()
 
     })
 
