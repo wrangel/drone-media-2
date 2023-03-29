@@ -10,44 +10,47 @@ import { s3 } from './manageSources.mjs'
 // Manipulate and save files
 const update = media => {
 
-    // Promise.all() //////
-    media.forEach(async medium => {
-        console.log(medium) //////
+    Promise.all(
+        media.map(async medium => {
+            console.log(medium) //////
 
-        // Get the file from S3 Origin bucket (Patrick) as a Readable Stream
-        const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
+            // Get the file from S3 Origin bucket (Patrick) as a Readable Stream
+            const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
 
+            // Loop through targets (for each image, there is an actual and thumbnail image)
 
-        ///------//
-        /*  Create a passthrough stream and an upload container
-        Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
-        */
-        const uploadStream = new PassThrough()
-        const upload = new Upload({
-            client: s3,
-            queueSize: 1,
-            params: {
-                Bucket: Constants.SITE_BUCKET,
-                ContentType: 'image/webp', //`image/${Constants.SITE_MEDIA_FORMAT}`,
-                Key: medium.key + '.webp', //medium.targets.actual,
-                Body: uploadStream
-            },
-        })
+            ///------//
+            /*  Create a passthrough stream and an upload container
+            Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
+            */
+            const uploadStream = new PassThrough()
+            const upload = new Upload({
+                client: s3,
+                queueSize: 1,
+                params: {
+                    Bucket: Constants.SITE_BUCKET,
+                    ContentType: 'image/webp', //`image/${Constants.SITE_MEDIA_FORMAT}`,
+                    Key: medium.key + '.webp', //medium.targets.actual,
+                    Body: uploadStream
+                },
+            })
 
-        const transformer = sharp()
-            .webp( { lossless: false } )
+            const transformer = sharp()
+                .webp( { lossless: false } )
             
-        transformer.resize({
-            width: 2000,
-            height: 1300,
-            position: sharp.strategy.attention
+            console.log(medium)
+            transformer.resize({
+                width: 2000,
+                height: 1300,
+                position: sharp.strategy.attention
+            })
+            ///---------///
+
+            response.pipe(transformer).pipe(uploadStream)
+            //return await upload.done()
+
         })
-        ///---------///
-
-        response.pipe(transformer).pipe(uploadStream)
-        await upload.done()
-
-    })
+    )
 } 
 
 export { update }
