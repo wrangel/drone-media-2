@@ -1,4 +1,4 @@
-import { ListObjectsCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import { ListObjectsCommand, DeleteObjectCommand, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import sharp from 'sharp'
 import Constants from './constants.mjs'
@@ -40,127 +40,70 @@ async function manage() {
 
   if (newFiles.length > 0) {
 
-    // Get presigned urls // TODO same as in getSignedUrls for the new files
     const media = await Promise.all(
       newFiles.map(async newFile => {
         return {
           key: newFile.key,
+          origin: newFile.path,
           target_actual: newFile.path.replace('.tif', '.webp'),
           target_thumbnail: 'thumbnails/' + newFile.key + '.webp',
-          sigUrl: await getSignedUrl(
+          sigUrl: await getSignedUrl( // use presigned urls for exif extraction // TODO same as in getSignedUrls for the new files
             s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
           )
         }
       })
-    )  
+    )
 
     // Save metadata of newly added files to db
     ////save(media) // TODO uncomment
 
+    const medium = media[0]
+    console.log(medium)
 
-    console.log(media)
-
-    //const medium = fileContainer[0]
-    //console.log(medium)
-
-
-
-    //const sharpObject = sharp(medium.sigUrl)
   
-  }
-}
 
-manage()
+    /// get a file from s3
+    const params1 = {
+      Bucket: Constants.ORIGIN_BUCKET,
+      Key: medium.origin,
+      //Body: Buffer.from("sdf")
+    }
 
+    const response = (await s3.send(new GetObjectCommand(params1))).Body // Readable stream
 
-  /* 
-    console.log()
-
-// Convert to WEBP
-const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
-  sharpObject.webp({ lossless: losslessFlag })
-    .toFile(outputPath + '.webp')
-    .catch(error => console.log(error))
-}
-
-// Convert data
-async function convertImages(media) {
-  Promise.all(
-    media.map(async medium => {
-      const sharpObject = sharp(medium.original)
-      // actuals, equal for all media categories
-      convertToWebp(sharpObject, true, medium.target)
-      /*  thumbnails (compressed)
-          a) hdr: as is
-          b) wide-angle & pano: crop to 2000x1300, in the middle of the pic
-      --
-          if(medium.folder != 'hdr') {
-            sharpObject.resize({
-              width: 2000,
-              height: 1300,
-              position: sharp.strategy.attention
-            })
-           }
-           convertToWebp(sharpObject, false, medium.thumbnail)
-          })
-        )
-      }
-      
-      await convertImages(newMedia)
-
-
-  // Outdated site files
-  const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
-  console.log("Outdated site files:")
-  console.log(outdatedFiles)
-  // TODO forEach await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: 'pan/100_0500.tif'}))
-
-  // Outdated metadata
-  const outdatedMetadata = metadata.filter(x => !originalFiles.map(y => y.key).includes(x))
-  await Island.deleteMany( { name : { $in : outdatedMetadata } } )
-
-  ------
-
-  //// metaata management and media conversion
-
-const MEDIA_FOLDERS = ['hdr', 'pan', 'wide_angle'] // MUST be sorted alphabetically
-
-const MEDIA_SUBS = ['originals', 'site'] // MUST be alphabetically sorted
-const MEDIA_ROOT = '/Users/matthiaswettstein/Desktop/media'
-const THUMBNAIL_REPO = 'thumbnails'
-const FORMATS = ['.tif', '.webp']
-
-// Convert to WEBP
-const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
-  sharpObject.webp({ lossless: losslessFlag })
-    .toFile(path.join(outputPath))
-    .catch(error => console.log(error))
-}
-
-// Convert data
-async function convertImages(media) {
-  Promise.all(
-    media.map(async medium => {
-      const sharpObject = sharp(medium.original)
-      // actuals, equal for all media categories
-      convertToWebp(sharpObject, true, medium.target)
-
-      /*  thumbnails (compressed)
-          a) hdr: as is
-          b) wide-angle & pano: crop to 2000x1300, in the middle of the pic
-      --
-     if(medium.folder != 'hdr') {
-      sharpObject.resize({
+    // Read image data from readableStream,
+    // resize to 300 pixels wide,
+    // emit an 'info' event with calculated dimensions
+    // and finally write image data to writableStream
+    const transformer = sharp()
+      .webp({ lossless: true }) // TODO add dyn flag
+      .resize({
         width: 2000,
         height: 1300,
         position: sharp.strategy.attention
       })
-     }
-     convertToWebp(sharpObject, false, medium.thumbnail)
+      .on('info', function(info) {
+        console.log(`Image resized to ${info.width}, ${info.height}`)
     })
-  )
+    let c = await response.pipe(transformer)//.pipe(transformed)
+
+    /// put the image on s3
+    // Define params
+    const params0 = {
+      Bucket: Constants.SITE_BUCKET,
+      Key: 'dududu',
+      Body: response.pipe(c),
+      Content: 'image/webp'
+    }
+
+    // put
+    const putCommand = new PutObjectCommand(params0)
+    await s3.send(putCommand)
+
+  
+    let b = Object.prototype.toString.call(c);
+    console.log(b)
+  }
 }
 
-await convertImages(newMedia)
-
-*/
+manage()
