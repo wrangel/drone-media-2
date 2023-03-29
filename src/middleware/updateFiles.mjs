@@ -11,13 +11,21 @@ import { s3 } from './manageSources.mjs'
 const update = media => {
 
     Promise.all(
-        media.map(async medium => {
+        media.flatMap(async medium => {
             console.log(medium) //////
 
             // Get the file from S3 Origin bucket (Patrick) as a Readable Stream
             const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
 
             // Loop through targets (for each image, there is an actual and thumbnail image)
+            let a = medium.targets.map(target => {
+                // Determine if image needs compression
+                const compress = target.indexOf("thumbnails") > -1 ? true : false
+                return compress
+            })
+            console.log("----------")
+
+            console.log(a)
 
             ///------//
             /*  Create a passthrough stream and an upload container
