@@ -17,13 +17,12 @@ const update = media => {
             const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
 
             // Loop through targets (for each image, there is an actual and thumbnail image)
-            let a = medium.targets.map(target => {
+            medium.targets.map(async target => {
                 // Determine if image needs compression and / or resizing
                 const compressFlag = target.indexOf("thumbnails") > -1 ? true : false
                 const resizeFlag = medium.type === 'hdr' ? false : true
 
-                            ///------//
-                /*  Create a passthrough stream and an upload container
+                /*  Create a PassThrough Stream and an upload container
                 Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
                 */
                 const uploadStream = new PassThrough()
@@ -33,37 +32,28 @@ const update = media => {
                     params: {
                         Bucket: Constants.SITE_BUCKET,
                         ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
-                        Key: medium.key + '.webp', //medium.targets.actual, /////////
+                        Key: target,
                         Body: uploadStream
                     },
                 })
 
-                const transformer = sharp()
+                // Create Sharp transformation stream
+                const transformStream = sharp()
                     .webp( { lossless: compressFlag } )
-
                 if(resizeFlag) {
-                    transformer.resize({
+                    transformStream.resize({
                         width: 2000,
                         height: 1300,
                         position: sharp.strategy.attention
                     })
                 }
-                
-                ///---------///
 
-                response.pipe(transformer).pipe(uploadStream)
-                //return await upload.done()
-
-                return resizeFlag /////
+                response.pipe(transformStream).pipe(uploadStream)
+                return await upload.done()
             })
-            console.log("----------")
-
-            console.log(a) //////
-
-
-
         })
     )
+    console.log("Done loading")
 } 
 
 export { update }
