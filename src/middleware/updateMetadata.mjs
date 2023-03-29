@@ -120,7 +120,6 @@ async function save(media) {
     // Update with authors
     update()
 
-    
 }
 
 export { save }

@@ -38,27 +38,43 @@ async function manage() {
   // Get new files
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
 
-  // Get presigned urls // TODO same as in getSignedUrls for the new files
-  const signedUrls = await Promise.all(
-    newFiles.map(async content => {
-      return {
-        key: content.key,
-        path: content.path,
-        sigUrl: await getSignedUrl(
-          s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: content.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
-        )
-      }
-    })
-  )  
-
   if (newFiles.length > 0) {
+
+    // Get presigned urls // TODO same as in getSignedUrls for the new files
+    const signedUrls = await Promise.all(
+      newFiles.map(async content => {
+        return {
+          key: content.key,
+          path: content.path,
+          sigUrl: await getSignedUrl(
+            s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: content.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
+          )
+        }
+      })
+    )  
+
     // Save metadata of newly added files to db
     /////save(signedUrls) TODO uncomment
-    console.log(signedUrls)
+    
+    // XXX
+    const fileContainer = signedUrls.map(signedUrl => {
+      return {
+        origin: signedUrl.path,
+        target_actual: signedUrl.path.replace('.tif', '.webp'),
+        target_thumbnail: 'thumbnails/' + signedUrl.key + '.webp',
+        sigUrl: signedUrl.sigUrl
+      }
+    })
+
+    console.log(fileContainer)
+
+    const medium = fileContainer[0]
+    //console.log(medium)
 
 
+
+    const sharpObject = sharp(medium.sigUrl)
   
-
   }
 }
 
@@ -74,11 +90,6 @@ const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
     .toFile(outputPath + '.webp')
     .catch(error => console.log(error))
 }
-
-  const obj = newFiles[0]
-
-  const sharpObject = await sharp(sigUrl, obj)
-  convertToWebp(sharpObject, true, )
 
 // Convert data
 async function convertImages(media) {
@@ -105,30 +116,6 @@ async function convertImages(media) {
       
       await convertImages(newMedia)
 
-import {Readable} from "stream";
-import {createWriteStream} from "fs";
-pipe(createWriteStream(fileName)
-let b = a.Body.pipe(createWriteStream(fileName))
-
-
-  const a = await Promise.all(
-    newFiles.map(async element => {
-      let b = await s3.send(new GetObjectCommand({Bucket: Constants.ORIGINALS_BUCKET, Key: element.path}))
-      let c = b.Body.pipe(createWriteStream(fileName))
-      return c
-    })
-  )
-
-  /*
-  // New metadata
-  const newMetadata = originalFiles.filter(x => !metadata.includes(x.key))
-  const a = await Promise.all(
-    newMetadata.map(async element => {
-      let b = s3.send(new GetObjectCommand({Bucket: Constants.ORIGINALS_BUCKET, Key: element.path}))
-      return b
-    })
-  )
-
 
   // Outdated site files
   const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
@@ -144,46 +131,12 @@ let b = a.Body.pipe(createWriteStream(fileName))
 
   //// metaata management and media conversion
 
-import path from 'path'
-import fs from 'fs'
-import ExifReader from 'exifreader'
-import sharp from 'sharp'
-
 const MEDIA_FOLDERS = ['hdr', 'pan', 'wide_angle'] // MUST be sorted alphabetically
 
 const MEDIA_SUBS = ['originals', 'site'] // MUST be alphabetically sorted
 const MEDIA_ROOT = '/Users/matthiaswettstein/Desktop/media'
 const THUMBNAIL_REPO = 'thumbnails'
 const FORMATS = ['.tif', '.webp']
-
-// Filter hidden files
-const filterDots = file => !file.startsWith('.')
-
-// Get core identifier
-const getIdentifier = fileName => {
-  return fileName.split('.')[0]
-}
-
-// Get original media
-const originalMedia = MEDIA_FOLDERS.flatMap(mediaFolder => {
-  // Get the path
-  const filePath = path.join(MEDIA_ROOT, MEDIA_SUBS[0], mediaFolder)
-  // Get the files in the path
-  return fs.readdirSync(filePath, { withFileTypes: false })
-    .filter(filterDots)
-    .map(file => {
-      const originalPath = path.join(filePath, file)
-      const targetPath = originalPath.replace(MEDIA_SUBS[0], MEDIA_SUBS[1]).replace(FORMATS[0], FORMATS[1])
-      return {
-        id: getIdentifier(file), 
-        folder: mediaFolder,
-        original: originalPath, 
-        target: targetPath,
-        thumbnail: targetPath.replace(/\b(hdr|pan|wide_angle)\b/gi, THUMBNAIL_REPO) // TODO hardcoded
-      }
-    })
-})
-
 
 // Convert to WEBP
 const convertToWebp = (sharpObject, losslessFlag, outputPath) => {
@@ -199,8 +152,6 @@ async function convertImages(media) {
       const sharpObject = sharp(medium.original)
       // actuals, equal for all media categories
       convertToWebp(sharpObject, true, medium.target)
-
-
 
       /*  thumbnails (compressed)
           a) hdr: as is
