@@ -4,6 +4,8 @@ import sharp from 'sharp'
 import Constants from './constants.mjs'
 import { save } from './updateMetadata.mjs'
 import { s3 } from './manageSources.mjs'
+import { createReadStream } from 'fs'
+import { join } from 'path'
 
 
 // Get image identifyer from image path
@@ -85,24 +87,24 @@ async function manage() {
       .on('info', function(info) {
         console.log(`Image resized to ${info.width}, ${info.height}`)
     })
-    let c = await response.pipe(transformer)//.pipe(transformed)
+    response.pipe(transformer)//.pipe(transformed)
+
+   let file =  join(process.env.PWD, 'media', 'about', '100_0186.webp')
+  
+    const readStream = createReadStream(file) // a ReadStream
 
     /// put the image on s3
     // Define params
-    const params0 = {
+    const params = {
       Bucket: Constants.SITE_BUCKET,
-      Key: 'dududu',
-      Body: response.pipe(c),
+      Key: 'dududu', // target_actual or target_thumbnail, respectively TODO
+      Body: readStream, //readStream,
       Content: 'image/webp'
     }
 
     // put
-    const putCommand = new PutObjectCommand(params0)
-    await s3.send(putCommand)
+    await s3.send(new PutObjectCommand(params))
 
-  
-    let b = Object.prototype.toString.call(c);
-    console.log(b)
   }
 }
 
