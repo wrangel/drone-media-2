@@ -1,12 +1,14 @@
 import { ListObjectsCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
-import { Upload } from '@aws-sdk/lib-storage'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { PassThrough } from 'stream'
-import sharp from 'sharp'
 import Constants from './constants.mjs'
-import { save } from './updateMetadata.mjs'
 import { s3 } from './manageSources.mjs'
+import { save } from './updateMetadata.mjs'
+import { update } from './updateFiles.mjs'
 
+
+import { PassThrough } from 'stream'
+import { Upload } from '@aws-sdk/lib-storage'
+import sharp from 'sharp'
 
 // Get image identifyer from image path
 const getId = path => {
@@ -59,6 +61,9 @@ async function manage() {
     // Save metadata of newly added files to db
     ////save(media) // TODO uncomment
 
+    // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
+    update(media)
+
     const medium = media[0]
 
     // Get a file from S3 as Readable Stream
@@ -75,7 +80,7 @@ async function manage() {
       })
 
     /*  Create a passthrough stream
-        Thanks, danalloway, https://github.com/lovell/sharp/issues/3313
+        Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
     */
     const uploadStream = new PassThrough()
 
