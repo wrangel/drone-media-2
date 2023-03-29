@@ -39,7 +39,7 @@ const update = media => {
                 })
 
                 const transformer = sharp()
-                    .webp( { lossless: false } )
+                    .webp( { lossless: compressFlag } )
 
                 if(resizeFlag) {
                     transformer.resize({
