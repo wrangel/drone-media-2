@@ -39,7 +39,6 @@ async function save(media) {
   // Get exif data for the new files
   const base = await Promise.all(
     media.map(async medium => {
-      console.log(medium)
       const exif = await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
       return {
         key: medium.key,

@@ -8,7 +8,7 @@ import { s3 } from './manageSources.mjs'
 
 
 // Manipulate and save files
-const update = async media => {
+async function update(media) {
   return await Promise.all(
     media.flatMap(async medium => {
       // Get the file from S3 Origin Bucket (Patrick) as Readable Stream

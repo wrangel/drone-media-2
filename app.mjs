@@ -64,5 +64,5 @@ function render() {
 // Update files and metadata
 await manage()
  .then(
-  render()
+  //render()
  )
