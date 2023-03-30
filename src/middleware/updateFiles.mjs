@@ -44,8 +44,10 @@ const update = async media => {
 
         // Pipe the stream through
         response.pipe(transformer).pipe(uploadStream)
+        // Return a Promise
         return await upload.done()
       })
+      // Pass the Promise on to the outer loop
       return
     })
   )
