@@ -87,4 +87,4 @@ async function manage() {
 
 }
 
-manage()
+export { manage }

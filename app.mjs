@@ -3,14 +3,10 @@ import express from 'express'
 import Constants from './src/middleware/constants.mjs'
 import { getUrls } from './src/middleware/serveSignedUrls.mjs'
 import { beautify } from './src/middleware/serveMetadata.mjs'
-
+import { manage } from './src/middleware/manageBooks.mjs'
 
 // Update files and metadata
-import './src/middleware/manageBooks.mjs'
-
-// Get presigned URLs from AWS S3
-const presignedUrls = await getUrls()
-
+await manage()
 
 /// RENDER
 // Initialise Express
@@ -49,6 +45,9 @@ app.get('/pano-viewer', (req, res, next) => {
   // req.query refers to the querystring components sent by media.ejs
   res.render('pages/pano-viewer', { url: req.query.url, qs: req.query.qs } )
 })
+
+// Get presigned URLs from AWS S3
+const presignedUrls = await getUrls()
 
 function render() {
   // Route media folders, provide them with  metadata
