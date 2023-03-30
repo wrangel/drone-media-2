@@ -9,18 +9,15 @@ import { Readable } from "stream"
 
 
 // Manipulate and save files
-const update = async media => {
+const update = media => {
   
-  const medium = media[0]
-
-  console.log(medium)
-
+  media.forEach(async medium => {
     // Get the file from S3 as Readable Stream
     const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
 
     // Create and apply Sharp transformer
     const transformer = sharp()
-      .webp( { lossless: true } )
+      .webp( { lossless: false } )
       .resize({
         width: 2000,
         height: 1300,
@@ -42,10 +39,15 @@ const update = async media => {
               Body: uploadStream
           },
       })
-    
+
+      // Pipe the stream through
       response.pipe(transformer).pipe(uploadStream)
-    
       await upload.done()
+
+  })
+
+
+    
 
 } 
 

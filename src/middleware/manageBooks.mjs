@@ -34,7 +34,7 @@ async function manage() {
   console.log(`${noFiles} new files to manage`)  
 
   if (noFiles > 0) {
-    console.log(':'), console.log(newFiles)
+    /////console.log(':'), console.log(newFiles) TODO uncomment
 
     const media = await Promise.all(
       newFiles.map(async newFile => {
@@ -60,6 +60,7 @@ async function manage() {
 
     // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
     update(media)
+      .then(console.log("Upload done"))
   }
 }
 
