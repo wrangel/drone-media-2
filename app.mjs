@@ -7,6 +7,7 @@ import { manage } from './src/middleware/manageBooks.mjs'
 
 // Update files and metadata
 await manage()
+ //.then(console.log("sdfsdfsdf"))
 
 /// RENDER
 // Initialise Express

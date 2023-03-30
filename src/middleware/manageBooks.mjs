@@ -24,6 +24,29 @@ async function manage() {
     let path = siteFile.Key
     return { key: getId(path), path: path }
   })
+
+  /*
+  /// Purge outdated site files NOT RUN - DENIED 
+  // TODO delete both actual and thumbnail
+  const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
+  console.log(`${outdatedFiles.length} outdated file(s) to purge`) 
+  console.log(outdatedFiles)
+  await Promise.all(
+    outdatedFiles.map(async outdatedFile => {
+      console.log(Constants.SITE_BUCKET, outdatedFile.path)
+      await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path}))
+    })
+  )
+  */
+  
+  /// Purge outdated metadata
+  // Get the current metadata from Mongo DB
+  const docs = (await Island.find({}, 'name -_id')
+    .lean())
+    .map(doc => doc.name)
+  // Get the outdated metadata
+  const outdatedMetadata = docs.filter(x => !originalFiles.map(y => y.key).includes(x))
+  await Island.deleteMany( { name : { $in : outdatedMetadata } } )
   
   // Get new files TODO does not distinguish between thumbnails and actuals
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
@@ -55,36 +78,8 @@ async function manage() {
     save(media)
 
     // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
-    await update(media)
-    console.log(`Added ${nonNewFiles} new files`)
+    return update(media)
   }
-
-  /*
-  /// Purge outdated site files NOT RUN - DENIED
-
-  const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
-  console.log(`${outdatedFiles.length} outdated file(s) to purge`) 
-  console.log(outdatedFiles)
-  await Promise.all(
-    outdatedFiles.map(async outdatedFile => {
-      console.log(Constants.SITE_BUCKET, outdatedFile.path)
-      await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path}))
-    })
-  )
-  */
-  
-
-  /// Purge outdated metadata
-
-  // Get the current metadata from Mongo DB
-  const docs = (await Island.find({}, 'name -_id')
-    .lean())
-    .map(doc => doc.name)
-  
-  // Get the outdated metadata
-  const outdatedMetadata = docs.filter(x => !originalFiles.map(y => y.key).includes(x))
-  await Island.deleteMany( { name : { $in : outdatedMetadata } } )
-
 }
 
 export { manage }
