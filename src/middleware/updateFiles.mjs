@@ -17,7 +17,6 @@ const update = media => {
 
       // Loop through both actual and thumbnail image for each medium
       medium.targets.map(async target => {
-        console.log(target)
 
         // Create and apply Sharp transformer
         const transformer = sharp()
@@ -32,7 +31,6 @@ const update = media => {
           Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
         */
           const uploadStream = new PassThrough()
-
           const upload = new Upload({
             client: s3,
             queueSize: 1,
@@ -48,16 +46,9 @@ const update = media => {
         response.pipe(transformer).pipe(uploadStream)
         return await upload.done()
       })
-
-      console.log("----------------")
-
       return
     })
   )
-
-
-    
-
 } 
 
 export { update }
