@@ -1,16 +1,12 @@
 import { ListObjectsCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import Constants from './constants.mjs'
+import { getId } from '../middleware/functions.mjs'
 import { Island } from './manageSources.mjs'
 import { s3 } from './manageSources.mjs'
 import { save } from './updateMetadata.mjs'
 import { update } from './updateFiles.mjs'
 
-
-// Get image identifyer from image path
-const getId = path => {
-  return path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
-}
 
 // Manage files and metadata
 async function manage() {

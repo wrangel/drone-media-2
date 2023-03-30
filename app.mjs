@@ -1,16 +1,12 @@
 /// PREPARE
 import express from 'express'
+import Constants from './src/middleware/constants.mjs'
+import { getUrls } from './src/middleware/serveSignedUrls.mjs'
+import { beautify } from './src/middleware/serveMetadata.mjs'
 
 
 // Update files and metadata
 import './src/middleware/manageBooks.mjs'
-
-
-/*
-
-import { getUrls } from './src/middleware/getSignedUrl.mjs'
-import Constants from './src/middleware/constants.mjs'
-import { beautify } from './src/middleware/beautifyMetadata.mjs'
 
 // Get presigned URLs from AWS S3
 const presignedUrls = await getUrls()
@@ -40,7 +36,7 @@ app.listen(Constants.PORT, _ => {
         from the front-end to the server (usually via a form) typically before a page is rendered and 
         the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
---
+*/
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
@@ -56,16 +52,14 @@ app.get('/pano-viewer', (req, res, next) => {
 
 function render() {
   // Route media folders, provide them with  metadata
-  Constants.MEDIA_FOLDERS.forEach(async mediaFolder => {
+  Constants.MEDIA_PAGES.forEach(async mediaPage => {
     // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
-    const prettyDocs = await beautify(mediaFolder, presignedUrls)
+    const prettyDocs = await beautify(mediaPage, presignedUrls)
     // Call the media.ejs for each of the media types, with the respective metadata
-    app.get('/' + mediaFolder, (req, res, next) => {
+    app.get('/' + mediaPage, (req, res, next) => {
       res.render('pages/media', {data: prettyDocs})
     })
   })
 }
 
 render()
-
-*/

@@ -1,8 +1,8 @@
-import { S3Client, GetObjectCommand, ListObjectsCommand} from '@aws-sdk/client-s3'
+import { GetObjectCommand, ListObjectsCommand} from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import Constants from './constants.mjs'
 import { getId } from '../middleware/functions.mjs'
-import { s3 } from './manageConnections.mjs'
+import { s3 } from './manageSources.mjs'
 
 // Get the urls
 async function getUrls() {

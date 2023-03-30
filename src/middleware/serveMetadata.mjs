@@ -32,15 +32,17 @@ const beautify = async (mediaFolder, presignedUrls) => {
     }).map(element => {
       return element.urls
     })
+    
     // Prepare the url of the actual image
     const url = new URL(urls[0].actual)
     const url1 = url.origin + url.pathname
     const url2 = encodeURIComponent(url.search)
+
     // Prepare output
     return {
       name: doc.name,
       type: doc.type,
-      viewer: doc.type == Constants.MEDIA_FOLDERS[1] ? 'pano' : 'img',
+      viewer: doc.type == Constants.MEDIA_PAGES[1] ? 'pano' : 'img',
       author: Constants.AUTHOR_PICTURES_PATH + doc.author + '.svg',
       dateTime: prepareDate(doc.dateTime),
       latitude: doc.geometry.coordinates.latitude,

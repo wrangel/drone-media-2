@@ -16,11 +16,12 @@ export default {
    DB_PASSWORD: process.env.DB_PASSWORD,
   // Reverse Geocoding
   REVERSE_GEO_ACCESS_TOKEN: process.env.ACCESS_TOKEN,
-  REVERSE_GEO_ADDRESS_COMPONENTS: ["address", "postcode", "place", "region", "country"],
-   REVERSE_GEO_URL_ELEMENTS: ['https://api.mapbox.com/geocoding/v5/mapbox.places/','.json?access_token='],
+  REVERSE_GEO_ADDRESS_COMPONENTS: new Array("address", "postcode", "place", "region", "country"),
+   REVERSE_GEO_URL_ELEMENTS: new Array('https://api.mapbox.com/geocoding/v5/mapbox.places/','.json?access_token='),
   // Misc 
   AUTHOR_PICTURES_PATH: 'media/author_pictures/',
   PORT: 37009,
+  MEDIA_PAGES: new Array('hdr', 'pan', 'wide_angle'), // MUST be sorted alphabetically
   SITE_MEDIA_FORMAT: '.webp',
   THUMBNAIL_FOLDER: 'thumbnails'
 }
