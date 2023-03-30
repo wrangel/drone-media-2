@@ -17,15 +17,18 @@ const update = async media => {
 
       // Loop through both actual and thumbnail image for each medium
       medium.targets.map(async target => {
+        // Determine if image needs compression and / or resizing
+        const losslessFlag = target.indexOf(Constants.THUMBNAIL_FOLDER) > -1 ? false : true
+        const resizeFlag = !losslessFlag && medium.type  != 'hdr' ? true : false
 
         // Create and apply Sharp transformer
         const transformer = sharp()
-        .webp( { lossless: false } )
-        .resize({
-          width: 2000,
-          height: 1300,
-          position: sharp.strategy.attention
-        })
+          .webp( { lossless: losslessFlag } )
+          .resize({
+            width: 2000,
+            height: 1300,
+            position: sharp.strategy.attention
+          })
 
         /*  Create a PassThrough Stream
           Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
@@ -37,7 +40,7 @@ const update = async media => {
             params: {
                 Bucket: Constants.SITE_BUCKET,
                 ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
-                Key: target, ////medium.targets[1],
+                Key: target,
                 Body: uploadStream
             },
         })
