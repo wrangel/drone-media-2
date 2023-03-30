@@ -5,9 +5,7 @@ import { getUrls } from './src/middleware/serveSignedUrls.mjs'
 import { beautify } from './src/middleware/serveMetadata.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 
-// Update files and metadata
-await manage()
- //.then(console.log("sdfsdfsdf"))
+
 
 /// RENDER
 // Initialise Express
@@ -62,4 +60,9 @@ function render() {
   })
 }
 
-render()
+
+// Update files and metadata
+await manage()
+ .then(
+  render()
+ )
