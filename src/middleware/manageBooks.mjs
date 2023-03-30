@@ -63,19 +63,20 @@ async function manage() {
     console.log(`Added ${nonNewFiles} new files`)
   }
 
+  /*
   /// Purge outdated site files NOT RUN - DENIED
+
   const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
   console.log(`${outdatedFiles.length} outdated file(s) to purge`) 
-  /*
   console.log(outdatedFiles)
-  let a = await Promise.all(
+  await Promise.all(
     outdatedFiles.map(async outdatedFile => {
       console.log(Constants.SITE_BUCKET, outdatedFile.path)
-      //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path}))
+      await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path}))
     })
   )
-  console.log(a)
   */
+  
 
   /// Purge outdated metadata
 
