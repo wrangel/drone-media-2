@@ -28,7 +28,7 @@ async function manage() {
     return { key: getId(path), path: path }
   })
   
-  // Get new files
+  // Get new files TODO does not distinguish between thumbnails and actuals
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
   const noFiles = newFiles.length
   console.log(`${noFiles} new files to manage`)  
@@ -60,7 +60,7 @@ async function manage() {
 
     // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
     update(media)
-      .then(console.log("Upload done"))
+      //////.then(console.log("Upload done")) TODO
   }
 }
 

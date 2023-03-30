@@ -11,9 +11,15 @@ import { Readable } from "stream"
 // Manipulate and save files
 const update = media => {
   
-  media.forEach(async medium => {
+  media.flatMap(async medium => {
     // Get the file from S3 as Readable Stream
     const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
+
+    medium.targets.forEach(target => {
+      console.log(target)
+    })
+
+    console.log("----------------")
 
     // Create and apply Sharp transformer
     const transformer = sharp()
@@ -42,8 +48,7 @@ const update = media => {
 
       // Pipe the stream through
       response.pipe(transformer).pipe(uploadStream)
-      await upload.done()
-
+      return await upload.done()
   })
 
 
