@@ -1,11 +1,10 @@
 
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { PassThrough } from 'stream'
 import sharp from 'sharp'
 import Constants from './constants.mjs'
 import { s3 } from './manageSources.mjs'
-import { Readable } from "stream"
 
 
 // Manipulate and save files
@@ -24,11 +23,13 @@ const update = async media => {
         // Create and apply Sharp transformer
         const transformer = sharp()
           .webp( { lossless: losslessFlag } )
-          .resize({
-            width: 2000,
-            height: 1300,
-            position: sharp.strategy.attention
-          })
+          if(resizeFlag) {
+            transformer.resize({
+              width: 2000,
+              height: 1300,
+              position: sharp.strategy.attention
+            })
+          }
 
         /*  Create a PassThrough Stream
           Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
@@ -45,7 +46,7 @@ const update = async media => {
             },
         })
 
-        // Pipe the stream through
+        // Pipe the stream through to the S3 Site bucket (Melville)
         response.pipe(transformer).pipe(uploadStream)
         // Return a Promise
         return await upload.done()
