@@ -60,7 +60,7 @@ async function manage() {
 
     // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
     await update(media)
-      //////.then(console.log("Upload done")) TODO
+      .then(console.log("Upload done"))
   }
 }
 

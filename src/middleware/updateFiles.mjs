@@ -9,8 +9,8 @@ import { Readable } from "stream"
 
 
 // Manipulate and save files
-const update = media => {
-  Promise.all(
+const update = async media => {
+  await Promise.all(
     media.flatMap(async medium => {
       // Get the file from S3 Origin Bucket (Patrick) as Readable Stream
       const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
@@ -27,7 +27,7 @@ const update = media => {
           position: sharp.strategy.attention
         })
 
-        /*  Create a passthrough stream
+        /*  Create a PassThrough Stream
           Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
         */
           const uploadStream = new PassThrough()
