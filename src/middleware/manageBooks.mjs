@@ -1,4 +1,4 @@
-import { ListObjectsCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import { ListObjectsCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import Constants from './constants.mjs'
 import { s3 } from './manageSources.mjs'
@@ -30,12 +30,11 @@ async function manage() {
   
   // Get new files TODO does not distinguish between thumbnails and actuals
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
-  const noFiles = newFiles.length
-  console.log(`${noFiles} new files to add`)  
+  const nonNewFiles = newFiles.length
+  console.log(`${nonNewFiles} new files to add`) 
 
-  if (noFiles > 0) {
-    /////console.log(':'), console.log(newFiles) TODO uncomment
-
+  // Upload and manipulate metadata and files
+  if (nonNewFiles > 0) {
     const media = await Promise.all(
       newFiles.map(async newFile => {
         const key = newFile.key
@@ -55,13 +54,31 @@ async function manage() {
       })
     )
 
-    // Save metadata of newly added files to db
+    // Save metadata of newly added files to Mongo DB
     save(media)
 
     // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
     await update(media)
-    console.log(`Added ${noFiles} new files`)
+    console.log(`Added ${nonNewFiles} new files`)
   }
+
+
+  // Outdated site files
+  const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
+  console.log(`${outdatedFiles.length} outdated file(s) to purge`) 
+  
+  /*
+  console.log(outdatedFiles)
+  let a = Promise.all(
+    outdatedFiles.map(async outdatedFile => {
+      //////await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path}))
+    })
+  )
+  console.log(a)
+  */
+
+  
+
 }
 
 manage()

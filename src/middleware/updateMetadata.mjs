@@ -39,10 +39,11 @@ async function save(media) {
   // Get exif data for the new files
   const base = await Promise.all(
     media.map(async medium => {
+      console.log(medium)
       const exif = await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
       return {
         key: medium.key,
-        target_actual: medium.target_actual,
+        target: medium.targets[0], // use actual file info
         exif_datetime: exif.DateTimeOriginal.description,
         exif_longitude: getCoordinates(exif.GPSLongitude.description),
         exif_latitude: getCoordinates(exif.GPSLatitude.description),
@@ -50,72 +51,75 @@ async function save(media) {
       }
     })
   )
-    // Get the urls for the reverse engineering call
-    const reverseUrls = base.map (
-      exif => Constants.REVERSE_GEO_URL_ELEMENTS[0] + exif.exif_longitude + ', ' + exif.exif_latitude + 
-        Constants.REVERSE_GEO_URL_ELEMENTS[1] + Constants.REVERSE_GEO_ACCESS_TOKEN 
-    )
 
-    // Get the jsons from the reverse engineering call
-    const jsons = await Promise.all(
-      reverseUrls.map(async reverseUrl => {
-        const resp = await fetch(reverseUrl)
-        return await resp.json()
-      })
-    )
+  // Get the urls for the reverse engineering call
+  const reverseUrls = base.map (
+    exif => Constants.REVERSE_GEO_URL_ELEMENTS[0] + exif.exif_longitude + ', ' + exif.exif_latitude + 
+      Constants.REVERSE_GEO_URL_ELEMENTS[1] + Constants.REVERSE_GEO_ACCESS_TOKEN 
+  )
 
-    // Get the reverse geocoding data
-    const reverseGeocodingData = jsons.map (
-      json => {
-        let data = {}
-        Constants.REVERSE_GEO_ADDRESS_COMPONENTS.forEach(addressComponent => {
-          data[addressComponent] = 
-            json.features
-              .filter(doc => doc.id.startsWith(addressComponent))
-              .map(doc => doc.text)[0]
-        })
-        return data
-      }
-    )
-
-    // Instantiate metadata for the schema
-    const metadata = {
-      geometry: {
-        type: "", 
-        coordinates: {}
-      }
-    }
-    // Combine everything into the Mongoose compatible metadata
-    const newIslands = base.map(function (b, i) {
-      let rgcd = reverseGeocodingData[i]
-      metadata.name = b.key
-      metadata.type = b.target_actual.substring(0, b.target_actual.indexOf('/'))
-      metadata.author = ''
-      metadata.dateTimeString = b.exif_datetime
-      metadata.dateTime = getDate(b.exif_datetime)
-      metadata.geometry.type = 'Point'
-      metadata.geometry.coordinates.latitude = b.exif_latitude
-      metadata.geometry.coordinates.longitude = b.exif_longitude
-      metadata.altitude = b.exif_altitude
-      metadata.country = rgcd.country
-      metadata.region = rgcd.region
-      metadata.location = rgcd.place
-      metadata.postalCode = rgcd.postcode
-      metadata.road = rgcd.address
-      metadata.noViews = 0
-      return new Island(metadata)
+  // Get the jsons from the reverse engineering call
+  const jsons = await Promise.all(
+    reverseUrls.map(async reverseUrl => {
+      const resp = await fetch(reverseUrl)
+      return await resp.json()
     })
+  )  
 
-    // Save document to DB
-    try {
-      await Island.insertMany(newIslands)
-      console.log(`Saved ${ newIslands.length } entries into the db: ${ newIslands.map(e => e.key).toString(',') }`)
-    } catch {
-      console.error()
+  // Get the reverse geocoding data
+  const reverseGeocodingData = jsons.map (
+    json => {
+      let data = {}
+      Constants.REVERSE_GEO_ADDRESS_COMPONENTS.forEach(addressComponent => {
+        data[addressComponent] = 
+          json.features
+            .filter(doc => doc.id.startsWith(addressComponent))
+            .map(doc => doc.text)[0]
+      })
+      return data
     }
+  )
 
-    // Update with authors
-    update()
+  // Instantiate metadata for the schema
+  const metadata = {
+    geometry: {
+      type: "", 
+      coordinates: {}
+    }
+  }
+
+  // Combine everything into the Mongoose compatible metadata
+  const newIslands = base.map(function (b, i) {
+    let rgcd = reverseGeocodingData[i]
+    metadata.name = b.key
+    metadata.type = b.target.substring(0, b.target.indexOf('/'))
+    metadata.author = ''
+    metadata.dateTimeString = b.exif_datetime
+    metadata.dateTime = getDate(b.exif_datetime)
+    metadata.geometry.type = 'Point'
+    metadata.geometry.coordinates.latitude = b.exif_latitude
+    metadata.geometry.coordinates.longitude = b.exif_longitude
+    metadata.altitude = b.exif_altitude
+    metadata.country = rgcd.country
+    metadata.region = rgcd.region
+    metadata.location = rgcd.place
+    metadata.postalCode = rgcd.postcode
+    metadata.road = rgcd.address
+    metadata.noViews = 0
+    return new Island(metadata)
+  }) 
+
+  // Save document to DB
+  try {
+    await Island.insertMany(newIslands)
+    console.log(`Saved ${ newIslands.length } entries into the db: ${ newIslands.map(e => e.key).toString(',') }`)
+  } catch {
+    console.error()
+  }  
+
+  // Update with authors
+  update()
+
 }
 
 export { save }
