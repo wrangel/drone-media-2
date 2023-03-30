@@ -1,56 +1,52 @@
 
-import { GetObjectCommand } from '@aws-sdk/client-s3'
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { PassThrough } from 'stream'
 import sharp from 'sharp'
 import Constants from './constants.mjs'
 import { s3 } from './manageSources.mjs'
+import { Readable } from "stream"
 
 
 // Manipulate and save files
-const update = media => {
+const update = async media => {
+  
+  const medium = media[0]
 
-    media.map(async medium => {
+  console.log(medium)
 
-      // Get the file from S3 Origin bucket (Patrick) as a Promise of a Readable Stream
-      const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
+    // Get the file from S3 as Readable Stream
+    const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
 
-      // Loop through targets (for each image, there is an actual and thumbnail image)
-      medium.targets.map(async target => {
-        // Determine if image needs compression and / or resizing
-        console.log("sdfsdfsdf")
-        const losslessFlag = target.indexOf(Constants.THUMBNAIL_FOLDER) > -1 ? false : true
-        const resizeFlag = !losslessFlag && medium.type  != 'hdr' ? true : false
-        /*  Create a PassThrough Stream and an upload container
+    // Create and apply Sharp transformer
+    const transformer = sharp()
+      .webp( { lossless: true } )
+      .resize({
+        width: 2000,
+        height: 1300,
+        position: sharp.strategy.attention
+      })
+
+    /*  Create a passthrough stream
         Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
-        */
+    */
         const uploadStream = new PassThrough()
+
         const upload = new Upload({
           client: s3,
           queueSize: 1,
           params: {
               Bucket: Constants.SITE_BUCKET,
               ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
-              Key: target,
+              Key: medium.targets[1],
               Body: uploadStream
           },
-        })
-        // Create Sharp transformation stream
-        const transformStream = sharp()
-          .webp( { lossless: losslessFlag } )
-        if(resizeFlag) {
-          transformStream.resize({
-              width: 2000,
-              height: 1300,
-              position: sharp.strategy.attention
-          })
-        }
-        // Pipe through
-        response.pipe(transformStream).pipe(uploadStream)
-        // Return an upload Promise
-        await upload.done()
       })
-    })
+    
+      response.pipe(transformer).pipe(uploadStream)
+    
+      await upload.done()
+
 } 
 
 export { update }

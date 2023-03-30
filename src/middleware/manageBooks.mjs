@@ -56,7 +56,7 @@ async function manage() {
     )
 
     // Save metadata of newly added files to db
-    save(media)
+    //save(media)
 
     // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
     update(media)
