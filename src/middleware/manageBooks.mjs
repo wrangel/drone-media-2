@@ -81,14 +81,23 @@ async function getNewFileInfo(newFiles) {
 async function manage() {
   // List
   const lists = await list()
-  // Purge
+  
+
+
+  
+  // Purge //// TODO PROMISE
   await purge(lists.originalFiles, lists.siteFiles)
+
+
   // Upload and manipulate metadata and files
   if (lists.newFiles.length > 0) {
-    const newFileInfo = await getNewFileInfo(lists.newFiles)
-    // Save metadata of newly added files to Mongo DB
-    await save(newFileInfo)
-    // Manipulate and save newly added files to the S3 bucket containing the site media (Melville)
+    const newFileInfo = await getNewFileInfo(lists.newFiles) //// TODO PROMISE
+
+
+    // Save metadata of newly added files to Mongo DB (Promise)
+  const metadataPromise = save(newFileInfo)
+
+    // Manipulate and save newly added files to the S3 bucket containing the site media (Melville) //// TODO PROMISE
     await update(newFileInfo)
   }
 }
