@@ -1,7 +1,6 @@
 import ExifReader from 'exifreader'
 import Constants from './constants.mjs'
 import { Island } from './manageSources.mjs'
-import { update } from './updateAuthors.mjs'
 
 /*  Converts the timestamp string into a GMT / Local date (that is what exifr is doing wrong!)
     https://stackoverflow.com/questions/43083993/javascript-how-to-convert-exif-date-time-data-to-timestamp
@@ -33,6 +32,7 @@ const getCoordinates = coordString => {
   return coordinate
 }
 
+
 // Save the data to the db
 async function save(media) {
 
@@ -57,7 +57,7 @@ async function save(media) {
       Constants.REVERSE_GEO_URL_ELEMENTS[1] + Constants.REVERSE_GEO_ACCESS_TOKEN 
   )
 
-  // Get the jsons from the reverse engineering call
+  // Get the jsons from the reverse engineering call (Wait on all promises to be resolved)
   const jsons = await Promise.all(
     reverseUrls.map(async reverseUrl => {
       const resp = await fetch(reverseUrl)
@@ -89,7 +89,7 @@ async function save(media) {
 
   // Combine everything into the Mongoose compatible metadata
   const newIslands = base.map(function (b, i) {
-    let rgcd = reverseGeocodingData[i]
+    const rgcd = reverseGeocodingData[i]
     metadata.name = b.key
     metadata.type = b.target.substring(0, b.target.indexOf('/'))
     metadata.author = ''
@@ -106,20 +106,32 @@ async function save(media) {
     metadata.road = rgcd.address
     metadata.noViews = 0
     return new Island(metadata)
-  }) 
+  })
 
-  // Save document to DB
-  try {
-    await Island.insertMany(newIslands)
-    console.log(`Saved ${ newIslands.length } entries into the db: ${ newIslands.map(e => e.key).toString(',') }`)
-  } catch {
-    console.error()
-  }  
+  // Save document to DB (Promise)
+ const mongoDbCall1 = Island.insertMany(newIslands)
 
-  // Update with authors
-  await update()
+  // Update the author on the DB (Promise)
+  const mongoDbCall2 = Island.aggregate([
+    {
+      $lookup: { from: 'authors',
+        localField: 'name', 
+        foreignField: 'name',
+        as: 'author'
+      }
+    }, { 
+      $unwind: '$author'
+    }, {
+      "$replaceRoot": { "newRoot": { "$mergeObjects": [ '$author', '$$ROOT' ] } }
+   }, {
+    $addFields: { "author": "$author.author" }
+  },
+    { "$merge": "islands" }
+  ])
+    .exec()
 
-  
+  // Return the Promises to be awaited for
+  return Promise.all([mongoDbCall1, mongoDbCall2])
 }
 
 export { save }
