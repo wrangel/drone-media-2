@@ -8,7 +8,6 @@ export default {
   ORIGIN_BUCKET: process.env.ORIGINALS_BUCKET,
   ACCESS_KEY: process.env.ACCESS_KEY,    
   SECRET_ACCESS_KEY: process.env.SECRET_ACCESS_KEY,
-   EXPIRY_TIME_IN_SECS: 86400,
   // MongoDB
   SERVER: process.env.SERVER,
   DB: process.env.DB,
@@ -20,7 +19,7 @@ export default {
    REVERSE_GEO_URL_ELEMENTS: new Array('https://api.mapbox.com/geocoding/v5/mapbox.places/','.json?access_token='),
   // Misc 
   AUTHOR_PICTURES_PATH: 'media/author_pictures/',
-  PORT: 37009,
+  PORT: 37008,
   MEDIA_PAGES: new Array('hdr', 'pan', 'wide_angle'), // MUST be sorted alphabetically
   SITE_MEDIA_FORMAT: '.webp',
   THUMBNAIL_FOLDER: 'thumbnails'

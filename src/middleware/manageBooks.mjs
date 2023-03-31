@@ -35,16 +35,16 @@ async function list() {
 
 // Purge files and metadata -- TODO delete both actual and thumbnail -- NOT RUN - DENIED 
 async function purge(originalFiles, siteFiles) {
-  /*
+
   const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
-  await Promise.all(
+  console.log("Outdated:")
+  console.log(outdatedFiles)
+  Promise.all(
     outdatedFiles.map(async outdatedFile => {
       console.log(Constants.SITE_BUCKET, outdatedFile.path)
       await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path}))
     })
   )
-  */
-
   // Get the outdated metadata
   const docs = (await Island.find({}, 'name -_id')
     .lean())
@@ -68,9 +68,8 @@ async function getNewFileInfo(newFiles) {
             path.replace(/\b(.tif|.jpeg)\b/gi, Constants.SITE_MEDIA_FORMAT), // actual
             Constants.THUMBNAIL_FOLDER + '/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail
         ],
-        sigUrl: await getSignedUrl( // use presigned urls for exif extraction // TODO same as in getSignedUrls for the new files
-          s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
-        )
+        // use presigned urls for exif extraction later on
+        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }), { expiresIn: 1200 })
       }
     })
   )
@@ -78,7 +77,7 @@ async function getNewFileInfo(newFiles) {
 
 // Manage files and metadata
 async function manage() {
-  // Wait for resolve of Promise to get bucket lists
+  // Wait for resolve of Promise to get bucket lists (from both Origin and Site buckets)
   const lists = await list()
   // Wait for resolve of Promise to get new file data
   const newFileInfo = await getNewFileInfo(lists.newFiles)

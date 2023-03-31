@@ -7,21 +7,19 @@ import { s3 } from './manageSources.mjs'
 // Get the urls
 async function getUrls() {
 
-  
-  // Get all the files in the bucket
-  const list = await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))
 
-  // Get presigned urls
+  // Wait for Promise to resolve to get all the files in the bucket
+  const list = (await s3.send(new ListObjectsCommand({ Bucket: Constants.SITE_BUCKET } ))).Contents
+
+  // Provide Promises to get presigned urls
   const arr0 = await Promise.all(
-    list.Contents.map(async content => {
+    list.map(async content => {
       const key = content.Key
-      const type = key.substring(0, key.indexOf('/')) == 'thumbnails' ? 'thumbnails' : 'actual'
+      const type = key.substring(0, key.indexOf('/')) == Constants.THUMBNAIL_FOLDER ? Constants.THUMBNAIL_FOLDER : 'actual'
       return {
         id: getId(key),
-        type, 
-        sigUrl: await getSignedUrl(
-          s3, new GetObjectCommand({ Bucket: Constants.SITE_BUCKET,  Key: key }, { expiresIn: Constants.EXPIRY_TIME_IN_SECS } )
-        )
+        type,
+        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.SITE_BUCKET,  Key: key }), { expiresIn: 95040 })
       }
     })
   )
