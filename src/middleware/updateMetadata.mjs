@@ -108,10 +108,10 @@ async function save(media) {
     return new Island(metadata)
   })
 
-  // Save document to DB (Promise)
+  // Promise to save document to DB
  const mongoDbCall1 = Island.insertMany(newIslands)
 
-  // Update the author on the DB (Promise)
+  // Promise to update the author on the DB
   const mongoDbCall2 = Island.aggregate([
     {
       $lookup: { from: 'authors',
@@ -130,7 +130,7 @@ async function save(media) {
   ])
     .exec()
 
-  // Return the Promises to be awaited for
+  // Return the Promises
   return Promise.all([mongoDbCall1, mongoDbCall2])
 }
 

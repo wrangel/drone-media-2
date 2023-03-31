@@ -10,14 +10,14 @@ import { update } from './updateFiles.mjs'
 
 // List files
 async function list() {
-  // List original files (which are the master)
+  // List original files (which are the master) - Await for Promise
   const originalFiles = (await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGIN_BUCKET } ))).Contents
     .map(originalFile => {
       let path = originalFile.Key
       return { key: getId(path), path: path }
     })
 
-  // Get site files
+  // Get site files - Await for Promise
   const siteFiles = (await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))).Contents
     .map(siteFile => {
       let path = siteFile.Key
@@ -50,13 +50,13 @@ async function purge(originalFiles, siteFiles) {
     .lean())
     .map(doc => doc.name)
   const outdatedMetadata = docs.filter(x => !originalFiles.map(y => y.key).includes(x))
-  await Island.deleteMany( { name : { $in : outdatedMetadata } } )
+  // Return Promise to delete elements on DB
+  return Island.deleteMany( { name : { $in : outdatedMetadata } } )
 }
-
 
 // Add new files' info
 async function getNewFileInfo(newFiles) {
-  return await Promise.all(
+  return Promise.all(
     newFiles.map(async newFile => {
       const key = newFile.key
       const path = newFile.path
@@ -76,37 +76,22 @@ async function getNewFileInfo(newFiles) {
   )
 }
 
-
 // Manage files and metadata
 async function manage() {
-  // List
+  // Wait for resolve of Promise to get bucket lists
   const lists = await list()
+  // Wait for resolve of Promise to get new file data
+  const newFileInfo = await getNewFileInfo(lists.newFiles)
   
+  // Promise to save metadata of newly added files to Mongo DB 
+  const updatePromise1 = save(newFileInfo)
+  // Promise to manipulate and save newly added files to the S3 bucket containing the site media (Melville)
+  const updatePromise2 = update(newFileInfo)
+  // Purge outdated files and metadata
+  const purgePromise = purge(lists.originalFiles, lists.siteFiles)
 
-
-  
-  // Purge //// TODO PROMISE
-  await purge(lists.originalFiles, lists.siteFiles)
-
-
-  // Upload and manipulate metadata and files
-  if (lists.newFiles.length > 0) {
-
-
-    // Wait for resolve of Promise to get new file data
-    const newFileInfo = await getNewFileInfo(lists.newFiles)
-
-
-    // Promise to save metadata of newly added files to Mongo DB 
-    const updatePromise1 = save(newFileInfo)
-
-    // Promise to manipulate and save newly added files to the S3 bucket containing the site media (Melville)
-    const updatePromise2 = fileupdate(newFileInfo)
-  
-  
-  }
-
-
+  // Return Promise to update everything to the caller
+  return Promise.all([updatePromise1, updatePromise2, purgePromise]) 
 }
 
 export { manage }

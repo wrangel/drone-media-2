@@ -1,12 +1,19 @@
-/// PREPARE
 import express from 'express'
 import Constants from './src/middleware/constants.mjs'
 import { getUrls } from './src/middleware/serveSignedUrls.mjs'
 import { beautify } from './src/middleware/serveMetadata.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 
+// Update files and metadata
+/////const done = await manage()
+/////console.log("done", done)
 
-/// RENDER
+// Get presigned URLs from AWS S3
+const presignedUrls = await getUrls()
+console.log(presignedUrls)
+
+/*
+
 // Initialise Express
 const app = express()
 
@@ -30,7 +37,7 @@ app.listen(Constants.PORT, _ => {
         from the front-end to the server (usually via a form) typically before a page is rendered and 
         the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
-*/
+--
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
@@ -44,9 +51,6 @@ app.get('/pano-viewer', (req, res, next) => {
   res.render('pages/pano-viewer', { url: req.query.url, qs: req.query.qs } )
 })
 
-// Get presigned URLs from AWS S3
-const presignedUrls = await getUrls()
-
 function render() {
   // Route media folders, provide them with  metadata
   Constants.MEDIA_PAGES.forEach(async mediaPage => {
@@ -59,9 +63,6 @@ function render() {
   })
 }
 
+render()
 
-// Update files and metadata
-await manage()
- .then(
-  render()
- )
+*/

@@ -49,7 +49,7 @@ async function update(media) {
         // Pipe the stream through to the S3 Site bucket (Melville)
         response.pipe(transformer).pipe(uploadStream)
         // Return a Promise
-        return await upload.done()
+        return upload.done()
       })
       // Pass the Promise on to the outer loop
       return

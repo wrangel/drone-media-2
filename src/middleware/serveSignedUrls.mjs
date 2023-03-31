@@ -6,6 +6,8 @@ import { s3 } from './manageSources.mjs'
 
 // Get the urls
 async function getUrls() {
+
+  
   // Get all the files in the bucket
   const list = await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))
 
