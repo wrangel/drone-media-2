@@ -91,15 +91,22 @@ async function manage() {
 
   // Upload and manipulate metadata and files
   if (lists.newFiles.length > 0) {
-    const newFileInfo = await getNewFileInfo(lists.newFiles) //// TODO PROMISE
 
 
-    // Save metadata of newly added files to Mongo DB (Promise)
-  const metadataPromise = save(newFileInfo)
+    // Wait for resolve of Promise to get new file data
+    const newFileInfo = await getNewFileInfo(lists.newFiles)
 
-    // Manipulate and save newly added files to the S3 bucket containing the site media (Melville) //// TODO PROMISE
-    await update(newFileInfo)
+
+    // Promise to save metadata of newly added files to Mongo DB 
+    const updatePromise1 = save(newFileInfo)
+
+    // Promise to manipulate and save newly added files to the S3 bucket containing the site media (Melville)
+    const updatePromise2 = fileupdate(newFileInfo)
+  
+  
   }
+
+
 }
 
 export { manage }
