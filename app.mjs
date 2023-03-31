@@ -6,7 +6,6 @@ import { beautify } from './src/middleware/serveMetadata.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 
 
-
 /// RENDER
 // Initialise Express
 const app = express()
@@ -64,5 +63,5 @@ function render() {
 // Update files and metadata
 await manage()
  .then(
-  //render()
+  render()
  )
