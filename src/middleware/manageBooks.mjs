@@ -16,33 +16,26 @@ async function list() {
       let path = originalFile.Key
       return { key: getId(path), path: path }
     })
-
   // Get site files - Await for Promise
   const siteFiles = (await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))).Contents
     .map(siteFile => {
       let path = siteFile.Key
       return { key: getId(path), path: path }
     })
-
   // Get new files TODO does not distinguish between thumbnails and actuals
   const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
   const nonNewFiles = newFiles.length
   console.log(`${nonNewFiles} new files to add`) 
-  
   return {originalFiles: originalFiles, siteFiles: siteFiles, newFiles: newFiles}
 }
 
 
 // Purge files and metadata -- TODO delete both actual and thumbnail -- NOT RUN - DENIED 
 async function purge(originalFiles, siteFiles) {
-
   const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
-  console.log("Outdated:")
-  console.log(outdatedFiles)
   Promise.all(
     outdatedFiles.map(async outdatedFile => {
-      console.log(Constants.SITE_BUCKET, outdatedFile.path)
-      await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path}))
+      //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path})) // TODO not run 
     })
   )
   // Get the outdated metadata
@@ -51,8 +44,9 @@ async function purge(originalFiles, siteFiles) {
     .map(doc => doc.name)
   const outdatedMetadata = docs.filter(x => !originalFiles.map(y => y.key).includes(x))
   // Return Promise to delete elements on DB
-  return Island.deleteMany( { name : { $in : outdatedMetadata } } )
+  return Island.deleteMany({ name : { $in : outdatedMetadata } })
 }
+
 
 // Add new files' info
 async function getNewFileInfo(newFiles) {

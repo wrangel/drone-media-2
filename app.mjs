@@ -5,11 +5,10 @@ import { beautify } from './src/middleware/serveMetadata.mjs'
 import { manage } from './src/middleware/manageBooks.mjs'
 
 // Update files and metadata
-/////await manage()
+await manage()
 
 // Get presigned URLs from AWS S3
 const presignedUrls = await getUrls()
-console.log(presignedUrls)
 
 // Initialise Express
 const app = express()
@@ -60,4 +59,4 @@ function render() {
   })
 }
 
-////render()
+render()

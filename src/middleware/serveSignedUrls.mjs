@@ -19,6 +19,7 @@ async function getUrls() {
       return {
         id: getId(key),
         type,
+        // Allow access for 1.1 days
         sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.SITE_BUCKET,  Key: key }), { expiresIn: 95040 })
       }
     })
