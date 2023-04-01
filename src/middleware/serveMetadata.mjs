@@ -47,7 +47,7 @@ const beautify = async (mediaFolder, presignedUrls) => {
       dateTime: prepareDate(doc.dateTime),
       latitude: doc.geometry.coordinates.latitude,
       longitude: doc.geometry.coordinates.longitude,
-      altitude: doc.altitude.toFixed(2) + 'm',
+      altitude: doc.altitude.toFixed(1) + 'm',
       country: doc.country,
       region: doc.region,
       location: doc.location,
