@@ -150,7 +150,7 @@ async function manage() {
   const purgePromise = purge(diffs)
 
   // Return Promise to update everything to the caller
-  return Promise.all([updatePromise0, updatePromise1, updatePromise2, purgePromise]) 
+  return Promise.all([updatePromise0, updatePromise1, updatePromise2, purgePromise])
 }
 
 export { manage }
