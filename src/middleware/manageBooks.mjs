@@ -37,7 +37,8 @@ async function getCurrentStatus() {
   return Promise.all([originalFiles, actualSiteFiles, thumbnailSiteFiles, islandDocs, authorDocs])
 }
 
-// TODO
+
+// Collect all differences
 function getDiffs(currentStatus) {
   const [originalFiles, actualSiteFiles, thumbnailSiteFiles, islandDocs, authorDocs] = currentStatus
   // 1a) Get actual files to be added to Site bucket
@@ -52,37 +53,48 @@ function getDiffs(currentStatus) {
   const newIslandDocs = originalFiles.filter(x => !islandDocs.includes(x.key))
   // 3b) Get documents to be purged from Island collection
   const outdatedIslandDocs = islandDocs.filter(x => !originalFiles.map(y => y.key).includes(x))  
-  // 4a) Get documents to be added to Author collection
-  const newAuthorDocs = originalFiles.filter(x => !authorDocs.includes(x.key))
-  // 4b) Get documents to be purged from Author collection
+  // 4a) Get documents to be purged from Author collection
   const outdatedAuthorDocs = authorDocs.filter(x => !originalFiles.map(y => y.key).includes(x))
   return {
     newActualFiles: newActualFiles, outdatedActualFiles: outdatedActualFiles,
     newThumbnailFiles: newThumbnailFiles, outdatedThumbnailFiles: outdatedThumbnailFiles,
     newIslandDocs: newIslandDocs, outdatedIslandDocs, outdatedIslandDocs,
-    newAuthorDocs: newAuthorDocs, outdatedAuthorDocs: outdatedAuthorDocs
+    outdatedAuthorDocs: outdatedAuthorDocs
   }
 }
 
 
-    /*
-
-// Purge files and metadata -- TODO delete both actual and thumbnail -- NOT RUN - DENIED 
-async function purge(originalFiles, siteFiles) {
-
-  Promise.all(
-    outdatedFiles.map(async outdatedFile => {
-      //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path})) // TODO not run 
+// Purge files and metadata 
+async function purge(diffs) {
+  // Get Promise to purge actual files
+  const actualFilePurgePromise = Promise.all(
+    diffs.outdatedActualFiles.map(async outdatedActualFile => {
+      //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedActualFile.path})) // TODO NOT RUN - DENIED 
     })
   )
-
-  const allPurges = Promise.all([
-    Island.deleteMany({ name : { $in : outdatedIslands } }), 
-    Author.deleteMany({ name : { $in : outdatedAuthors } })
+  const thumbnailFilePurgePromise = Promise.all(
+    diffs.outdatedThumbnailFiles.map(async outdatedThumbnailFile => {
+      //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedThumbnailFile.path})) // TODO NOT RUN - DENIED 
+    })
+  )
+  // Return Promise to purge every outdated element
+  return Promise.all([
+    actualFilePurgePromise,
+    thumbnailFilePurgePromise,
+    Island.deleteMany({ name : { $in :diffs.outdatedIslandDocs } }), 
+    Author.deleteMany({ name : { $in : diffs.outdatedAuthorDocs } })
   ])
-  // Return Promises to delete elements on DB
-  return allPurges
 }
+
+/* new actuals
+  - get metadata
+  - add metadata
+  - add file
+  new thumbnails
+  - add file
+  new Island metadata (make sure you update Authors manually!)
+  - add metadata
+  - merge with Authors
 
 
 // Add new files' info
@@ -113,8 +125,7 @@ async function manage() {
   // Wait for Promises to get the current contents
   const currentStatus = await getCurrentStatus()
   const diffs = getDiffs(currentStatus)
-  console.log(diffs)
-
+  const purgeEverything = await purge(diffs)
 
 
   /*
