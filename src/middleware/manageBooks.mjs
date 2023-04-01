@@ -10,18 +10,22 @@ import { update } from './updateFiles.mjs'
 
 // Get current status
 async function getCurrentStatus() {
-  // List original files (which are the master) - Await for Promise
+  // List Original files (which are the master) - Await for Promise
   const originalFiles = (await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGIN_BUCKET } ))).Contents
     .map(originalFile => {
       let path = originalFile.Key
       return { key: getId(path), path: path }
     })
-  // Get site files - Await for Promise
+  // Get Site files - Await for Promise
   const siteFiles = (await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))).Contents
     .map(siteFile => {
       let path = siteFile.Key
       return { key: getId(path), path: path }
     })
+  // Get actual image Site files
+  const actualSiteFiles = siteFiles.filter(siteFile => siteFile.path.indexOf("thumbnails") == -1)
+  // Get thumbnail image Site files
+  const thumbnailSiteFiles = siteFiles.filter(siteFile => siteFile.path.indexOf("thumbnails") > -1)
   // Get Island collection entries
   const islandDocs = (await Island.find({}, 'name -_id')
     .lean())
@@ -30,46 +34,38 @@ async function getCurrentStatus() {
   const authorDocs = (await Author.find({}, 'name -_id')
     .lean())
     .map(doc => doc.name)
-  return Promise.all([originalFiles, siteFiles, islandDocs, authorDocs])
+  return Promise.all([originalFiles, actualSiteFiles, thumbnailSiteFiles, islandDocs, authorDocs])
 }
 
 // TODO
-async function getDiffs(currentStatus) {
-  const [originalFiles, siteFiles, islandDocs, authorDocs] = currentStatus
-  // 1a) Get files to be added to Site bucket
-  const newFiles = originalFiles.filter(x => !siteFiles.map(y => y.key).includes(x.key))
-  // 1b) Get files to be purged from Site bucket
-  const outdatedFiles = siteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
-  // 2a) Get documents to be added to Island collection
-  const newIslandDocs = originalFiles.filter(x => !islandDocs.includes(x.key))
-
+function getDiffs(currentStatus) {
+  const [originalFiles, actualSiteFiles, thumbnailSiteFiles, islandDocs, authorDocs] = currentStatus
+  // 1a) Get actual files to be added to Site bucket
+  const newActualFiles = originalFiles.filter(x => !actualSiteFiles.map(y => y.key).includes(x.key))
+  // 1b) Get actual files to be purged from Site bucket
+  const outdatedActualFiles = actualSiteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
+  // 2a) Get actual files to be added to Site bucket
+  const newThumbnailFiles = originalFiles.filter(x => !thumbnailSiteFiles.map(y => y.key).includes(x.key))
+  // 2b) Get actual files to be purged from Site bucket
+  const outdatedThumbnailFiles = thumbnailSiteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
   // 3a) Get documents to be added to Island collection
+  const newIslandDocs = originalFiles.filter(x => !islandDocs.includes(x.key))
+  // 3b) Get documents to be purged from Island collection
+  const outdatedIslandDocs = islandDocs.filter(x => !originalFiles.map(y => y.key).includes(x))  
+  // 4a) Get documents to be added to Author collection
   const newAuthorDocs = originalFiles.filter(x => !authorDocs.includes(x.key))
-
-
-  console.log(newAuthorDocs)
+  // 4b) Get documents to be purged from Author collection
+  const outdatedAuthorDocs = authorDocs.filter(x => !originalFiles.map(y => y.key).includes(x))
+  return {
+    newActualFiles: newActualFiles, outdatedActualFiles: outdatedActualFiles,
+    newThumbnailFiles: newThumbnailFiles, outdatedThumbnailFiles: outdatedThumbnailFiles,
+    newIslandDocs: newIslandDocs, outdatedIslandDocs, outdatedIslandDocs,
+    newAuthorDocs: newAuthorDocs, outdatedAuthorDocs: outdatedAuthorDocs
+  }
 }
 
 
     /*
-
-    console.log("----", newFiles)
-    /// Original files
-      // site files
-        // actuals
-        // thumbnails
-      // Island files
-      // authors files 
-
-
-  const nonNewFiles = newFiles.length
-  ////////console.log(`${nonNewFiles} new files to add`) 
-  ////return {originalFiles: originalFiles, siteFiles: siteFiles, newFiles: newFiles}
-  */
-
-
-
-
 
 // Purge files and metadata -- TODO delete both actual and thumbnail -- NOT RUN - DENIED 
 async function purge(originalFiles, siteFiles) {
@@ -79,12 +75,7 @@ async function purge(originalFiles, siteFiles) {
       //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedFile.path})) // TODO not run 
     })
   )
-  // Get the outdated metadata on Island
-  
-  const outdatedIslands = docsIsland.filter(x => !originalFiles.map(y => y.key).includes(x))
-  // Get the outdated metadata on Author
-  
-  const outdatedAuthors = docsAuthor.filter(x => !originalFiles.map(y => y.key).includes(x))
+
   const allPurges = Promise.all([
     Island.deleteMany({ name : { $in : outdatedIslands } }), 
     Author.deleteMany({ name : { $in : outdatedAuthors } })
@@ -114,13 +105,15 @@ async function getNewFileInfo(newFiles) {
     })
   )
 }
+*/
 
 
 // Manage files and metadata
 async function manage() {
   // Wait for Promises to get the current contents
   const currentStatus = await getCurrentStatus()
-  await getDiffs(currentStatus)
+  const diffs = getDiffs(currentStatus)
+  console.log(diffs)
 
 
 
