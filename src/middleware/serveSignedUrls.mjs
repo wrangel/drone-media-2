@@ -7,7 +7,6 @@ import { s3 } from './manageSources.mjs'
 // Get the urls
 async function getUrls() {
 
-
   // Wait for Promise to resolve to get all the files in the bucket
   const list = (await s3.send(new ListObjectsCommand({ Bucket: Constants.SITE_BUCKET } ))).Contents
 
@@ -15,7 +14,7 @@ async function getUrls() {
   const arr0 = await Promise.all(
     list.map(async content => {
       const key = content.Key
-      const type = key.substring(0, key.indexOf('/')) == Constants.THUMBNAIL_FOLDER ? Constants.THUMBNAIL_FOLDER : 'actual'
+      const type = key.substring(0, key.indexOf('/')) == Constants.THUMBNAIL_ID ? Constants.THUMBNAIL_ID : Constants.ACTUAL_ID
       return {
         id: getId(key),
         type,

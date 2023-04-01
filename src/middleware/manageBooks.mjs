@@ -23,9 +23,9 @@ async function getCurrentStatus() {
       return { key: getId(path), path: path }
     })
   // Get actual image Site files
-  const actualSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_FOLDER) == -1)
+  const actualSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_ID) == -1)
   // Get thumbnail image Site files
-  const thumbnailSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_FOLDER) > -1)
+  const thumbnailSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_ID) > -1)
   // Get Island collection entries
   const islandDocs = (await Island.find({}, 'name -_id')
     .lean())
@@ -44,11 +44,11 @@ function getDiffs(currentStatus) {
   // 1a) Get actual files to be added to Site bucket
   const newActualMedia = originalMedia.filter(x => !actualSiteMedia.map(y => y.key).includes(x.key))
   // 1b) Get actual files to be purged from Site bucket
-  const outdatedActualFiles = actualSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
+  const outdatedActualMedia = actualSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
   // 2a) Get actual files to be added to Site bucket
   const newThumbnailMedia = originalMedia.filter(x => !thumbnailSiteMedia.map(y => y.key).includes(x.key))
   // 2b) Get actual files to be purged from Site bucket
-  const outdatedThumbnailFiles = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
+  const outdatedThumbnailMedia = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
   // 3a) Get documents to be added to Island collection
   const newIslandDocs = originalMedia.filter(x => !islandDocs.includes(x.key))
   // 3b) Get documents to be purged from Island collection
@@ -56,8 +56,8 @@ function getDiffs(currentStatus) {
   // 4a) Get documents to be purged from Author collection
   const outdatedAuthorDocs = authorDocs.filter(x => !originalMedia.map(y => y.key).includes(x))
   return {
-    newActualMedia: newActualMedia, outdatedActualFiles: outdatedActualFiles,
-    newThumbnailMedia: newThumbnailMedia, outdatedThumbnailFiles: outdatedThumbnailFiles,
+    newActualMedia: newActualMedia, outdatedActualMedia: outdatedActualMedia,
+    newThumbnailMedia: newThumbnailMedia, outdatedThumbnailMedia: outdatedThumbnailMedia,
     newIslandDocs: newIslandDocs, outdatedIslandDocs, outdatedIslandDocs,
     outdatedAuthorDocs: outdatedAuthorDocs
   }
@@ -68,12 +68,12 @@ function getDiffs(currentStatus) {
 async function purge(diffs) {
   // Get Promise to purge actual files
   const actualFilePurgePromise = Promise.all(
-    diffs.outdatedActualFiles.map(async outdatedActualFile => {
+    diffs.outdatedActualMedia.map(async outdatedActualFile => {
       //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedActualFile.path})) // TODO NOT RUN - DENIED 
     })
   )
   const thumbnailFilePurgePromise = Promise.all(
-    diffs.outdatedThumbnailFiles.map(async outdatedThumbnailFile => {
+    diffs.outdatedThumbnailMedia.map(async outdatedThumbnailFile => {
       //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedThumbnailFile.path})) // TODO NOT RUN - DENIED 
     })
   )
@@ -114,7 +114,7 @@ async function getInfo(newmedia) {
         origin: path, 
         targets: [
             path.replace(/\b(.tif|.jpeg)\b/gi, Constants.SITE_MEDIA_FORMAT), // actual
-            Constants.THUMBNAIL_FOLDER + '/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail
+            Constants.THUMBNAIL_ID + '/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail
         ],
         // use presigned urls for exif extraction in case of metadata
         sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newMedium.path }), { expiresIn: 1200 })
@@ -126,12 +126,12 @@ async function getInfo(newmedia) {
 
 // Manage files and metadata
 async function manage() {
-  // Wait for Promises to get the current contents
+
+  // Wait for Promises to get the current contents and differences
   const currentStatus = await getCurrentStatus()
   const diffs = getDiffs(currentStatus)
-  // Purge outdated media
-  await purge(diffs)
-
+  console.log("Status quo:")
+  console.log(diffs)
 
   // Wait for Promise to compile generic info for all new media to be added
   const info = await Promise.all([
@@ -140,22 +140,17 @@ async function manage() {
     getInfo(diffs.newIslandDocs)
   ])
 
-  // Promise to manipulate and save newly added actual images to 
-  
-  
+  // Promise to manipulate and save newly added actual images to the S3 bucket containing the site media (Melville)
+  const updatePromise0 = update(info[0], Constants.ACTUAL_ID)
+  // Promise to manipulate and save newly added thumbnail images to the S3 bucket containing the site media (Melville)
+  const updatePromise1 = update(info[1], Constants.THUMBNAIL_ID)
   // Promise to save metadata of newly added files to Mongo DB 
-  const updatePromise1 = save(info[2])
-
-  /*
- 
-
-  // Promise to manipulate and save newly added files to the S3 bucket containing the site media (Melville)
-  const updatePromise2 = update(newFileInfo)
-
+  const updatePromise2 = save(info[2])
+  // Purge outdated media
+  const purgePromise = purge(diffs)
 
   // Return Promise to update everything to the caller
-  return Promise.all([updatePromise1, updatePromise2, purgePromise]) 
-  */
+  return Promise.all([updatePromise0, updatePromise1, updatePromise2, purgePromise]) 
 }
 
 export { manage }

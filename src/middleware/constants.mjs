@@ -22,5 +22,6 @@ export default {
   PORT: 37008,
   MEDIA_PAGES: new Array('hdr', 'pan', 'wide_angle'), // MUST be sorted alphabetically
   SITE_MEDIA_FORMAT: '.webp',
-  THUMBNAIL_FOLDER: 'thumbnails'
+  ACTUAL_ID: 'actual',
+  THUMBNAIL_ID: 'thumbnails'
 }

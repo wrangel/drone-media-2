@@ -8,53 +8,56 @@ import { s3 } from './manageSources.mjs'
 
 
 // Manipulate and save files (Return a Promise that this all will happen)
-async function update(media) {
+async function update(media, mediaType) {
   return Promise.all(
     media.flatMap(async medium => {
       // Get the file from S3 Origin Bucket (Patrick) as Readable Stream
       const response = (await s3.send(new GetObjectCommand( { Bucket: Constants.ORIGIN_BUCKET, Key: medium.origin } ))).Body
 
-      // Loop through both actual and thumbnail image for each medium
-      medium.targets.map(async target => {
-        // Determine if image needs compression and / or resizing
-        const losslessFlag = target.indexOf(Constants.THUMBNAIL_FOLDER) > -1 ? false : true
-        const resizeFlag = !losslessFlag && medium.type  != 'hdr' ? true : false
+      // Instantiate the target
+      let target
+      // Instantiate Sharp transformer
+      const transformer = sharp()
 
-        // Create and apply Sharp transformer
-        const transformer = sharp()
-          .webp( { lossless: losslessFlag } )
-          if(resizeFlag) {
-            transformer.resize({
-              width: 2000,
-              height: 1300,
-              position: sharp.strategy.attention
-            })
-          }
+      // Adapt transformer and target for actual media
+      if(mediaType == Constants.ACTUAL_ID) {
+        target = medium.targets[0]
+        transformer.webp( { lossless: true } )
+      } 
+      // Adapt transformer and target for thumbnail media
+      else {
+        target = medium.targets[1]
+        transformer.webp( { lossless: false } )
+        if(medium.type  != 'hdr') {
+          transformer.resize({
+            width: 2000,
+            height: 1300,
+            position: sharp.strategy.attention
+          })
+        }
+      }
 
-        /*  Create a PassThrough Stream
+      /*  Create a PassThrough Stream
           Thanks, @danalloway, https://github.com/lovell/sharp/issues/3313, https://sharp.pixelplumbing.com/api-constructor
-        */
-          const uploadStream = new PassThrough()
-          const upload = new Upload({
-            client: s3,
-            queueSize: 1,
-            params: {
-                Bucket: Constants.SITE_BUCKET,
-                ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
-                Key: target,
-                Body: uploadStream
-            },
-        })
-
-        // Pipe the stream through to the S3 Site bucket (Melville)
-        response.pipe(transformer).pipe(uploadStream)
-        // Return a Promise
-        return upload.done()
+      */
+      const uploadStream = new PassThrough()
+      const upload = new Upload({
+        client: s3,
+        queueSize: 1,
+        params: {
+          Bucket: Constants.SITE_BUCKET,
+          ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
+          Key: target,
+          Body: uploadStream
+        },
       })
-      // Pass the Promise on to the outer loop
-      return
-    })
-  )
+
+      // Pipe the stream through to the S3 Site bucket (Melville)
+      response.pipe(transformer).pipe(uploadStream)
+      // Return a Promise
+      return upload.done()
+    })  
+  ) 
 } 
 
 export { update }
