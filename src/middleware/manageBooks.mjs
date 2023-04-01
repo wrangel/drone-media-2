@@ -81,28 +81,33 @@ async function purge(diffs) {
   return Promise.all([
     actualFilePurgePromise,
     thumbnailFilePurgePromise,
-    Island.deleteMany({ name : { $in :diffs.outdatedIslandDocs } }), 
+    Island.deleteMany({ name : { $in : diffs.outdatedIslandDocs } }), 
     Author.deleteMany({ name : { $in : diffs.outdatedAuthorDocs } })
   ])
 }
 
+
 /* new actuals
-  - get metadata
-  - add metadata
-  - add file
+  - get metadata A
+  - add metadata B
+  - add file C
+
   new thumbnails
-  - add file
+  - add file C
+
   new Island metadata (make sure you update Authors manually!)
-  - add metadata
-  - merge with Authors
+  - get metadata A
+  - add metadata B
+  - merge with Authors D
 
+*/
 
-// Add new files' info
-async function getNewFileInfo(newFiles) {
+// Add info for newly added elements
+async function getInfo(newElements) {
   return Promise.all(
-    newFiles.map(async newFile => {
-      const key = newFile.key
-      const path = newFile.path
+    newElements.map(async newElement => {
+      const key = newElement.key
+      const path = newElement.path
       return {
         key: key,
         type: path.substring(0, path.indexOf('/')),
@@ -112,12 +117,12 @@ async function getNewFileInfo(newFiles) {
             Constants.THUMBNAIL_FOLDER + '/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail
         ],
         // use presigned urls for exif extraction later on
-        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newFile.path }), { expiresIn: 1200 })
+        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newElement.path }), { expiresIn: 1200 })
       }
     })
   )
 }
-*/
+
 
 
 // Manage files and metadata
@@ -125,8 +130,14 @@ async function manage() {
   // Wait for Promises to get the current contents
   const currentStatus = await getCurrentStatus()
   const diffs = getDiffs(currentStatus)
-  const purgeEverything = await purge(diffs)
+  // Purge outdated elements
+  await purge(diffs)
 
+
+  const info = await getInfo(diffs.newThumbnailFiles)
+  console.log(info)
+
+  //diffs.newActualFiles, diffs.newIslandDocs diffs.newThumbnailFiles
 
   /*
   // Wait for resolve of Promise to get new file data
