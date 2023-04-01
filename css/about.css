@@ -23,9 +23,7 @@ body {
 	/*mix-blend-mode: difference;*/ /* brilliant: change font according to ANY background */
 }
 
-h1,
-h2,
-p {
+h1,h2,p {
 	font-weight: 300;
 }
 
@@ -38,3 +36,4 @@ a:visited {
 a:hover {
 	color: var(--color);
 }
+
