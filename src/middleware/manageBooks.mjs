@@ -11,7 +11,7 @@ import { update } from './updateFiles.mjs'
 // Get current status
 async function getCurrentStatus() {
   // List Original files (which are the master) - Await for Promise
-  const originalFiles = (await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGIN_BUCKET } ))).Contents
+  const originalMedia = (await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGIN_BUCKET } ))).Contents
     .map(originalFile => {
       let path = originalFile.Key
       return { key: getId(path), path: path }
@@ -23,9 +23,9 @@ async function getCurrentStatus() {
       return { key: getId(path), path: path }
     })
   // Get actual image Site files
-  const actualSiteFiles = siteFiles.filter(siteFile => siteFile.path.indexOf("thumbnails") == -1)
+  const actualSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_FOLDER) == -1)
   // Get thumbnail image Site files
-  const thumbnailSiteFiles = siteFiles.filter(siteFile => siteFile.path.indexOf("thumbnails") > -1)
+  const thumbnailSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_FOLDER) > -1)
   // Get Island collection entries
   const islandDocs = (await Island.find({}, 'name -_id')
     .lean())
@@ -34,30 +34,30 @@ async function getCurrentStatus() {
   const authorDocs = (await Author.find({}, 'name -_id')
     .lean())
     .map(doc => doc.name)
-  return Promise.all([originalFiles, actualSiteFiles, thumbnailSiteFiles, islandDocs, authorDocs])
+  return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs, authorDocs])
 }
 
 
 // Collect all differences
 function getDiffs(currentStatus) {
-  const [originalFiles, actualSiteFiles, thumbnailSiteFiles, islandDocs, authorDocs] = currentStatus
+  const [originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs, authorDocs] = currentStatus
   // 1a) Get actual files to be added to Site bucket
-  const newActualFiles = originalFiles.filter(x => !actualSiteFiles.map(y => y.key).includes(x.key))
+  const newActualMedia = originalMedia.filter(x => !actualSiteMedia.map(y => y.key).includes(x.key))
   // 1b) Get actual files to be purged from Site bucket
-  const outdatedActualFiles = actualSiteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
+  const outdatedActualFiles = actualSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
   // 2a) Get actual files to be added to Site bucket
-  const newThumbnailFiles = originalFiles.filter(x => !thumbnailSiteFiles.map(y => y.key).includes(x.key))
+  const newThumbnailMedia = originalMedia.filter(x => !thumbnailSiteMedia.map(y => y.key).includes(x.key))
   // 2b) Get actual files to be purged from Site bucket
-  const outdatedThumbnailFiles = thumbnailSiteFiles.filter(x => !originalFiles.map(y => y.key).includes(x.key))
+  const outdatedThumbnailFiles = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
   // 3a) Get documents to be added to Island collection
-  const newIslandDocs = originalFiles.filter(x => !islandDocs.includes(x.key))
+  const newIslandDocs = originalMedia.filter(x => !islandDocs.includes(x.key))
   // 3b) Get documents to be purged from Island collection
-  const outdatedIslandDocs = islandDocs.filter(x => !originalFiles.map(y => y.key).includes(x))  
+  const outdatedIslandDocs = islandDocs.filter(x => !originalMedia.map(y => y.key).includes(x))  
   // 4a) Get documents to be purged from Author collection
-  const outdatedAuthorDocs = authorDocs.filter(x => !originalFiles.map(y => y.key).includes(x))
+  const outdatedAuthorDocs = authorDocs.filter(x => !originalMedia.map(y => y.key).includes(x))
   return {
-    newActualFiles: newActualFiles, outdatedActualFiles: outdatedActualFiles,
-    newThumbnailFiles: newThumbnailFiles, outdatedThumbnailFiles: outdatedThumbnailFiles,
+    newActualMedia: newActualMedia, outdatedActualFiles: outdatedActualFiles,
+    newThumbnailMedia: newThumbnailMedia, outdatedThumbnailFiles: outdatedThumbnailFiles,
     newIslandDocs: newIslandDocs, outdatedIslandDocs, outdatedIslandDocs,
     outdatedAuthorDocs: outdatedAuthorDocs
   }
@@ -102,12 +102,12 @@ async function purge(diffs) {
 
 */
 
-// Add info for newly added elements
-async function getInfo(newElements) {
+// Compile generic info for newly added media
+async function getInfo(newmedia) {
   return Promise.all(
-    newElements.map(async newElement => {
-      const key = newElement.key
-      const path = newElement.path
+    newmedia.map(async newMedium => {
+      const key = newMedium.key
+      const path = newMedium.path
       return {
         key: key,
         type: path.substring(0, path.indexOf('/')),
@@ -116,13 +116,12 @@ async function getInfo(newElements) {
             path.replace(/\b(.tif|.jpeg)\b/gi, Constants.SITE_MEDIA_FORMAT), // actual
             Constants.THUMBNAIL_FOLDER + '/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail
         ],
-        // use presigned urls for exif extraction later on
-        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newElement.path }), { expiresIn: 1200 })
+        // use presigned urls for exif extraction in case of metadata
+        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newMedium.path }), { expiresIn: 1200 })
       }
     })
   )
 }
-
 
 
 // Manage files and metadata
@@ -130,24 +129,29 @@ async function manage() {
   // Wait for Promises to get the current contents
   const currentStatus = await getCurrentStatus()
   const diffs = getDiffs(currentStatus)
-  // Purge outdated elements
+  // Purge outdated media
   await purge(diffs)
 
 
-  const info = await getInfo(diffs.newThumbnailFiles)
-  console.log(info)
+  // Wait for Promise to compile generic info for all new media to be added
+  const info = await Promise.all([
+    getInfo(diffs.newActualMedia),
+    getInfo(diffs.newThumbnailMedia),
+    getInfo(diffs.newIslandDocs)
+  ])
 
-  //diffs.newActualFiles, diffs.newIslandDocs diffs.newThumbnailFiles
+  // Promise to manipulate and save newly added actual images to 
+  
+  
+  // Promise to save metadata of newly added files to Mongo DB 
+  const updatePromise1 = save(info[2])
 
   /*
-  // Wait for resolve of Promise to get new file data
-  const newFileInfo = await getNewFileInfo(lists.newFiles)
-  // Promise to save metadata of newly added files to Mongo DB 
-  const updatePromise1 = save(newFileInfo)
+ 
+
   // Promise to manipulate and save newly added files to the S3 bucket containing the site media (Melville)
   const updatePromise2 = update(newFileInfo)
-  // Purge outdated files and metadata
-  const purgePromise = purge(lists.originalFiles, lists.siteFiles)
+
 
   // Return Promise to update everything to the caller
   return Promise.all([updatePromise1, updatePromise2, purgePromise]) 
