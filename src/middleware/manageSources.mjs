@@ -21,7 +21,7 @@ mongoose.connect(
   `mongodb+srv://${Constants.DB_USER}:${Constants.DB_PASSWORD}@${Constants.SERVER}/${Constants.DB}?retryWrites=true&w=majority`
   )
 
-// Create Mongoose Schema
+// Create Mongoose Island Schema
 const islandSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -72,7 +72,23 @@ const islandSchema = new mongoose.Schema({
   }
 })
 
-// Create Mongoose Model
+// Create Mongoose Island Model
 const Island = mongoose.model('Island', islandSchema)
 
-export { Island, s3 }
+// Create Mongoose Author Schema
+const authorSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  author: {
+    type: String,
+    required: true
+  }
+})
+
+// Create Mongoose Author Model
+const Author = mongoose.model('Author', authorSchema)
+
+export { Island, Author, s3 }
