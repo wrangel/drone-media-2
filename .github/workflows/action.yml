@@ -1,8 +1,0 @@
-# workflow
-name: Ellesmere Docker
-
-# on events
-on:
-  push:
-    branches:
-      - master
