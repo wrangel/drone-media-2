@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-export default {
+export default { 
   // AWS
   BUCKET_REGION: process.env.BUCKET_REGION,
   SITE_BUCKET: process.env.SITE_BUCKET,
