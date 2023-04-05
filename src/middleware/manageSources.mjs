@@ -90,8 +90,12 @@ const islandSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  geometry: {
-    type: Object,
+  latitude: {
+    type: Number,
+    required: true
+  },
+  longitude: {
+    type: Number,
     required: true
   },
   altitude: {

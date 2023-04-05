@@ -2,6 +2,7 @@ import ExifReader from 'exifreader'
 import Constants from './constants.mjs'
 import { Island } from './manageSources.mjs'
 
+
 /*  Converts the timestamp string into a GMT / Local date (that is what exifr is doing wrong!)
     https://stackoverflow.com/questions/43083993/javascript-how-to-convert-exif-date-time-data-to-timestamp
 */
@@ -51,6 +52,8 @@ async function save(media) {
     })
   )
 
+  console.log(base)
+
   // Get the urls for the reverse engineering call
   const reverseUrls = base.map (
     exif => Constants.REVERSE_GEO_URL_ELEMENTS[0] + exif.exif_longitude + ', ' + exif.exif_latitude + 
@@ -79,33 +82,24 @@ async function save(media) {
     }
   )
 
-  // Instantiate metadata for the schema
-  const metadata = {
-    geometry: {
-      type: "", 
-      coordinates: {}
-    }
-  }
-
-  // Combine everything into the Mongoose compatible metadata
+  // Combine everything into the Mongoose compatible metadata (one for each document)
   const newIslands = base.map(function (b, i) {
     const rgcd = reverseGeocodingData[i]
-    metadata.name = b.key
-    metadata.type = b.target.substring(0, b.target.indexOf('/'))
-    metadata.author = ''
-    metadata.dateTimeString = b.exif_datetime
-    metadata.dateTime = getDate(b.exif_datetime)
-    metadata.geometry.type = 'Point'
-    metadata.geometry.coordinates.latitude = b.exif_latitude
-    metadata.geometry.coordinates.longitude = b.exif_longitude
-    metadata.altitude = b.exif_altitude
-    metadata.country = rgcd.country
-    metadata.region = rgcd.region
-    metadata.location = rgcd.place
-    metadata.postalCode = rgcd.postcode
-    metadata.road = rgcd.address
-    metadata.noViews = 0
-    return new Island(metadata)
+    return new Island({
+      name: b.key,
+      type: b.target.substring(0, b.target.indexOf('/')),
+      dateTimeString: b.exif_datetime,
+      dateTime: getDate(b.exif_datetime),
+      latitude: b.exif_latitude,
+      longitude: b.exif_longitude,
+      altitude: b.exif_altitude,
+      country: rgcd.country,
+      region: rgcd.region,
+      location: rgcd.place,
+      postalCode: rgcd.postcode,
+      road: rgcd.address,
+      noViews: 0
+    })
   })
 
   // Promise to save document to DB

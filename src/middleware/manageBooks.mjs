@@ -86,22 +86,6 @@ async function purge(diffs) {
   ])
 }
 
-
-/* new actuals
-  - get metadata A
-  - add metadata B
-  - add file C
-
-  new thumbnails
-  - add file C
-
-  new Island metadata (make sure you update Authors manually!)
-  - get metadata A
-  - add metadata B
-  - merge with Authors D
-
-*/
-
 // Compile generic info for newly added media
 async function getInfo(newmedia) {
   return Promise.all(
