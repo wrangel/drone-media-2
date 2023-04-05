@@ -69,12 +69,12 @@ async function purge(diffs) {
   // Get Promise to purge actual files
   const actualFilePurgePromise = Promise.all(
     diffs.outdatedActualMedia.map(async outdatedActualFile => {
-      //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedActualFile.path})) // TODO NOT RUN - DENIED 
+      await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedActualFile.path}))
     })
   )
   const thumbnailFilePurgePromise = Promise.all(
     diffs.outdatedThumbnailMedia.map(async outdatedThumbnailFile => {
-      //await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedThumbnailFile.path})) // TODO NOT RUN - DENIED 
+      await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedThumbnailFile.path}))
     })
   )
   // Return Promise to purge every outdated element
