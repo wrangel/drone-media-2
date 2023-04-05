@@ -4,7 +4,7 @@ import { Upload } from '@aws-sdk/lib-storage'
 import { PassThrough } from 'stream'
 import sharp from 'sharp'
 import Constants from './constants.mjs'
-import { s3 } from './manageSources.mjs'
+import { s3 } from './handleSources.mjs'
 
 
 // Manipulate and save files (Return a Promise that this all will happen)

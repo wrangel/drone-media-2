@@ -2,7 +2,7 @@ import express from 'express'
 import Constants from './src/middleware/constants.mjs'
 import { getUrls } from './src/middleware/serveSignedUrls.mjs'
 import { beautify } from './src/middleware/serveMetadata.mjs'
-import { manage } from './src/middleware/manageBooks.mjs'
+import { manage } from './src/middleware/handleBooks.mjs'
 
 // Update files and metadata
 await manage()

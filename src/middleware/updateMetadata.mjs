@@ -1,6 +1,6 @@
 import ExifReader from 'exifreader'
 import Constants from './constants.mjs'
-import { Island } from './manageSources.mjs'
+import { Island } from './handleSources.mjs'
 
 
 /*  Converts the timestamp string into a GMT / Local date (that is what exifr is doing wrong!)

@@ -1,5 +1,5 @@
 import Constants from './constants.mjs'
-import { Island } from './manageSources.mjs'
+import { Island } from './handleSources.mjs'
 
 // Prepare date for website
 const prepareDate = date => {
@@ -21,12 +21,13 @@ const prepareDate = date => {
 // Adapt metadata to show prettily on the website
 const beautify = async (mediaFolder, presignedUrls) => {
 
+  // Get the metadata from the db
   const docs = await Island.find({ type : mediaFolder })
     .sort({ dateTime: -1 })
     .lean()
 
+  // Get the current presigned urls
   return docs.map (doc => {
-    // Get the current presigned urls for the medium
     const urls = presignedUrls.filter(element => {
       return element.name === doc.name
     }).map(element => {

@@ -1,9 +1,9 @@
 import { ListObjectsCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import Constants from './constants.mjs'
-import { getId } from '../middleware/functions.mjs'
-import { Island, Author } from './manageSources.mjs'
-import { s3 } from './manageSources.mjs'
+import { getId } from './functions.mjs'
+import { Island, Author } from './handleSources.mjs'
+import { s3 } from './handleSources.mjs'
 import { save } from './updateMetadata.mjs'
 import { update } from './updateFiles.mjs'
 
