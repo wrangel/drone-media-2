@@ -5,3 +5,7 @@ media/
 .env
 .DS_Store
 node_modules
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
