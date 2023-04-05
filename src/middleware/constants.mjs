@@ -1,6 +1,3 @@
-import dotenv from 'dotenv'
-dotenv.config()
-
 export default { 
   // AWS
   BUCKET_REGION: process.env.BUCKET_REGION,
@@ -28,3 +25,6 @@ export default {
   ACTUAL_ID: 'actual',
   THUMBNAIL_ID: 'thumbnails'
 }
+
+console.log("sdfasdfasdfasdfsdf")
+console.log(process.env.SERVER)
