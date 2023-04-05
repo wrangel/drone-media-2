@@ -1,7 +1,5 @@
 import { S3Client } from '@aws-sdk/client-s3'
 import mongoose from 'mongoose'
-import { exec, execSync } from 'child_process'
-import axios from 'axios'
 import Constants from './constants.mjs'
 
 
@@ -21,6 +19,9 @@ const s3 = new S3Client({
 
 /*
 // Allow access from current IP, if changed
+
+import { exec, execSync } from 'child_process'
+import axios from 'axios'
 
 // Run command against Mongo Atlas
 const runCli = cmd => {
