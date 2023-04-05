@@ -19,6 +19,7 @@ const s3 = new S3Client({
 
 /// Manage Mongo DB
 
+/*
 // Allow access from current IP, if changed
 
 // Run command against Mongo Atlas
@@ -62,6 +63,7 @@ if(existingIps.length === Constants.MAX_IP_ENTRIES) {
     .slice(-1)[0]
   runCli(COMMANDS.delete + removableIp)
 }
+*/
 
 // Mongoose Schema
 
