@@ -1,5 +1,7 @@
 import { GetObjectCommand, ListObjectsCommand} from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import dotenv from 'dotenv-vault-core'
+dotenv.config()
 import Constants from './constants.mjs'
 import { getId } from '../middleware/functions.mjs'
 import { s3 } from './handleSources.mjs'
@@ -8,7 +10,7 @@ import { s3 } from './handleSources.mjs'
 async function getUrls() {
 
   // Wait for Promise to resolve to get all the files in the bucket
-  const list = (await s3.send(new ListObjectsCommand({ Bucket: Constants.SITE_BUCKET } ))).Contents
+  const list = (await s3.send(new ListObjectsCommand({ Bucket: process.env.SITE_BUCKET } ))).Contents
 
   // Provide Promises to get presigned urls
   const arr0 = await Promise.all(
@@ -19,7 +21,7 @@ async function getUrls() {
         id: getId(key),
         type,
         // Allow access for 1.1 days
-        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.SITE_BUCKET,  Key: key }), { expiresIn: 95040 })
+        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: process.env.SITE_BUCKET,  Key: key }), { expiresIn: 95040 })
       }
     })
   )

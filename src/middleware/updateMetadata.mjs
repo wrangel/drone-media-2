@@ -1,4 +1,6 @@
 import ExifReader from 'exifreader'
+import dotenv from 'dotenv-vault-core'
+dotenv.config()
 import Constants from './constants.mjs'
 import { Island } from './handleSources.mjs'
 
@@ -57,7 +59,7 @@ async function save(media) {
   // Get the urls for the reverse engineering call
   const reverseUrls = base.map (
     exif => Constants.REVERSE_GEO_URL_ELEMENTS[0] + exif.exif_longitude + ', ' + exif.exif_latitude + 
-      Constants.REVERSE_GEO_URL_ELEMENTS[1] + Constants.REVERSE_GEO_ACCESS_TOKEN 
+      Constants.REVERSE_GEO_URL_ELEMENTS[1] + process.env.ACCESS_TOKEN
   )
 
   // Get the jsons from the reverse engineering call (Wait on all promises to be resolved)
