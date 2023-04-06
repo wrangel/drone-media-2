@@ -29,7 +29,7 @@ app.set('view engine', 'ejs')
 app.listen(process.env.PORT, _ => {
   console.log(`App is running on port ${process.env.PORT}`)
 })
-console.log("sdfdf")
+
 /* *** GET Routes - display pages ***
     Root Route
     --> There are two types of routes, GET and POST. GET routes display pages and POST routes upload data 
