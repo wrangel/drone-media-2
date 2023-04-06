@@ -1,6 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3'
 import mongoose from 'mongoose'
-import Constants from './constants.mjs'
+import dotenv from 'dotenv-vault-core'
+dotenv.config()
 
 
 /// Set up S3 client
@@ -8,10 +9,10 @@ import Constants from './constants.mjs'
 // Create instance of S3 Client
 const s3 = new S3Client({
   credentials: {
-    accessKeyId: Constants.ACCESS_KEY,
-    secretAccessKey: Constants.SECRET_ACCESS_KEY
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY
   },
-  region: Constants.BUCKET_REGION
+  region: process.env.BUCKET_REGION
 })
 
 
@@ -22,6 +23,7 @@ const s3 = new S3Client({
 
 import { exec, execSync } from 'child_process'
 import axios from 'axios'
+import Constants from './constants.mjs'
 
 // Run command against Mongo Atlas
 const runCli = cmd => {
@@ -70,7 +72,7 @@ if(existingIps.length === Constants.MAX_IP_ENTRIES) {
 
 mongoose.set('strictQuery', false)
 mongoose.connect(
-  `mongodb+srv://${Constants.DB_USER}:${Constants.DB_PASSWORD}@${Constants.SERVER}/${Constants.DB}?retryWrites=true&w=majority`
+  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.SERVER}/${process.env.DB}?retryWrites=true&w=majority`
   )
 
 // Create Mongoose Island Schema

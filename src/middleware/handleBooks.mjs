@@ -1,5 +1,7 @@
 import { ListObjectsCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import dotenv from 'dotenv-vault-core'
+dotenv.config()
 import Constants from './constants.mjs'
 import { getId } from './functions.mjs'
 import { Island, Author } from './handleSources.mjs'
@@ -11,13 +13,13 @@ import { update } from './updateFiles.mjs'
 // Get current status
 async function getCurrentStatus() {
   // List Original files (which are the master) - Await for Promise
-  const originalMedia = (await s3.send(new ListObjectsCommand( { Bucket: Constants.ORIGIN_BUCKET } ))).Contents
+  const originalMedia = (await s3.send(new ListObjectsCommand( { Bucket: process.env.ORIGINALS_BUCKET } ))).Contents
     .map(originalFile => {
       let path = originalFile.Key
       return { key: getId(path), path: path }
     })
   // Get Site files - Await for Promise
-  const siteFiles = (await s3.send(new ListObjectsCommand( { Bucket: Constants.SITE_BUCKET } ))).Contents
+  const siteFiles = (await s3.send(new ListObjectsCommand( { Bucket: process.env.SITE_BUCKET } ))).Contents
     .map(siteFile => {
       let path = siteFile.Key
       return { key: getId(path), path: path }
@@ -69,12 +71,12 @@ async function purge(diffs) {
   // Get Promise to purge actual files
   const actualFilePurgePromise = Promise.all(
     diffs.outdatedActualMedia.map(async outdatedActualFile => {
-      await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedActualFile.path}))
+      await s3.send(new DeleteObjectCommand({Bucket: process.env.SITE_BUCKET, Key: outdatedActualFile.path}))
     })
   )
   const thumbnailFilePurgePromise = Promise.all(
     diffs.outdatedThumbnailMedia.map(async outdatedThumbnailFile => {
-      await s3.send(new DeleteObjectCommand({Bucket: Constants.SITE_BUCKET, Key: outdatedThumbnailFile.path}))
+      await s3.send(new DeleteObjectCommand({Bucket: process.env.SITE_BUCKET, Key: outdatedThumbnailFile.path}))
     })
   )
   // Return Promise to purge every outdated element
@@ -101,7 +103,7 @@ async function getInfo(newmedia) {
             Constants.THUMBNAIL_ID + '/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail
         ],
         // use presigned urls for exif extraction in case of metadata
-        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: Constants.ORIGIN_BUCKET,  Key: newMedium.path }), { expiresIn: 1200 })
+        sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: process.env.ORIGINALS_BUCKET,  Key: newMedium.path }), { expiresIn: 1200 })
       }
     })
   )
