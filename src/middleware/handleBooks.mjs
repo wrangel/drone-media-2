@@ -28,11 +28,11 @@ async function getCurrentStatus() {
   const actualSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_ID) == -1)
   // Get thumbnail image Site files
   const thumbnailSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_ID) > -1)
-  // Get Island collection entries
+  // Await Island collection entries
   const islandDocs = (await Island.find({}, 'name -_id')
     .lean())
     .map(doc => doc.name)
-  // Get Author collection entries
+  // Await Author collection entries
   const authorDocs = (await Author.find({}, 'name -_id')
     .lean())
     .map(doc => doc.name)
