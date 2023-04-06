@@ -1,4 +1,6 @@
 import express from 'express'
+import dotenv from 'dotenv-vault-core'
+dotenv.config()
 import Constants from './src/middleware/constants.mjs'
 import { getUrls } from './src/middleware/serveSignedUrls.mjs'
 import { beautify } from './src/middleware/serveMetadata.mjs'
@@ -24,8 +26,8 @@ app.use(express.static('.'))
 app.set('view engine', 'ejs')
 
 // Determine port website will run on
-app.listen(Constants.PORT, _ => {
-  console.log(`App is running on port ${Constants.PORT}`)
+app.listen(process.env.PORT, _ => {
+  console.log(`App is running on port ${process.env.PORT}`)
 })
 
 /* *** GET Routes - display pages ***
