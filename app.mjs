@@ -1,16 +1,8 @@
 import express from 'express'
 import Constants from './src/middleware/constants.mjs'
-
-
-console.log(Constants.ACCESS_KEY)
-
-/*
 import { getUrls } from './src/middleware/serveSignedUrls.mjs'
 import { beautify } from './src/middleware/serveMetadata.mjs'
 import { manage } from './src/middleware/handleBooks.mjs'
-
-
-
 
 
 // Update files and metadata
@@ -42,7 +34,7 @@ app.listen(Constants.PORT, _ => {
         from the front-end to the server (usually via a form) typically before a page is rendered and 
         the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
---
+*/
 app.get('/', (req, res, next) => res.render('pages/index'))
 app.get('/about', (req, res, next) => res.render('pages/about'))
 
@@ -69,5 +61,3 @@ function render() {
 }
 
 render()
-
-*/
