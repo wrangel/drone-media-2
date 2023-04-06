@@ -3,7 +3,7 @@ services:
   web:
     image: wrangel/ellesmere:latest
     build: .
-    command: "node -r dotenv/config app.mjs"
+    command: "node app.mjs"
     ports:
       - "8080:8080"
     env_file:

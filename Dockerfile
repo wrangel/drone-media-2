@@ -16,4 +16,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 8080
-CMD [ "node", "-r dotenv/config", "app.mjs" ]
+CMD [ "node", "app.mjs" ]
