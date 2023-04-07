@@ -21,4 +21,4 @@ jobs:
     - name: docker build
       run: docker build . --platform linux/amd64 --no-cache -t wrangel/ellesmere:latest
     - name: docker push
-      run:  docker push ${{secrets.DOCKER_USER}}/ellesmere:amd
+      run:  docker push ${{secrets.DOCKER_USER}}/ellesmere:latest
