@@ -1,10 +1,10 @@
-version: '3.8'
+version: '3.3'
 services:
-  web:
-    image: wrangel/ellesmere:latest
-    build: .
-    command: "node app.mjs"
-    ports:
-      - "8080:8080"
-    env_file:
-      .env
+    ellesmere:
+        environment:
+            - 'DOTENV_KEY=dotenv://:key_39e33a287ff4681e9089e6c055ba1920b7e939e8b698f5520870c55dedcca2d9@dotenv.org/vault/.env.vault?environment=development'
+        ports:
+            - '8080:8080'
+        image: wrangel/ellesmere
+        build: .
+        command: "node app.mjs"
