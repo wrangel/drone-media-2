@@ -21,7 +21,7 @@ const prepareDate = date => {
 // Adapt metadata to show prettily on the website
 const beautify = async (mediaFolder, presignedUrls) => {
 
-  // Get the metadata from the db
+  // Get the metadata from MongoDB
   const docs = await Island.find({ type : mediaFolder })
     .sort({ dateTime: -1 })
     .lean()

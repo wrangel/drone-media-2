@@ -36,7 +36,7 @@ const getCoordinates = coordString => {
 }
 
 
-// Save the data to the db
+// Save the data to MongoDB
 async function save(media) {
 
   // Get exif data for the new files
