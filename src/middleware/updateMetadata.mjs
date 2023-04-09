@@ -104,30 +104,9 @@ async function save(media) {
     })
   })
 
-  // Promise to save document to DB
- const mongoDbCall1 = Island.insertMany(newIslands)
+  // Return Promise to save document to DB
+ return Island.insertMany(newIslands)
 
-  // Promise to update the author on the DB
-  const mongoDbCall2 = Island.aggregate([
-    {
-      $lookup: { from: 'authors',
-        localField: 'name', 
-        foreignField: 'name',
-        as: 'author'
-      }
-    }, { 
-      $unwind: '$author'
-    }, {
-      "$replaceRoot": { "newRoot": { "$mergeObjects": [ '$author', '$$ROOT' ] } }
-   }, {
-    $addFields: { "author": "$author.author" }
-  },
-    { "$merge": "islands" }
-  ])
-    .exec()
-
-  // Return the Promises
-  return Promise.all([mongoDbCall1, mongoDbCall2])
 }
 
 export { save }

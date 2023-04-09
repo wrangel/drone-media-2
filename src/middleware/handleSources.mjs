@@ -82,20 +82,4 @@ const islandSchema = new mongoose.Schema({
 // Create Mongoose Island Model
 const Island = mongoose.model('Island', islandSchema)
 
-// Create Mongoose Author Schema
-const authorSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  author: {
-    type: String,
-    required: true
-  }
-})
-
-// Create Mongoose Author Model
-const Author = mongoose.model('Author', authorSchema)
-
-export { Island, Author, s3 }
+export { Island, s3 }

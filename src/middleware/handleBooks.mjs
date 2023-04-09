@@ -4,7 +4,7 @@ import dotenv from 'dotenv-vault-core'
 dotenv.config()
 import Constants from './constants.mjs'
 import { getId } from './functions.mjs'
-import { Island, Author } from './handleSources.mjs'
+import { Island } from './handleSources.mjs'
 import { s3 } from './handleSources.mjs'
 import { save } from './updateMetadata.mjs'
 import { update } from './updateFiles.mjs'
@@ -32,17 +32,15 @@ async function getCurrentStatus() {
   const islandDocs = (await Island.find({}, 'name -_id')
     .lean())
     .map(doc => doc.name)
-  // Await Author collection entries
-  const authorDocs = (await Author.find({}, 'name -_id')
-    .lean())
-    .map(doc => doc.name)
-  return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs, authorDocs])
+  return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs])
 }
+
+
 
 
 // Collect all differences
 function getDiffs(currentStatus) {
-  const [originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs, authorDocs] = currentStatus
+  const [originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs] = currentStatus
   // 1a) Get actual files to be added to Site bucket
   const newActualMedia = originalMedia.filter(x => !actualSiteMedia.map(y => y.key).includes(x.key))
   // 1b) Get actual files to be purged from Site bucket
@@ -54,14 +52,11 @@ function getDiffs(currentStatus) {
   // 3a) Get documents to be added to Island collection
   const newIslandDocs = originalMedia.filter(x => !islandDocs.includes(x.key))
   // 3b) Get documents to be purged from Island collection
-  const outdatedIslandDocs = islandDocs.filter(x => !originalMedia.map(y => y.key).includes(x))  
-  // 4a) Get documents to be purged from Author collection
-  const outdatedAuthorDocs = authorDocs.filter(x => !originalMedia.map(y => y.key).includes(x))
+  const outdatedIslandDocs = islandDocs.filter(x => !originalMedia.map(y => y.key).includes(x))
   return {
     newActualMedia: newActualMedia, outdatedActualMedia: outdatedActualMedia,
     newThumbnailMedia: newThumbnailMedia, outdatedThumbnailMedia: outdatedThumbnailMedia,
-    newIslandDocs: newIslandDocs, outdatedIslandDocs, outdatedIslandDocs,
-    outdatedAuthorDocs: outdatedAuthorDocs
+    newIslandDocs: newIslandDocs, outdatedIslandDocs, outdatedIslandDocs
   }
 }
 
@@ -83,8 +78,7 @@ async function purge(diffs) {
   return Promise.all([
     actualFilePurgePromise,
     thumbnailFilePurgePromise,
-    Island.deleteMany({ name : { $in : diffs.outdatedIslandDocs } }), 
-    Author.deleteMany({ name : { $in : diffs.outdatedAuthorDocs } })
+    Island.deleteMany({ name : { $in : diffs.outdatedIslandDocs } })
   ])
 }
 
