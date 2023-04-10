@@ -4,10 +4,10 @@ import dotenv from 'dotenv-vault-core'
 dotenv.config()
 import Constants from './constants.mjs'
 import { getId } from './functions.mjs'
-import { Island } from './handleSources.mjs'
-import { s3 } from './handleSources.mjs'
+import { Island, s3 } from './handleSources.mjs'
 import { save } from './updateMetadata.mjs'
 import { update } from './updateFiles.mjs'
+import { get } from 'mongoose'
 
 
 // Get current status
@@ -28,19 +28,18 @@ async function getCurrentStatus() {
   const actualSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_ID) == -1)
   // Get thumbnail image Site files
   const thumbnailSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_ID) > -1)
-  // Await Island collection entries
-  const islandDocs = (await Island.find({}, 'name -_id')
+  // Await Island collection entries (for outdated entries)
+  const islandDocs1 = (await Island.find({}, 'name -_id')
     .lean())
     .map(doc => doc.name)
-  return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs])
+  // Await incomplete Island collection entries (for new entries)
+  const islandDocs2 = await Island.find({ 'type' : { '$exists' : false } })
+  return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1, islandDocs2])
 }
-
-
-
 
 // Collect all differences
 function getDiffs(currentStatus) {
-  const [originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs] = currentStatus
+  const [originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1, islandDocs2] = currentStatus
   // 1a) Get actual files to be added to Site bucket
   const newActualMedia = originalMedia.filter(x => !actualSiteMedia.map(y => y.key).includes(x.key))
   // 1b) Get actual files to be purged from Site bucket
@@ -50,16 +49,15 @@ function getDiffs(currentStatus) {
   // 2b) Get actual files to be purged from Site bucket
   const outdatedThumbnailMedia = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
   // 3a) Get documents to be added to Island collection
-  const newIslandDocs = originalMedia.filter(x => !islandDocs.includes(x.key))
-  // 3b) Get documents to be purged from Island collection
-  const outdatedIslandDocs = islandDocs.filter(x => !originalMedia.map(y => y.key).includes(x))
+  const newIslandDocs = islandDocs2.map(element => element.name)
+    // 3b) Get documents to be purged from Island collection
+  const outdatedIslandDocs = islandDocs1.filter(x => !originalMedia.map(y => y.key).includes(x))
   return {
     newActualMedia: newActualMedia, outdatedActualMedia: outdatedActualMedia,
     newThumbnailMedia: newThumbnailMedia, outdatedThumbnailMedia: outdatedThumbnailMedia,
     newIslandDocs: newIslandDocs, outdatedIslandDocs, outdatedIslandDocs
   }
 }
-
 
 // Purge files and metadata 
 async function purge(diffs) {
@@ -113,6 +111,11 @@ async function manage() {
   console.log("Status quo:")
   console.log(diffs)
 
+  let a = diffs.newIslandDocs///await getInfo(diffs.newIslandDocs)
+  console.log(a)
+
+
+    /*
   // Wait for Promise to compile generic info for all new media to be added
   const info = await Promise.all([
     getInfo(diffs.newActualMedia),
@@ -131,6 +134,7 @@ async function manage() {
 
   // Return Promise to update everything to the caller
   return Promise.all([updatePromise0, updatePromise1, updatePromise2, purgePromise])
+  */
 }
 
 export { manage }
