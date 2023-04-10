@@ -84,6 +84,8 @@ async function purge(diffs) {
 async function getInfo(newmedia) {
   return Promise.all(
     newmedia.map(async newMedium => {
+
+
       const key = newMedium.key
       const path = newMedium.path
       return {
@@ -98,6 +100,9 @@ async function getInfo(newmedia) {
         sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: process.env.ORIGINALS_BUCKET,  Key: newMedium.path }), { expiresIn: 1200 })
       }
     })
+
+
+    
   )
 }
 
@@ -111,7 +116,7 @@ async function manage() {
   console.log("Status quo:")
   console.log(diffs)
 
-  let a = diffs.newIslandDocs///await getInfo(diffs.newIslandDocs)
+  let a = diffs.newIslandDocs ///await getInfo(diffs.newIslandDocs)
   console.log(a)
 
 
