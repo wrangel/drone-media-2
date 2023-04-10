@@ -7,7 +7,6 @@ import { getId } from './functions.mjs'
 import { Island, s3 } from './handleSources.mjs'
 import { save } from './updateMetadata.mjs'
 import { update } from './updateFiles.mjs'
-import { get } from 'mongoose'
 
 
 // Get current status
@@ -111,16 +110,6 @@ async function manage() {
   console.log("Status quo:")
   console.log(diffs)
 
-
-
-  /*
-  let b = currentStatus[0]
-  let a = diffs.newIslandDocs ///await getInfo(diffs.newIslandDocs)
-  console.log(b)
-  */
-
-
-    /*
   // Wait for Promise to compile generic info for all new media to be added
   const info = await Promise.all([
     getInfo(diffs.newActualMedia),
@@ -139,7 +128,6 @@ async function manage() {
 
   // Return Promise to update everything to the caller
   return Promise.all([updatePromise0, updatePromise1, updatePromise2, purgePromise])
-  */
 }
 
 export { manage }

@@ -42,6 +42,9 @@ async function save(media) {
   // Get exif data for the new files
   const base = await Promise.all(
     media.map(async medium => {
+
+      console.log(medium)
+      
       const exif = await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
       return {
         key: medium.key,
@@ -53,8 +56,6 @@ async function save(media) {
       }
     })
   )
-
-  console.log(base)
 
   // Get the urls for the reverse engineering call
   const reverseUrls = base.map (
@@ -87,7 +88,8 @@ async function save(media) {
   // Combine everything into the Mongoose compatible metadata (one for each document)
   const newIslands = base.map(function (b, i) {
     const rgcd = reverseGeocodingData[i]
-    return new Island({
+
+    return {
       name: b.key,
       type: b.target.substring(0, b.target.indexOf('/')),
       dateTimeString: b.exif_datetime,
@@ -101,12 +103,15 @@ async function save(media) {
       postalCode: rgcd.postcode,
       road: rgcd.address,
       noViews: 0
-    })
+    }
   })
 
-  // Return Promise to save document to DB
- return Island.insertMany(newIslands)
-
+  // Return Promises to update document to DB
+  return Promise.all(
+    newIslands.map(async newIsland => {
+      await Island.findOneAndUpdate({ name: newIsland.name }, newIsland)
+    })
+  )
 }
 
 export { save }
