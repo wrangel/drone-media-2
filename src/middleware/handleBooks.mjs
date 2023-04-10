@@ -49,8 +49,8 @@ function getDiffs(currentStatus) {
   // 2b) Get actual files to be purged from Site bucket
   const outdatedThumbnailMedia = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
   // 3a) Get documents to be added to Island collection
-  const newIslandDocs = islandDocs2.map(element => element.name)
-    // 3b) Get documents to be purged from Island collection
+  const newIslandDocs = originalMedia.filter(x => islandDocs2.map(element => element.name).includes(x.key))
+  // 3b) Get documents to be purged from Island collection
   const outdatedIslandDocs = islandDocs1.filter(x => !originalMedia.map(y => y.key).includes(x))
   return {
     newActualMedia: newActualMedia, outdatedActualMedia: outdatedActualMedia,
@@ -84,8 +84,6 @@ async function purge(diffs) {
 async function getInfo(newmedia) {
   return Promise.all(
     newmedia.map(async newMedium => {
-
-
       const key = newMedium.key
       const path = newMedium.path
       return {
@@ -100,9 +98,6 @@ async function getInfo(newmedia) {
         sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: process.env.ORIGINALS_BUCKET,  Key: newMedium.path }), { expiresIn: 1200 })
       }
     })
-
-
-    
   )
 }
 
@@ -116,8 +111,13 @@ async function manage() {
   console.log("Status quo:")
   console.log(diffs)
 
+
+
+  /*
+  let b = currentStatus[0]
   let a = diffs.newIslandDocs ///await getInfo(diffs.newIslandDocs)
-  console.log(a)
+  console.log(b)
+  */
 
 
     /*
