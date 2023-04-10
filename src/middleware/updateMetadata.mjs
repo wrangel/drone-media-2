@@ -38,13 +38,10 @@ const getCoordinates = coordString => {
 
 // Save the data to MongoDB
 async function save(media) {
-
+  
   // Get exif data for the new files
   const base = await Promise.all(
-    media.map(async medium => {
-
-      console.log(medium)
-      
+    media.map(async medium => {      
       const exif = await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
       return {
         key: medium.key,
@@ -88,7 +85,6 @@ async function save(media) {
   // Combine everything into the Mongoose compatible metadata (one for each document)
   const newIslands = base.map(function (b, i) {
     const rgcd = reverseGeocodingData[i]
-
     return {
       name: b.key,
       type: b.target.substring(0, b.target.indexOf('/')),
