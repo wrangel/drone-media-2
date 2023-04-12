@@ -48,7 +48,7 @@ async function update(media, mediaType) {
         queueSize: 1,
         params: {
           Bucket: process.env.SITE_BUCKET ,
-          ContentType: `image/${Constants.SITE_MEDIA_FORMAT}`,
+          ContentType: `image/${Constants.MEDIA_FORMATS.site}`,
           Key: target,
           Body: uploadStream
         },

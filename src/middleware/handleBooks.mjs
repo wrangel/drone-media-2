@@ -47,7 +47,7 @@ function getDiffs(currentStatus) {
   const newThumbnailMedia = originalMedia.filter(x => !thumbnailSiteMedia.map(y => y.key).includes(x.key))
   // 2b) Get actual files to be purged from Site bucket
   const outdatedThumbnailMedia = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
-  // 3a) Get documents to be added to Island collection
+  // 3a) Get documents to be added to Island collection (originalMedia only needed for type, which actually is not needed downstream)
   const newIslandDocs = originalMedia.filter(x => islandDocs2.map(element => element.name).includes(x.key))
   // 3b) Get documents to be purged from Island collection
   const outdatedIslandDocs = islandDocs1.filter(x => !originalMedia.map(y => y.key).includes(x))
@@ -90,8 +90,8 @@ async function getInfo(newmedia) {
         type: path.substring(0, path.indexOf('/')),
         origin: path, 
         targets: [
-            path.replace(/\b(.tif|.jpeg)\b/gi, Constants.SITE_MEDIA_FORMAT), // actual
-            Constants.THUMBNAIL_ID + '/' + key + Constants.SITE_MEDIA_FORMAT // thumbnail
+            path.replace(/\b(.tif|.jpeg)\b/gi, Constants.MEDIA_FORMATS.site), // actual
+            Constants.THUMBNAIL_ID + '/' + key + Constants.MEDIA_FORMATS.site // thumbnail
         ],
         // use presigned urls for exif extraction in case of metadata
         sigUrl: await getSignedUrl(s3, new GetObjectCommand({ Bucket: process.env.ORIGINALS_BUCKET,  Key: newMedium.path }), { expiresIn: 1200 })

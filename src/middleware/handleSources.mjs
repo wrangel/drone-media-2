@@ -35,42 +35,36 @@ const islandSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  author: String,
-  dateTimeString: {
+  author: {
     type: String,
     required: true
+  },
+  dateTimeString: {
+    type: String
   },
   dateTime: {
-    type: Date,
-    required: true
+    type: Date
   },
   latitude: {
-    type: Number,
-    required: true
+    type: Number
   },
   longitude: {
-    type: Number,
-    required: true
+    type: Number
   },
   altitude: {
-    type: Number,
-    required: true
+    type: Number
   },
   country: {
-    type: String,
-    required: true
+    type: String
   },
   region: {
-    type: String,
-    required: true
+    type: String
   },
   location: {
-    type: String,
-    required: true
+    type: String
   },
   postalCode: {
-    type: String,
-    required: true
+    type: String
   },
   road: String,
   noViews: {

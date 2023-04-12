@@ -45,7 +45,6 @@ async function save(media) {
       const exif = await ExifReader.load(medium.sigUrl) // Slow, but reliable (exifr is fast, but omits timezone offset)
       return {
         key: medium.key,
-        target: medium.targets[0], // use actual file info
         exif_datetime: exif.DateTimeOriginal.description,
         exif_longitude: getCoordinates(exif.GPSLongitude.description),
         exif_latitude: getCoordinates(exif.GPSLatitude.description),
@@ -82,12 +81,13 @@ async function save(media) {
     }
   )
 
-  // Combine everything into the Mongoose compatible metadata (one for each document)
+  /*  Combine everything into the Mongoose compatible metadata (one for each document)
+      Note that name, type and author are provided by helper.mjs, and name is used for id'ing the correct document
+  */
   const newIslands = base.map(function (b, i) {
     const rgcd = reverseGeocodingData[i]
     return {
       name: b.key,
-      type: b.target.substring(0, b.target.indexOf('/')),
       dateTimeString: b.exif_datetime,
       dateTime: getDate(b.exif_datetime),
       latitude: b.exif_latitude,

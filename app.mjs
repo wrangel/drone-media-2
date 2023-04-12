@@ -1,8 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv-vault-core'
 dotenv.config()
-
-
 import Constants from './src/middleware/constants.mjs'
 import { getUrls } from './src/middleware/serveSignedUrls.mjs'
 import { beautify } from './src/middleware/serveMetadata.mjs'
