@@ -1,6 +1,9 @@
 import { exec } from 'child_process'
+import util from 'util'
 import readline from 'readline'
 
+// Promisify child process
+const execPromise = util.promisify(exec)
 
 /// Web App
 // Get image identifyer from image path
@@ -28,7 +31,7 @@ const question = function(q) {
 
 // Run command against Mongo Atlas
 const runCli = cmd => {
-  exec(cmd, (error, stdout, stderr) => {
+  execPromise(cmd, (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`)
       return

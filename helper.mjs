@@ -26,6 +26,7 @@ const fileInfo = files
 const noMedia = fileInfo.length
 if (noMedia == 0) {
   console.log("No media to manage")
+  process.exit(0)
 } 
 else {
   console.log(`${noMedia} media to manage`)
@@ -56,8 +57,10 @@ else {
   await Island.insertMany(newIslands)
 
   /// C) Upload media to AWS S3 (requires AWS CLI with proper authentication: Alternative would be an S3 client)
-  fileInfo.forEach(fi => 
+  await Promise.all(
+    fileInfo.map(fi => 
     runCli(`aws s3 cp ${process.env.INPUT_DIRECTORY}${fi.sourceFile} s3://${process.env.ORIGINALS_BUCKET}/${fi.mediaType}/${fi.targetFile}`)
+    )
   )
 
   /// D) Convert file to .jpeg, copy .jpeg to OneDrive, move .tif to 'done' folder
@@ -78,4 +81,5 @@ else {
       })
     })
   )
+  
 }
