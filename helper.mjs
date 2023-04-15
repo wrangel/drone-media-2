@@ -51,8 +51,8 @@ else {
   }
 
   /// B) Update MongoDB
-  // Prepare JSON for MongoDB insert
-  const newIslands = fileInfo.map(element => { return { name: element.name, type: element.mediaType, author: element.author } })
+  // Prepare JSON for MongoDB insert -- type: element.mediaType is obsolete, since it is added downstream anyway
+  const newIslands = fileInfo.map(element => { return { name: element.name, author: element.author } })
   // Update MongoDB
   await Island.insertMany(newIslands)
 
