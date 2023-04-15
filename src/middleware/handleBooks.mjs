@@ -32,7 +32,7 @@ async function getCurrentStatus() {
     .lean())
     .map(doc => doc.name)
   // Await incomplete Island collection entries (for new entries)
-  const islandDocs2 = await Island.find({ 'type' : { '$exists' : false } })
+  const islandDocs2 = await Island.find({ 'dateTime' : { '$exists' : false } })
   return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1, islandDocs2])
 }
 
@@ -47,7 +47,7 @@ function getDiffs(currentStatus) {
   const newThumbnailMedia = originalMedia.filter(x => !thumbnailSiteMedia.map(y => y.key).includes(x.key))
   // 2b) Get actual files to be purged from Site bucket
   const outdatedThumbnailMedia = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
-  // 3a) Get documents to be added to Island collection (originalMedia only needed for type, which actually is not needed downstream)
+  // 3a) Get documents to be added to Island collection
   const newIslandDocs = originalMedia.filter(x => islandDocs2.map(element => element.name).includes(x.key))
   // 3b) Get documents to be purged from Island collection
   const outdatedIslandDocs = islandDocs1.filter(x => !originalMedia.map(y => y.key).includes(x))
