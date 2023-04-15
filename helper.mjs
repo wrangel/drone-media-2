@@ -7,7 +7,6 @@ import Constants from './src/middleware/constants.mjs'
 import { Island } from './src/middleware/handleSources.mjs'
 import { question, runCli } from './src/middleware/functions.mjs'
 
-
 // A) Prepare
 // Get infos about the new media files
 const files = fs.readdirSync(process.env.INPUT_DIRECTORY)
@@ -66,10 +65,12 @@ else {
   /// D) Convert file to .jpeg, copy .jpeg to OneDrive, move .tif to 'done' folder
   await Promise.all(
     fileInfo.map(async fi => {
+      console.log(fi)
       const inputFile = path.join(process.env.INPUT_DIRECTORY, fi.sourceFile)
       // Handle jpegs
       await sharp(inputFile)
         .jpeg({ quality: 100 })
+        .withMetadata()
         .toFile(path.join(process.env.ONEDRIVE_DIRECTORY, fi.sourceFile.replace(Constants.MEDIA_FORMATS.large, Constants.MEDIA_FORMATS.small)))
       // Handle .tifs
       fs.rename(inputFile, path.join(process.env.OUTPUT_DIRECTORY, fi.sourceFile), function (err) {
