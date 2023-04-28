@@ -51,18 +51,11 @@ else {
 
   /// B) Update MongoDB
   // Prepare JSON for MongoDB insert -- type: element.mediaType is obsolete, since it is added downstream anyway
-  const newIslands = fileInfo.map(element => { return { name: element.name, author: element.author } })
+  const newIslands = fileInfo.map(element => { return { name: element.name, type: element.mediaType, author: element.author } })
   // Update MongoDB
   await Island.insertMany(newIslands)
 
-  /// C) Upload media to AWS S3 (requires AWS CLI with proper authentication: Alternative would be an S3 client)
-  await Promise.all(
-    fileInfo.map(fi => 
-    runCli(`aws s3 cp ${process.env.INPUT_DIRECTORY}${fi.sourceFile} s3://${process.env.ORIGINALS_BUCKET}/${fi.mediaType}/${fi.targetFile}`)
-    )
-  )
-
-  /// D) Convert file to .jpeg, copy .jpeg to OneDrive, move .tif to 'done' folder
+  /// C) Convert file to .jpeg, copy .jpeg to OneDrive, move .tif to 'done' folder
   await Promise.all(
     fileInfo.map(async fi => {
       console.log(fi)
@@ -82,5 +75,12 @@ else {
       })
     })
   )
-  
+
+  /// D) Upload media to AWS S3 (requires AWS CLI with proper authentication: Alternative would be an S3 client)
+  await Promise.all(
+    fileInfo.map(fi => 
+    runCli(`aws s3 cp ${process.env.OUTPUT_DIRECTORY}${fi.sourceFile} s3://${process.env.ORIGINALS_BUCKET}/${fi.mediaType}/${fi.targetFile}`)
+    )
+  )
+
 }

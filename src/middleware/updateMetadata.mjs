@@ -65,7 +65,7 @@ async function save(media) {
       const resp = await fetch(reverseUrl)
       return await resp.json()
     })
-  )  
+  ) 
 
   // Get the reverse geocoding data
   const reverseGeocodingData = jsons.map (

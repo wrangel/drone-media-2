@@ -32,8 +32,7 @@ const islandSchema = new mongoose.Schema({
     unique: true
   },
   type: {
-    type: String,
-    required: true
+    type: String
   },
   author: {
     type: String,
