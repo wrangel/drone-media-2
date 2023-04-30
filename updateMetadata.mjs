@@ -37,11 +37,10 @@ const getCoordinates = (coordString, orientation) => {
   return coordinate
 }
 
-/*
-// A) Prepare ////OK
-// Get infos about the new media files
+// A) Prepare
+// Get basic infos about the new media files
 const files = fs.readdirSync(process.env.INPUT_DIRECTORY)
-const fileInfo = files
+const media = files
   .filter(sourceFile => !sourceFile.startsWith('.'))
   .map(sourceFile => {
     let name = sourceFile.substring(0, sourceFile.lastIndexOf('.'))
@@ -53,19 +52,17 @@ const fileInfo = files
     return {name: name, sourceFile: sourceFile, targetFile: name + Constants.MEDIA_FORMATS.large}
   })
 
-
-const noMedia = fileInfo.length
+const noMedia = media.length
 if (noMedia == 0) {
   console.log("No media to manage")
   process.exit(0)
 } 
 else {
   console.log(`${noMedia} media to manage`)
-  console.log(fileInfo)
-  // Collect user input about authors of the media (while is async by nature!)
+  // Collect user input about authors and type of the media (while is async by nature!)
   let idx = 0
-  while (idx < fileInfo.length) {
-    const name = fileInfo[idx].name
+  while (idx < media.length) {
+    const name = media[idx].name
     const answer = await question(`Author and media type of --> ${ name } <-- (comma separated) : `)
     let [author, mediaType] = answer.split(',').map(x => x.trim())
     // Allow only known authors
@@ -76,75 +73,84 @@ else {
     while (!Constants.MEDIA_PAGES.includes(mediaType)) {
       mediaType = await question(`Please choose one of (${ Constants.MEDIA_PAGES }) as media type for --> ${ name } <-- : `)
     }
-    // Add the new info to the fileInfo object
-    fileInfo[idx].author = author
-    fileInfo[idx].mediaType = mediaType
+    // Add the new info to the media object
+    media[idx].author = author
+    media[idx].mediaType = mediaType
     idx += 1
   }
+
+  // Get exif data for the new files
+  const base = await Promise.all(
+    media.map(async medium => {      
+      const exif = await ExifReader.load(path.join(process.env.INPUT_DIRECTORY, medium.sourceFile))
+      return {
+        key: medium.key,
+        exif_datetime: exif.DateTimeOriginal.description,
+        exif_longitude: getCoordinates(exif.GPSLongitude.description, exif.GPSLongitudeRef.value[0]),
+        exif_latitude: getCoordinates(exif.GPSLatitude.description, exif.GPSLatitudeRef.value[0]),
+        exif_altitude: getAltitude(exif.GPSAltitude.description)
+      }
+    })
+  )
+
+  // Get the urls for the reverse engineering call
+  const reverseUrls = base.map (
+    exif => Constants.REVERSE_GEO_URL_ELEMENTS[0] + exif.exif_longitude + ', ' + exif.exif_latitude + 
+      Constants.REVERSE_GEO_URL_ELEMENTS[1] + process.env.ACCESS_TOKEN
+  )
+
+  // Get the jsons from the reverse engineering call (Wait on all promises to be resolved)
+  const jsons = await Promise.all(
+    reverseUrls.map(async reverseUrl => {
+      const resp = await fetch(reverseUrl)
+      return await resp.json()
+    })
+  )
+
+  // Get the reverse geocoding data
+  const reverseGeocodingData = jsons.map (
+    json => {
+      let data = {}
+      Constants.REVERSE_GEO_ADDRESS_COMPONENTS.forEach(addressComponent => {
+        data[addressComponent] = 
+          json.features
+            .filter(doc => doc.id.startsWith(addressComponent))
+            .map(doc => doc.text)[0]
+      })
+      return data
+    }
+  )
+
+  /*  Combine everything into the Mongoose compatible metadata (one for each document)
+      Note that name, type and author are provided by helper.mjs, and name is used for id'ing the correct document
   */
-
-  const media = [ ////// KILL
-  {
-    name: '100_0208',
-    sourceFile: '100_0208.tif',
-    targetFile: '100_0208.tif'
-  }
-]
-
-// Get exif data for the new files
-const base = await Promise.all(
-  media.map(async medium => {      
-    const exif = await ExifReader.load(path.join(process.env.INPUT_DIRECTORY, medium.sourceFile))
+  const newIslands = media.map(function (medium, i) {
+    const b = base[i]
+    const rgcd = reverseGeocodingData[i]
     return {
-      key: medium.key,
-      exif_datetime: exif.DateTimeOriginal.description,
-      exif_longitude: getCoordinates(exif.GPSLongitude.description, exif.GPSLongitudeRef.value[0]),
-      exif_latitude: getCoordinates(exif.GPSLatitude.description, exif.GPSLatitudeRef.value[0]),
-      exif_altitude: getAltitude(exif.GPSAltitude.description)
+      name: medium.name,
+      type: medium.mediaType,
+      author: medium.author,
+      dateTimeString: b.exif_datetime,
+      dateTime: getDate(b.exif_datetime),
+      latitude: b.exif_latitude,
+      longitude: b.exif_longitude,
+      altitude: b.exif_altitude,
+      country: rgcd.country,
+      region: rgcd.region,
+      location: rgcd.place,
+      postalCode: rgcd.postcode,
+      road: rgcd.address,
+      noViews: 0
     }
   })
-)
 
-// Get the urls for the reverse engineering call
-const reverseUrls = base.map (
-  exif => Constants.REVERSE_GEO_URL_ELEMENTS[0] + exif.exif_longitude + ', ' + exif.exif_latitude + 
-    Constants.REVERSE_GEO_URL_ELEMENTS[1] + process.env.ACCESS_TOKEN
-)
-
-// Get the jsons from the reverse engineering call (Wait on all promises to be resolved)
-const jsons = await Promise.all(
-  reverseUrls.map(async reverseUrl => {
-    const resp = await fetch(reverseUrl)
-    return await resp.json()
-  })
-)
-
-// Get the reverse geocoding data
-const reverseGeocodingData = jsons.map (
-  json => {
-    let data = {}
-    Constants.REVERSE_GEO_ADDRESS_COMPONENTS.forEach(addressComponent => {
-      data[addressComponent] = 
-        json.features
-          .filter(doc => doc.id.startsWith(addressComponent))
-          .map(doc => doc.text)[0]
-    })
-    return data
-  }
-)
-
-console.log(reverseGeocodingData)
-
-  /*
   /// B) Update MongoDB
-  // Prepare JSON for MongoDB insert -- type: element.mediaType is obsolete, since it is added downstream anyway
-  const newIslands = fileInfo.map(element => { return { name: element.name, type: element.mediaType, author: element.author } })
-  // Update MongoDB
   await Island.insertMany(newIslands)
 
   /// C) Convert file to .jpeg, copy .jpeg to OneDrive, move .tif to 'done' folder
   await Promise.all(
-    fileInfo.map(async fi => {
+    media.map(async fi => {
       console.log(fi)
       const inputFile = path.join(process.env.INPUT_DIRECTORY, fi.sourceFile)
       // Handle jpegs
@@ -165,10 +171,11 @@ console.log(reverseGeocodingData)
 
   /// D) Upload media to AWS S3 (requires AWS CLI with proper authentication: Alternative would be an S3 client)
   await Promise.all(
-    fileInfo.map(fi => 
+    media.map(fi => 
     runCli(`aws s3 cp ${process.env.OUTPUT_DIRECTORY}${fi.sourceFile} s3://${process.env.ORIGINALS_BUCKET}/${fi.mediaType}/${fi.targetFile}`)
     )
   )
-  */
 
-/////}
+  process.exit(0)
+
+}

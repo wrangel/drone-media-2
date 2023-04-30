@@ -5,7 +5,6 @@ dotenv.config()
 import Constants from './constants.mjs'
 import { getId } from './functions.mjs'
 import { Island, s3 } from './handleSources.mjs'
-import { save } from './updateMetadata.mjs'
 import { update } from './updateFiles.mjs'
 
 
@@ -31,14 +30,12 @@ async function getCurrentStatus() {
   const islandDocs1 = (await Island.find({}, 'name -_id')
     .lean())
     .map(doc => doc.name)
-  // Await incomplete Island collection entries (for new entries)
-  const islandDocs2 = await Island.find({ 'dateTime' : { '$exists' : false } })
-  return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1, islandDocs2])
+  return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1])
 }
 
 // Collect all differences
 function getDiffs(currentStatus) {
-  const [originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1, islandDocs2] = currentStatus
+  const [originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1] = currentStatus
   // 1a) Get actual files to be added to Site bucket
   const newActualMedia = originalMedia.filter(x => !actualSiteMedia.map(y => y.key).includes(x.key))
   // 1b) Get actual files to be purged from Site bucket
@@ -47,14 +44,11 @@ function getDiffs(currentStatus) {
   const newThumbnailMedia = originalMedia.filter(x => !thumbnailSiteMedia.map(y => y.key).includes(x.key))
   // 2b) Get actual files to be purged from Site bucket
   const outdatedThumbnailMedia = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
-  // 3a) Get documents to be added to Island collection
-  const newIslandDocs = originalMedia.filter(x => islandDocs2.map(element => element.name).includes(x.key))
   // 3b) Get documents to be purged from Island collection
   const outdatedIslandDocs = islandDocs1.filter(x => !originalMedia.map(y => y.key).includes(x))
   return {
     newActualMedia: newActualMedia, outdatedActualMedia: outdatedActualMedia,
-    newThumbnailMedia: newThumbnailMedia, outdatedThumbnailMedia: outdatedThumbnailMedia,
-    newIslandDocs: newIslandDocs, outdatedIslandDocs, outdatedIslandDocs
+    newThumbnailMedia: newThumbnailMedia, outdatedThumbnailMedia: outdatedThumbnailMedia
   }
 }
 
@@ -113,16 +107,13 @@ async function manage() {
   // Wait for Promise to compile generic info for all new media to be added
   const info = await Promise.all([
     getInfo(diffs.newActualMedia),
-    getInfo(diffs.newThumbnailMedia),
-    getInfo(diffs.newIslandDocs)
+    getInfo(diffs.newThumbnailMedia)
   ])
 
   // Promise to manipulate and save newly added actual images to the S3 bucket containing the site media (Melville)
   const updatePromise0 = update(info[0], Constants.ACTUAL_ID)
   // Promise to manipulate and save newly added thumbnail images to the S3 bucket containing the site media (Melville)
   const updatePromise1 = update(info[1], Constants.THUMBNAIL_ID)
-  // Promise to save metadata of newly added files to Mongo DB 
-  const updatePromise2 = save(info[2])
   // Purge outdated media
   const purgePromise = purge(diffs)
 
