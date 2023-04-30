@@ -25,16 +25,14 @@ const getAltitude = altitudeString => {
   return altitude
 }
 
-// Convert GPS, if string is returned
-const getCoordinates = coordString => {
+// Get decimal GPS coordinates
+const getCoordinates = (coordString, orientation) => {
   let coordinate = parseFloat(coordString)
-  const orientation = coordString.toString().match(/[a-zA-Z]+/g) 
-  if(orientation != null && ['S', 'W'].indexOf(orientation[0]) > - 1) {
-      coordinate = -coordinate
+  if(['S', 'W'].indexOf(orientation) > - 1) {
+    coordinate = -coordinate
   }
   return coordinate
 }
-
 
 // Save the data to MongoDB
 async function save(media) {
@@ -46,8 +44,8 @@ async function save(media) {
       return {
         key: medium.key,
         exif_datetime: exif.DateTimeOriginal.description,
-        exif_longitude: getCoordinates(exif.GPSLongitude.description),
-        exif_latitude: getCoordinates(exif.GPSLatitude.description),
+        exif_longitude: getCoordinates(exif.GPSLongitude.description, exif.GPSLongitudeRef.value[0]),
+        exif_latitude: getCoordinates(exif.GPSLatitude.description, exif.GPSLatitudeRef.value[0]),
         exif_altitude: getAltitude(exif.GPSAltitude.description)
       }
     })
@@ -108,6 +106,7 @@ async function save(media) {
       await Island.findOneAndUpdate({ name: newIsland.name }, newIsland)
     })
   )
+
 }
 
 export { save }
