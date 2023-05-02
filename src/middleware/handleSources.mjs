@@ -72,7 +72,6 @@ const islandSchema = new mongoose.Schema({
     type: String
   },
   postalCode: {
-    required: true,
     type: String
   },
   road: String,

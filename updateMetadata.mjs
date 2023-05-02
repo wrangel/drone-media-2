@@ -13,7 +13,7 @@ import { question, runCli } from './src/middleware/functions.mjs'
 */
 const getDate = str => { 
   const [year, month, date, hour, min, sec] = str.split(/\D/) 
-  return new Date(year, month - 1 ,date, hour, min, sec) 
+  return new Date(year, month - 1, date, hour, min, sec) 
 }
 
 // Converts the altitude into meter-above-sea
@@ -175,7 +175,5 @@ else {
     runCli(`aws s3 cp ${process.env.OUTPUT_DIRECTORY}${fi.sourceFile} s3://${process.env.ORIGINALS_BUCKET}/${fi.mediaType}/${fi.targetFile}`)
     )
   )
-
-  process.exit(0)
 
 }
