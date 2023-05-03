@@ -28,6 +28,7 @@ const beautify = async (mediaFolder, presignedUrls) => {
 
   // Get the current presigned urls
   return docs.map (doc => {
+
     const urls = presignedUrls.filter(element => {
       return element.name === doc.name
     }).map(element => {

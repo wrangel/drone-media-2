@@ -59,6 +59,7 @@ if (noMedia == 0) {
 } 
 else {
   console.log(`${noMedia} media to manage`)
+  /*
   // Collect user input about authors and type of the media (while is async by nature!)
   let idx = 0
   while (idx < media.length) {
@@ -123,7 +124,7 @@ else {
 
   /*  Combine everything into the Mongoose compatible metadata (one for each document)
       Note that name, type and author are provided by helper.mjs, and name is used for id'ing the correct document
-  */
+  --
   const newIslands = media.map(function (medium, i) {
     const b = base[i]
     const rgcd = reverseGeocodingData[i]
@@ -168,7 +169,7 @@ else {
       })
     })
   )
-
+    */
   /// D) Upload media to AWS S3 (requires AWS CLI with proper authentication: Alternative would be an S3 client)
   await Promise.all(
     media.map(fi => 
