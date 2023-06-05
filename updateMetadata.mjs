@@ -4,9 +4,11 @@ import ExifReader from 'exifreader'
 import sharp from 'sharp'
 import dotenv from 'dotenv'
 dotenv.config()
+import { ListObjectsCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import Constants from './src/middleware/constants.mjs'
-import { Island } from './src/middleware/handleSources.mjs'
-import { question, runCli } from './src/middleware/functions.mjs'
+import { Island, s3 } from './src/middleware/handleSources.mjs'
+import { question, runCli, getId } from './src/middleware/functions.mjs'
+
 
 /*  Converts the timestamp string into a GMT / Local date (that is what exifr is doing wrong!)
     https://stackoverflow.com/questions/43083993/javascript-how-to-convert-exif-date-time-data-to-timestamp
@@ -37,7 +39,85 @@ const getCoordinates = (coordString, orientation) => {
   return coordinate
 }
 
-// A) Prepare
+// Get current outdated media
+async function getCurrentStatus() {
+  // List Original files on Saint Patrick Island (which are the master) - Await for Promise
+  const originalMedia = (await s3.send(new ListObjectsCommand( { Bucket: process.env.ORIGINALS_BUCKET } ))).Contents
+    .map(originalFile => {
+      let path = originalFile.Key
+      return { key: getId(path), path: path }
+    })
+  // Get Site files - Await for Promise
+  const siteFiles = (await s3.send(new ListObjectsCommand( { Bucket: process.env.SITE_BUCKET } ))).Contents
+    .map(siteFile => {
+      let path = siteFile.Key
+      return { key: getId(path), path: path }
+    })
+  // Get actual image Site files
+  const actualSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_ID) == -1)
+  // Get thumbnail image Site files
+  const thumbnailSiteMedia = siteFiles.filter(siteFile => siteFile.path.indexOf(Constants.THUMBNAIL_ID) > -1)
+  // Await Island collection entries (for outdated entries)
+  const islandDocs1 = (await Island.find({}, 'name -_id')
+    .lean())
+    .map(doc => doc.name)
+  return Promise.all([originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1])
+}
+
+// Collect all differences
+function getOutdated(currentStatus) {
+  const [originalMedia, actualSiteMedia, thumbnailSiteMedia, islandDocs1] = currentStatus
+  // 1) Get actual files to be purged from Site bucket
+  const outdatedActualMedia = actualSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
+  // 2) Get actual files to be purged from Site bucket
+  const outdatedThumbnailMedia = thumbnailSiteMedia.filter(x => !originalMedia.map(y => y.key).includes(x.key))
+  // 3) Get documents to be purged from Island collection
+  const outdatedIslandDocs = islandDocs1.filter(x => !originalMedia.map(y => y.key).includes(x))
+  return {
+    outdatedActualMedia: outdatedActualMedia,
+    outdatedThumbnailMedia: outdatedThumbnailMedia,
+    outdatedIslandDocs: outdatedIslandDocs
+  }
+}
+
+// Purge files and metadata 
+async function purge(diffs) {
+  // Get Promise to purge actual files
+  const actualFilePurgePromise = Promise.all(
+    diffs.outdatedActualMedia.map(async outdatedActualFile => {
+      await s3.send(new DeleteObjectCommand({Bucket: process.env.SITE_BUCKET, Key: outdatedActualFile.path}))
+    })
+  )
+  const thumbnailFilePurgePromise = Promise.all(
+    diffs.outdatedThumbnailMedia.map(async outdatedThumbnailFile => {
+      await s3.send(new DeleteObjectCommand({Bucket: process.env.SITE_BUCKET, Key: outdatedThumbnailFile.path}))
+    })
+  )
+  // Return Promise to purge every outdated element
+  return Promise.all([
+    actualFilePurgePromise,
+    thumbnailFilePurgePromise,
+    Island.deleteMany({ name : { $in : diffs.outdatedIslandDocs } })
+  ])
+}
+
+/// A) Purge outdated media
+const currentStatus = await getCurrentStatus()
+const diffs = getOutdated(currentStatus)
+console.log("Outdated Media:")
+console.log(diffs)
+await purge(diffs)
+
+
+
+////
+
+
+
+
+
+//// B) Add new media 
+/// B1) Prepare
 // Get basic infos about the new media files
 const files = fs.readdirSync(process.env.INPUT_DIRECTORY)
 const media = files
@@ -52,6 +132,9 @@ const media = files
     return {name: name, sourceFile: sourceFile, targetFile: name + Constants.MEDIA_FORMATS.large}
   })
 
+
+
+
 const noMedia = media.length
 if (noMedia == 0) {
   console.log("No media to manage")
@@ -59,7 +142,6 @@ if (noMedia == 0) {
 } 
 else {
   console.log(`${noMedia} media to manage`)
-  /*
   // Collect user input about authors and type of the media (while is async by nature!)
   let idx = 0
   while (idx < media.length) {
@@ -124,7 +206,7 @@ else {
 
   /*  Combine everything into the Mongoose compatible metadata (one for each document)
       Note that name, type and author are provided by helper.mjs, and name is used for id'ing the correct document
-  --
+  */
   const newIslands = media.map(function (medium, i) {
     const b = base[i]
     const rgcd = reverseGeocodingData[i]
@@ -169,7 +251,7 @@ else {
       })
     })
   )
-    */
+
   /// D) Upload media to AWS S3 (requires AWS CLI with proper authentication: Alternative would be an S3 client)
   await Promise.all(
     media.map(fi => 

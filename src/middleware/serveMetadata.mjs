@@ -60,7 +60,7 @@ const beautify = async (mediaFolder, presignedUrls) => {
       actualUrl: url1,
       actualQueryString: url2
     }
-  })   
+  })    
 }
 
 export { beautify } 
