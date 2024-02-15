@@ -1,34 +1,33 @@
-import express from 'express'
-import dotenv from 'dotenv-vault-core'
-dotenv.config()
-import Constants from './src/middleware/constants.mjs'
-import { getUrls } from './src/middleware/serveSignedUrls.mjs'
-import { beautify } from './src/middleware/serveMetadata.mjs'
-import { manage } from './src/middleware/handleBooks.mjs'
-
+import express from "express";
+import dotenv from "dotenv-vault-core";
+dotenv.config();
+import Constants from "./src/middleware/constants.mjs";
+import { getUrls } from "./src/middleware/serveSignedUrls.mjs";
+import { beautify } from "./src/middleware/serveMetadata.mjs";
+import { manage } from "./src/middleware/handleBooks.mjs";
 
 // Update files and metadata
-await manage()
+await manage();
 
 // Get presigned URLs from AWS S3
-const presignedUrls = await getUrls()
+const presignedUrls = await getUrls();
 
 // Initialise Express
-const app = express()
+const app = express();
 
 // Set views directory
-app.set('views', './src/' + 'views')
+app.set("views", "./src/" + "views");
 
 // Render static files from root folder (css, ..)
-app.use(express.static('.'))
+app.use(express.static("."));
 
 // Tell Express server to use ejs view engine
-app.set('view engine', 'ejs')
+app.set("view engine", "ejs");
 
 // Determine port website will run on
-app.listen(process.env.PORT, _ => {
-  console.log(`App is running on port ${process.env.PORT}`)
-})
+app.listen(process.env.PORT, (_) => {
+  console.log(`App is running on port ${process.env.PORT}`);
+});
 
 /* *** GET Routes - display pages ***
     Root Route
@@ -37,29 +36,34 @@ app.listen(process.env.PORT, _ => {
         the uploaded data is somehow used
     --> The ‘/’ specifies the URL of the website the code will activate on
 */
-app.get('/', (req, res, next) => res.render('pages/index'))
-app.get('/about', (req, res, next) => res.render('pages/about'))
+app.get("/", (req, res, next) => res.render("pages/index"));
+app.get("/about", (req, res, next) => res.render("pages/about"));
 
-app.get('/img-viewer', (req, res, next) => {
+app.get("/img-viewer", (req, res, next) => {
   // req.query refers to the querystring components sent by media.ejs
-  res.render('pages/img-viewer', { type: req.query.type, url: req.query.url, qs: req.query.qs } )
-})
+  res.render("pages/img-viewer", {
+    type: req.query.type,
+    url: req.query.url,
+    qs: req.query.qs,
+  });
+});
 
-app.get('/pano-viewer', (req, res, next) => {
+app.get("/pano-viewer", (req, res, next) => {
   // req.query refers to the querystring components sent by media.ejs
-  res.render('pages/pano-viewer', { url: req.query.url, qs: req.query.qs } )
-})
+  res.render("pages/pano-viewer", { url: req.query.url, qs: req.query.qs });
+});
 
 function render() {
   // Route media folders, provide them with  metadata
-  Constants.MEDIA_PAGES.forEach(async mediaPage => {
+  Constants.MEDIA_PAGES.forEach(async (mediaPage) => {
     // Get the metadata documents related to the respective media folder. Sort it. Convert them to JS object
-    const prettyDocs = await beautify(mediaPage, presignedUrls)
+    const prettyDocs = await beautify(mediaPage, presignedUrls);
+    console.log(prettyDocs[0]);
     // Call the media.ejs for each of the media types, with the respective metadata
-    app.get('/' + mediaPage, (req, res, next) => {
-      res.render('pages/media', {data: prettyDocs})
-    })
-  })
+    app.get("/" + mediaPage, (req, res, next) => {
+      res.render("pages/media", { data: prettyDocs });
+    });
+  });
 }
 
-render()
+render();
